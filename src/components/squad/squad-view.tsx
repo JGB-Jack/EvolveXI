@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { archivePlayer } from "@/lib/actions/players";
@@ -134,10 +135,15 @@ export function SquadView({
           <h1 className="text-2xl font-semibold">Your Squad</h1>
           <p className="text-muted-foreground">{teamName}</p>
         </div>
-        <Button onClick={openAdd}>
-          <Plus className="size-4" />
-          Add player
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={openAdd}>
+            <Plus className="size-4" />
+            Add player
+          </Button>
+          <Button render={<Link href="/sessions/new/details" />}>
+            Start assessment
+          </Button>
+        </div>
       </div>
 
       <Table>
