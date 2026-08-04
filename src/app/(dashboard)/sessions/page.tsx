@@ -27,7 +27,12 @@ const PILLAR_LABEL: Record<string, string> = {
   social: "Social",
 };
 
-export default async function SessionsPage() {
+export default async function SessionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ completed?: string }>;
+}) {
+  const { completed } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -66,6 +71,12 @@ export default async function SessionsPage() {
           New session
         </Button>
       </div>
+
+      {completed === "1" && (
+        <p className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
+          Session complete — nice work.
+        </p>
+      )}
 
       {!hasSessions ? (
         <Card>

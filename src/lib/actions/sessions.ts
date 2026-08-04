@@ -67,5 +67,5 @@ export async function createSession(
     return { error: playersError.message };
   }
 
-  redirect("/sessions");
+  redirect(`/sessions/${session.id}/assess/${input.playerIds[0]}`);
 }
