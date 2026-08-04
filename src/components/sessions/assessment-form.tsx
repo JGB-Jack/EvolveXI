@@ -87,6 +87,7 @@ export function AssessmentForm({
   const [unanswered, setUnanswered] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
   const [confirmingSkip, setConfirmingSkip] = useState(false);
+  const [confirmArmed, setConfirmArmed] = useState(false);
 
   const questionsByPillar = new Map<string, Question[]>();
   for (const q of questions) {
@@ -105,6 +106,7 @@ export function AssessmentForm({
       return next;
     });
     setConfirmingSkip(false);
+    setConfirmArmed(false);
     try {
       await saveRating(session.id, player.id, questionId, score);
     } catch (err) {
@@ -133,12 +135,21 @@ export function AssessmentForm({
     if (missing.length > 0 && !confirmingSkip) {
       setUnanswered(new Set(missing.map((q) => q.id)));
       toast.warning(
-        `${missing.length} question${missing.length === 1 ? "" : "s"} unanswered. Click again to continue anyway.`,
+        `${missing.length} question${missing.length === 1 ? "" : "s"} unanswered. Click "Continue anyway" to proceed.`,
       );
       document
         .getElementById(`question-${missing[0].id}`)
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
       setConfirmingSkip(true);
+      setConfirmArmed(false);
+      // Require the button to be seen in its new state for a moment before
+      // it can be pressed, so an impatient double-click doesn't skip past
+      // the warning without the coach ever registering it.
+      setTimeout(() => setConfirmArmed(true), 600);
+      return;
+    }
+
+    if (missing.length > 0 && !confirmArmed) {
       return;
     }
 
@@ -287,13 +298,15 @@ export function AssessmentForm({
           </div>
           <Button
             onClick={handleContinue}
-            disabled={saving}
+            disabled={saving || (confirmingSkip && !confirmArmed)}
             variant={confirmingSkip ? "destructive" : "default"}
           >
             {saving
               ? "Saving..."
               : confirmingSkip
-                ? "Continue anyway"
+                ? confirmArmed
+                  ? "Continue anyway"
+                  : "Unanswered questions..."
                 : isLast
                   ? "Finish session"
                   : "Save & next player"}
