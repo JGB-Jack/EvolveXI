@@ -86,6 +86,7 @@ export function AssessmentForm({
   );
   const [unanswered, setUnanswered] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
+  const [confirmingSkip, setConfirmingSkip] = useState(false);
 
   const questionsByPillar = new Map<string, Question[]>();
   for (const q of questions) {
@@ -103,6 +104,7 @@ export function AssessmentForm({
       next.delete(questionId);
       return next;
     });
+    setConfirmingSkip(false);
     try {
       await saveRating(session.id, player.id, questionId, score);
     } catch (err) {
@@ -128,11 +130,16 @@ export function AssessmentForm({
 
   async function handleContinue() {
     const missing = questions.filter((q) => !(q.id in scores));
-    if (missing.length > 0) {
+    if (missing.length > 0 && !confirmingSkip) {
       setUnanswered(new Set(missing.map((q) => q.id)));
       toast.warning(
-        `${missing.length} question${missing.length === 1 ? "" : "s"} unanswered for this player.`,
+        `${missing.length} question${missing.length === 1 ? "" : "s"} unanswered. Click again to continue anyway.`,
       );
+      document
+        .getElementById(`question-${missing[0].id}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setConfirmingSkip(true);
+      return;
     }
 
     setSaving(true);
@@ -194,6 +201,7 @@ export function AssessmentForm({
                   return (
                     <div
                       key={q.id}
+                      id={`question-${q.id}`}
                       className={cn(
                         "space-y-2 rounded-lg p-2",
                         isUnanswered && "bg-amber-50 ring-1 ring-amber-400",
@@ -277,12 +285,18 @@ export function AssessmentForm({
               Exit session
             </Button>
           </div>
-          <Button onClick={handleContinue} disabled={saving}>
+          <Button
+            onClick={handleContinue}
+            disabled={saving}
+            variant={confirmingSkip ? "destructive" : "default"}
+          >
             {saving
               ? "Saving..."
-              : isLast
-                ? "Finish session"
-                : "Save & next player"}
+              : confirmingSkip
+                ? "Continue anyway"
+                : isLast
+                  ? "Finish session"
+                  : "Save & next player"}
           </Button>
         </div>
       </div>
