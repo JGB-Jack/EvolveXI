@@ -16,6 +16,16 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const { data: team } = await supabase
+    .from("teams")
+    .select("id")
+    .eq("coach_id", user.id)
+    .maybeSingle();
+
+  if (!team) {
+    redirect("/onboarding/team");
+  }
+
   const name = (user.user_metadata?.full_name as string) ?? "";
 
   return (
