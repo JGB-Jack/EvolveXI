@@ -1,5 +1,12 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -10,9 +17,29 @@ export default async function HomePage() {
 
   const { data: team } = await supabase
     .from("teams")
-    .select("name, age_band")
+    .select("id, name, age_band")
     .eq("coach_id", user!.id)
     .single();
+
+  const { count: squadCount } = await supabase
+    .from("players")
+    .select("*", { count: "exact", head: true })
+    .eq("team_id", team!.id)
+    .eq("active", true);
+
+  const { count: sessionCount } = await supabase
+    .from("sessions")
+    .select("*", { count: "exact", head: true })
+    .eq("team_id", team!.id);
+
+  const { data: inProgress } = await supabase
+    .from("sessions")
+    .select("id, date, type")
+    .eq("team_id", team!.id)
+    .is("completed_at", null)
+    .order("date", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   return (
     <div className="space-y-6">
@@ -22,15 +49,39 @@ export default async function HomePage() {
           {team?.name} &middot; {team?.age_band}
         </p>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Phase 2 checkpoint</CardTitle>
-          <CardDescription>
-            Team setup and the question bank are wired up. Squad management
-            arrives in Phase 3.
-          </CardDescription>
-        </CardHeader>
-      </Card>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>{squadCount ?? 0}</CardTitle>
+            <CardDescription>Players in your squad</CardDescription>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>{sessionCount ?? 0}</CardTitle>
+            <CardDescription>Sessions run so far</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+
+      {inProgress && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Resume in-progress session</CardTitle>
+            <CardDescription>
+              {inProgress.type} &middot; {inProgress.date}
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
+      <div className="flex gap-3">
+        <Button render={<Link href="/squad" />}>Go to squad</Button>
+        <Button variant="outline" render={<Link href="/sessions" />}>
+          View sessions
+        </Button>
+      </div>
     </div>
   );
 }
