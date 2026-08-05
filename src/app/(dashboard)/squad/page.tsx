@@ -11,7 +11,7 @@ export default async function SquadPage() {
 
   const { data: team } = await supabase
     .from("teams")
-    .select("id, name")
+    .select("id, name, age_band")
     .eq("coach_id", user.id)
     .single();
 
@@ -30,6 +30,11 @@ export default async function SquadPage() {
   }
 
   return (
-    <SquadView teamId={team.id} teamName={team.name} players={players ?? []} />
+    <SquadView
+      teamId={team.id}
+      teamName={team.name}
+      teamAgeBand={team.age_band}
+      players={players ?? []}
+    />
   );
 }

@@ -38,10 +38,12 @@ type SortKey = "name" | "position" | "squad_number";
 export function SquadView({
   teamId,
   teamName,
+  teamAgeBand,
   players,
 }: {
   teamId: string;
   teamName: string;
+  teamAgeBand: string;
   players: EditablePlayer[];
 }) {
   const router = useRouter();
@@ -103,7 +105,9 @@ export function SquadView({
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-semibold">Your Squad</h1>
-          <p className="text-muted-foreground">{teamName}</p>
+          <p className="text-muted-foreground">
+            {teamName} &middot; {teamAgeBand}
+          </p>
         </div>
         <Card>
           <CardHeader>
@@ -133,7 +137,9 @@ export function SquadView({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Your Squad</h1>
-          <p className="text-muted-foreground">{teamName}</p>
+          <p className="text-muted-foreground">
+            {teamName} &middot; {teamAgeBand}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={openAdd}>
