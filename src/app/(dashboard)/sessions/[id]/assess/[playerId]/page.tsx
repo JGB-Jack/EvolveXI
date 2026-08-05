@@ -14,12 +14,14 @@ export default async function AssessPlayerPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: session } = await supabase
+  const { data: sessionRow } = await supabase
     .from("sessions")
-    .select("id, date, type, opponent, team_id")
+    .select("id, date, type, opponent, team_id, teams(age_band)")
     .eq("id", sessionId)
     .single();
-  if (!session) notFound();
+  if (!sessionRow) notFound();
+  const { teams: teamRow, ...session } = sessionRow;
+  const teamAgeBand = (teamRow as unknown as { age_band: string }).age_band;
 
   const { data: sessionPillars } = await supabase
     .from("session_pillars")
@@ -56,12 +58,24 @@ export default async function AssessPlayerPage({
   const player = ordered[currentIndex];
   if (!player) notFound();
 
+  // Below U10-U11, positions aren't fixed (players rotate freely), so every
+  // player sees the shared "outfield" set regardless of their nominal
+  // position. From U10-U11 up, positional variants (including a
+  // goalkeeper-specific Physical set) are matched to the player's actual
+  // position instead.
+  const isPositionalBand = !["U6-U7", "U8-U9"].includes(teamAgeBand);
+  const variants = !isPositionalBand
+    ? ["all", "outfield"]
+    : player.primary_position === "goalkeeper"
+      ? ["all", "goalkeeper"]
+      : ["all", "outfield", player.primary_position];
+
   const { data: questions } = await supabase
     .from("team_questions")
     .select("*")
     .eq("team_id", session.team_id)
     .in("pillar_id", pillarIds)
-    .in("variant", ["all", "outfield", player.primary_position])
+    .in("variant", variants)
     .order("order_index");
 
   const { data: existingAssessments } = await supabase
