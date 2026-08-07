@@ -9,7 +9,6 @@ import {
   savePillarNotes,
   saveStandoutMoment,
   markPlayerComplete,
-  completeSession,
 } from "@/lib/actions/assessments";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -77,7 +76,6 @@ export function AssessmentForm({
 }) {
   const router = useRouter();
   const player = players[currentIndex];
-  const isLast = currentIndex === players.length - 1;
 
   const [scores, setScores] = useState<Record<string, number>>(existingScores);
   const [notes, setNotes] = useState<Record<string, string>>(existingNotes);
@@ -157,14 +155,7 @@ export function AssessmentForm({
     try {
       await saveStandoutMoment(session.id, player.id, standoutMoment);
       await markPlayerComplete(session.id, player.id);
-
-      if (isLast) {
-        await completeSession(session.id);
-        toast.success("Session complete!");
-        router.push("/sessions?completed=1");
-      } else {
-        router.push(`/sessions/${session.id}/assess/${players[currentIndex + 1].id}`);
-      }
+      router.push(`/sessions/${session.id}/report/${player.id}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to continue");
     } finally {
@@ -307,9 +298,7 @@ export function AssessmentForm({
                 ? confirmArmed
                   ? "Continue anyway"
                   : "Unanswered questions..."
-                : isLast
-                  ? "Finish session"
-                  : "Save & next player"}
+                : "Save & view report"}
           </Button>
         </div>
       </div>
