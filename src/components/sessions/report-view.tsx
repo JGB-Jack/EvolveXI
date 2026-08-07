@@ -26,6 +26,7 @@ const PILLAR_NAME: Record<string, string> = {
   psychological: "Psychological",
   social: "Social",
 };
+const PILLAR_ORDER = ["technical", "physical", "tactical", "psychological", "social"];
 
 const POSITION_LABEL: Record<string, string> = {
   defence: "Defence",
@@ -206,7 +207,13 @@ export function ReportView({
             </CardContent>
           </Card>
 
-          {content.pillars.map((p) => (
+          {[...content.pillars]
+            .sort(
+              (a, b) =>
+                PILLAR_ORDER.indexOf(a.pillar_id) -
+                PILLAR_ORDER.indexOf(b.pillar_id),
+            )
+            .map((p) => (
             <Card key={p.pillar_id}>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between text-base">
