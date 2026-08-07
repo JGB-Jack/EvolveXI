@@ -27,12 +27,7 @@ const PILLAR_LABEL: Record<string, string> = {
   social: "Social",
 };
 
-export default async function SessionsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ completed?: string }>;
-}) {
-  const { completed } = await searchParams;
+export default async function SessionsPage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -50,7 +45,7 @@ export default async function SessionsPage({
   const { data: sessions } = await supabase
     .from("sessions")
     .select(
-      "id, date, type, opponent, session_pillars(pillar_id), session_players(player_id)",
+      "id, date, type, opponent, completed_at, session_pillars(pillar_id), session_players(player_id)",
     )
     .eq("team_id", team.id)
     .order("date", { ascending: false });
@@ -72,12 +67,6 @@ export default async function SessionsPage({
         </Button>
       </div>
 
-      {completed === "1" && (
-        <p className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
-          Session complete — nice work.
-        </p>
-      )}
-
       {!hasSessions ? (
         <Card>
           <CardHeader>
@@ -95,6 +84,8 @@ export default async function SessionsPage({
               <TableHead>Type</TableHead>
               <TableHead>Pillars</TableHead>
               <TableHead>Players</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -115,6 +106,36 @@ export default async function SessionsPage({
                   </div>
                 </TableCell>
                 <TableCell>{session.session_players.length}</TableCell>
+                <TableCell>
+                  {session.completed_at ? (
+                    <Badge variant="outline">Complete</Badge>
+                  ) : (
+                    <Badge>In progress</Badge>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  {session.completed_at ? (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      render={<Link href={`/sessions/${session.id}/dashboard`} />}
+                    >
+                      Dashboard
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      render={
+                        <Link
+                          href={`/sessions/${session.id}/assess/${session.session_players[0]?.player_id}`}
+                        />
+                      }
+                    >
+                      Resume
+                    </Button>
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

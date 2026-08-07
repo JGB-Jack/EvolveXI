@@ -145,7 +145,7 @@ export function ReportView({
       setSaving(true);
       try {
         await completeSession(sessionId);
-        router.push("/sessions?completed=1");
+        router.push(`/sessions/${sessionId}/complete`);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Failed to finish session");
         setSaving(false);
