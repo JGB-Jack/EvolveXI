@@ -80,7 +80,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Create your NextXI account</CardTitle>
+          <CardTitle>Create your EvolveXI account</CardTitle>
           <CardDescription>
             Start assessing your squad in minutes.
           </CardDescription>

@@ -62,7 +62,7 @@ function LoginForm() {
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Log in to NextXI</CardTitle>
+          <CardTitle>Log in to EvolveXI</CardTitle>
           <CardDescription>Welcome back, coach.</CardDescription>
         </CardHeader>
         <CardContent>

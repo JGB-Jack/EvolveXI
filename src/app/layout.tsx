@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NextXI — Watch. Assess. Develop.",
+  title: "EvolveXI — Watch. Assess. Develop.",
   description:
     "Player assessment and development tracking for grassroots football coaches.",
 };
