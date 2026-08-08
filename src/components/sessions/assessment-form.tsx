@@ -20,7 +20,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, ChevronDown } from "lucide-react";
 
 const PILLAR_ORDER = [
   { id: "technical", name: "Technical" },
@@ -86,6 +86,16 @@ export function AssessmentForm({
   const [saving, setSaving] = useState(false);
   const [confirmingSkip, setConfirmingSkip] = useState(false);
   const [confirmArmed, setConfirmArmed] = useState(false);
+  const [expandedRefs, setExpandedRefs] = useState<Set<string>>(new Set());
+
+  function toggleRef(questionId: string) {
+    setExpandedRefs((prev) => {
+      const next = new Set(prev);
+      if (next.has(questionId)) next.delete(questionId);
+      else next.add(questionId);
+      return next;
+    });
+  }
 
   const questionsByPillar = new Map<string, Question[]>();
   for (const q of questions) {
@@ -231,6 +241,37 @@ export function AssessmentForm({
                         <p className="text-sm text-muted-foreground">
                           {anchors[selected - 1]}
                         </p>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => toggleRef(q.id)}
+                        aria-expanded={expandedRefs.has(q.id)}
+                        className="flex items-center gap-1.5 text-sm font-medium text-primary"
+                      >
+                        <ChevronDown
+                          className={cn(
+                            "size-3.5 transition-transform",
+                            expandedRefs.has(q.id) && "rotate-180",
+                          )}
+                        />
+                        {expandedRefs.has(q.id)
+                          ? "Hide all 5 descriptions"
+                          : "Show all 5 descriptions"}
+                      </button>
+                      {expandedRefs.has(q.id) && (
+                        <div className="space-y-1.5 border-t border-dashed pt-2">
+                          {anchors.map((anchor, i) => (
+                            <div
+                              key={i}
+                              className="flex gap-2 text-sm text-muted-foreground"
+                            >
+                              <span className="shrink-0 font-medium text-foreground">
+                                {i + 1}
+                              </span>
+                              <span>{anchor}</span>
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </div>
                   );
