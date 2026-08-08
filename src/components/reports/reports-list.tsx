@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
@@ -63,45 +64,81 @@ export function ReportsList({ reports }: { reports: Report[] }) {
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm"
       />
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Player</TableHead>
-            <TableHead>Session</TableHead>
-            <TableHead>Generated</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filtered.map((r) => (
-            <TableRow key={r.id}>
-              <TableCell className="font-medium">
-                {r.players?.first_name} {r.players?.last_name}
-              </TableCell>
-              <TableCell>
-                {r.sessions?.type}
-                {r.sessions?.opponent ? ` vs ${r.sessions.opponent}` : ""}
-                {" · "}
-                {r.sessions?.date}
-              </TableCell>
-              <TableCell>
-                {new Date(r.created_at).toLocaleDateString()}
-              </TableCell>
-              <TableCell className="text-right">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  render={
-                    <Link href={`/sessions/${r.session_id}/report/${r.player_id}`} />
-                  }
-                >
-                  View
-                </Button>
-              </TableCell>
+      {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
+      <div className="space-y-3 sm:hidden">
+        {filtered.map((r) => (
+          <Card key={r.id}>
+            <CardContent className="flex items-center justify-between gap-3 py-4">
+              <div className="min-w-0">
+                <p className="truncate font-medium">
+                  {r.players?.first_name} {r.players?.last_name}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {r.sessions?.type}
+                  {r.sessions?.opponent ? ` vs ${r.sessions.opponent}` : ""}
+                  {" · "}
+                  {r.sessions?.date}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Generated {new Date(r.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="shrink-0"
+                render={
+                  <Link href={`/sessions/${r.session_id}/report/${r.player_id}`} />
+                }
+              >
+                View
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="hidden sm:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Player</TableHead>
+              <TableHead>Session</TableHead>
+              <TableHead>Generated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {filtered.map((r) => (
+              <TableRow key={r.id}>
+                <TableCell className="font-medium">
+                  {r.players?.first_name} {r.players?.last_name}
+                </TableCell>
+                <TableCell>
+                  {r.sessions?.type}
+                  {r.sessions?.opponent ? ` vs ${r.sessions.opponent}` : ""}
+                  {" · "}
+                  {r.sessions?.date}
+                </TableCell>
+                <TableCell>
+                  {new Date(r.created_at).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    render={
+                      <Link href={`/sessions/${r.session_id}/report/${r.player_id}`} />
+                    }
+                  >
+                    View
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

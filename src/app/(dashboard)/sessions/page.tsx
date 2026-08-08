@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
+  CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
@@ -77,26 +78,29 @@ export default async function SessionsPage() {
           </CardHeader>
         </Card>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Pillars</TableHead>
-              <TableHead>Players</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+        <>
+          {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
+          <div className="space-y-3 sm:hidden">
             {sessions!.map((session) => (
-              <TableRow key={session.id}>
-                <TableCell>{session.date}</TableCell>
-                <TableCell>
-                  {session.type}
-                  {session.opponent ? ` vs ${session.opponent}` : ""}
-                </TableCell>
-                <TableCell>
+              <Card key={session.id}>
+                <CardContent className="space-y-3 py-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-medium">
+                        {session.type}
+                        {session.opponent ? ` vs ${session.opponent}` : ""}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {session.date} &middot; {session.session_players.length}{" "}
+                        player{session.session_players.length === 1 ? "" : "s"}
+                      </p>
+                    </div>
+                    {session.completed_at ? (
+                      <Badge variant="outline">Complete</Badge>
+                    ) : (
+                      <Badge>In progress</Badge>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-1">
                     {session.session_pillars.map((sp) => (
                       <Badge key={sp.pillar_id} variant="secondary">
@@ -104,20 +108,11 @@ export default async function SessionsPage() {
                       </Badge>
                     ))}
                   </div>
-                </TableCell>
-                <TableCell>{session.session_players.length}</TableCell>
-                <TableCell>
-                  {session.completed_at ? (
-                    <Badge variant="outline">Complete</Badge>
-                  ) : (
-                    <Badge>In progress</Badge>
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
                   {session.completed_at ? (
                     <Button
                       size="sm"
-                      variant="ghost"
+                      variant="outline"
+                      className="w-full"
                       render={<Link href={`/sessions/${session.id}/dashboard`} />}
                     >
                       Dashboard
@@ -125,7 +120,8 @@ export default async function SessionsPage() {
                   ) : (
                     <Button
                       size="sm"
-                      variant="ghost"
+                      variant="outline"
+                      className="w-full"
                       render={
                         <Link
                           href={`/sessions/${session.id}/assess/${session.session_players[0]?.player_id}`}
@@ -135,11 +131,77 @@ export default async function SessionsPage() {
                       Resume
                     </Button>
                   )}
-                </TableCell>
-              </TableRow>
+                </CardContent>
+              </Card>
             ))}
-          </TableBody>
-        </Table>
+          </div>
+
+          <div className="hidden sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Pillars</TableHead>
+                  <TableHead>Players</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sessions!.map((session) => (
+                  <TableRow key={session.id}>
+                    <TableCell>{session.date}</TableCell>
+                    <TableCell>
+                      {session.type}
+                      {session.opponent ? ` vs ${session.opponent}` : ""}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {session.session_pillars.map((sp) => (
+                          <Badge key={sp.pillar_id} variant="secondary">
+                            {PILLAR_LABEL[sp.pillar_id]}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>{session.session_players.length}</TableCell>
+                    <TableCell>
+                      {session.completed_at ? (
+                        <Badge variant="outline">Complete</Badge>
+                      ) : (
+                        <Badge>In progress</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {session.completed_at ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          render={<Link href={`/sessions/${session.id}/dashboard`} />}
+                        >
+                          Dashboard
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          render={
+                            <Link
+                              href={`/sessions/${session.id}/assess/${session.session_players[0]?.player_id}`}
+                            />
+                          }
+                        >
+                          Resume
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       )}
     </div>
   );

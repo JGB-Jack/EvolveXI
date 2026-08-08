@@ -115,62 +115,102 @@ export function SessionDashboard({
         </div>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead
-              className="cursor-pointer select-none"
-              onClick={() => toggleSort("name")}
-            >
-              Player
-            </TableHead>
-            {pillarIds.map((id) => (
-              <TableHead
-                key={id}
-                className="cursor-pointer select-none"
-                onClick={() => toggleSort(id)}
+      {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
+      <div className="space-y-3 sm:hidden">
+        {sorted.map(({ player, pillarAverages, overall }) => (
+          <Card key={player.id}>
+            <CardContent className="space-y-3 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-medium">
+                  {player.first_name} {player.last_name}
+                </p>
+                <span className={cn("text-lg", scoreColorClass(overall))}>
+                  {formatScore(overall)}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                {pillarIds.map((id) => (
+                  <span key={id} className="text-muted-foreground">
+                    {PILLAR_NAME[id]}{" "}
+                    <span className={scoreColorClass(pillarAverages[id])}>
+                      {formatScore(pillarAverages[id])}
+                    </span>
+                  </span>
+                ))}
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full"
+                render={
+                  <Link href={`/sessions/${session.id}/report/${player.id}`} />
+                }
               >
-                {PILLAR_NAME[id]}
+                View report
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="hidden sm:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => toggleSort("name")}
+              >
+                Player
               </TableHead>
-            ))}
-            <TableHead
-              className="cursor-pointer select-none"
-              onClick={() => toggleSort("overall")}
-            >
-              Overall
-            </TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sorted.map(({ player, pillarAverages, overall }) => (
-            <TableRow key={player.id}>
-              <TableCell className="font-medium">
-                {player.first_name} {player.last_name}
-              </TableCell>
               {pillarIds.map((id) => (
-                <TableCell key={id} className={cn(scoreColorClass(pillarAverages[id]))}>
-                  {formatScore(pillarAverages[id])}
-                </TableCell>
-              ))}
-              <TableCell className={cn(scoreColorClass(overall))}>
-                {formatScore(overall)}
-              </TableCell>
-              <TableCell className="text-right">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  render={
-                    <Link href={`/sessions/${session.id}/report/${player.id}`} />
-                  }
+                <TableHead
+                  key={id}
+                  className="cursor-pointer select-none"
+                  onClick={() => toggleSort(id)}
                 >
-                  View report
-                </Button>
-              </TableCell>
+                  {PILLAR_NAME[id]}
+                </TableHead>
+              ))}
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => toggleSort("overall")}
+              >
+                Overall
+              </TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {sorted.map(({ player, pillarAverages, overall }) => (
+              <TableRow key={player.id}>
+                <TableCell className="font-medium">
+                  {player.first_name} {player.last_name}
+                </TableCell>
+                {pillarIds.map((id) => (
+                  <TableCell key={id} className={cn(scoreColorClass(pillarAverages[id]))}>
+                    {formatScore(pillarAverages[id])}
+                  </TableCell>
+                ))}
+                <TableCell className={cn(scoreColorClass(overall))}>
+                  {formatScore(overall)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    render={
+                      <Link href={`/sessions/${session.id}/report/${player.id}`} />
+                    }
+                  >
+                    View report
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <div>
         <h2 className="mb-4 text-lg font-semibold">Player profiles</h2>

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import {
   Card,
+  CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
@@ -152,55 +153,29 @@ export function SquadView({
         </div>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead
-              className="cursor-pointer select-none"
-              onClick={() => toggleSort("name")}
-            >
-              Name
-            </TableHead>
-            <TableHead
-              className="cursor-pointer select-none"
-              onClick={() => toggleSort("position")}
-            >
-              Position
-            </TableHead>
-            <TableHead
-              className="cursor-pointer select-none"
-              onClick={() => toggleSort("squad_number")}
-            >
-              Squad #
-            </TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sorted.map((player) => (
-            <TableRow key={player.id}>
-              <TableCell>
+      {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
+      <div className="space-y-3 sm:hidden">
+        {sorted.map((player) => (
+          <Card key={player.id}>
+            <CardContent className="flex items-center justify-between gap-3 py-4">
+              <div className="min-w-0">
                 <button
-                  className="font-medium underline-offset-2 hover:underline"
+                  className="truncate font-medium underline-offset-2 hover:underline"
                   onClick={() =>
                     router.push(`/squad/player/${player.id}/profile`)
                   }
                 >
                   {player.first_name} {player.last_name}
                 </button>
-              </TableCell>
-              <TableCell>
-                {POSITION_LABEL[player.primary_position]}
-                {player.secondary_position &&
-                  ` / ${POSITION_LABEL[player.secondary_position]}`}
-              </TableCell>
-              <TableCell>{player.squad_number ?? "-"}</TableCell>
-              <TableCell className="text-right">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => openEdit(player)}
-                >
+                <p className="text-sm text-muted-foreground">
+                  {POSITION_LABEL[player.primary_position]}
+                  {player.secondary_position &&
+                    ` / ${POSITION_LABEL[player.secondary_position]}`}
+                  {player.squad_number && ` · #${player.squad_number}`}
+                </p>
+              </div>
+              <div className="flex shrink-0 gap-1">
+                <Button size="sm" variant="ghost" onClick={() => openEdit(player)}>
                   Edit
                 </Button>
                 <Button
@@ -210,11 +185,77 @@ export function SquadView({
                 >
                   Archive
                 </Button>
-              </TableCell>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="hidden sm:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => toggleSort("name")}
+              >
+                Name
+              </TableHead>
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => toggleSort("position")}
+              >
+                Position
+              </TableHead>
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => toggleSort("squad_number")}
+              >
+                Squad #
+              </TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {sorted.map((player) => (
+              <TableRow key={player.id}>
+                <TableCell>
+                  <button
+                    className="font-medium underline-offset-2 hover:underline"
+                    onClick={() =>
+                      router.push(`/squad/player/${player.id}/profile`)
+                    }
+                  >
+                    {player.first_name} {player.last_name}
+                  </button>
+                </TableCell>
+                <TableCell>
+                  {POSITION_LABEL[player.primary_position]}
+                  {player.secondary_position &&
+                    ` / ${POSITION_LABEL[player.secondary_position]}`}
+                </TableCell>
+                <TableCell>{player.squad_number ?? "-"}</TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => openEdit(player)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleArchive(player)}
+                  >
+                    Archive
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <PlayerFormSheet
         open={sheetOpen}
