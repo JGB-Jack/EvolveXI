@@ -58,7 +58,7 @@ export function NavBar({
                   )}
                 >
                   <Icon className="size-4" />
-                  <span className="hidden sm:inline">{label}</span>
+                  <span className="hidden lg:inline">{label}</span>
                 </Link>
               );
             })}
