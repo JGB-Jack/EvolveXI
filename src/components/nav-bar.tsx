@@ -26,17 +26,24 @@ export function NavBar({
     : email[0]?.toUpperCase();
 
   return (
-    <header className="border-b bg-background">
+    <header className="bg-primary">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <span className="text-lg font-semibold tracking-tight text-primary">
+        <span className="text-lg font-semibold tracking-tight text-primary-foreground">
           EvolveXI
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger
-            render={<Button variant="ghost" className="gap-2 px-2" />}
+            render={
+              <Button
+                variant="ghost"
+                className="gap-2 px-2 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+              />
+            }
           >
             <Avatar className="size-7">
-              <AvatarFallback>{initials}</AvatarFallback>
+              <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground">
+                {initials}
+              </AvatarFallback>
             </Avatar>
             <span className="hidden text-sm md:inline">{name || email}</span>
           </DropdownMenuTrigger>
