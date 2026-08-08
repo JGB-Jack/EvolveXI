@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
-      <span className="text-3xl font-semibold tracking-tight">EvolveXI</span>
+      <span className="text-3xl font-semibold tracking-tight text-primary">
+        EvolveXI
+      </span>
       <h1 className="max-w-xl text-4xl font-semibold tracking-tight">
         Know what to look for. Develop better players.
       </h1>
