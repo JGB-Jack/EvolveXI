@@ -55,18 +55,22 @@ export default async function HomePage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>{squadCount ?? 0}</CardTitle>
-            <CardDescription>Players in your squad</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>{sessionCount ?? 0}</CardTitle>
-            <CardDescription>Sessions run so far</CardDescription>
-          </CardHeader>
-        </Card>
+        <Link href="/squad" className="block">
+          <Card className="transition-colors hover:bg-muted/50">
+            <CardHeader>
+              <CardTitle>{squadCount ?? 0}</CardTitle>
+              <CardDescription>Players in your squad</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+        <Link href="/sessions" className="block">
+          <Card className="transition-colors hover:bg-muted/50">
+            <CardHeader>
+              <CardTitle>{sessionCount ?? 0}</CardTitle>
+              <CardDescription>Sessions run so far</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
       </div>
 
       {inProgress && resumePlayerId && (
