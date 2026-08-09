@@ -62,7 +62,7 @@ export function ReportsList({ reports }: { reports: Report[] }) {
         placeholder="Search by player name..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm"
+        className="max-w-sm bg-background"
       />
       {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
       <div className="space-y-3 sm:hidden">
@@ -98,7 +98,7 @@ export function ReportsList({ reports }: { reports: Report[] }) {
         ))}
       </div>
 
-      <div className="hidden sm:block">
+      <Card className="hidden sm:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -138,7 +138,7 @@ export function ReportsList({ reports }: { reports: Report[] }) {
             ))}
           </TableBody>
         </Table>
-      </div>
+      </Card>
     </div>
   );
 }

@@ -27,8 +27,8 @@ export default async function SessionPlayersPage() {
   return (
     <div className="mx-auto max-w-lg space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Select players</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-semibold text-white">Select players</h1>
+        <p className="text-white/70">
           All players are selected by default &mdash; deselect anyone
           absent or injured.
         </p>

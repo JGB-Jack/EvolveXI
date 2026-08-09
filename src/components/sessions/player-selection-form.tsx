@@ -75,7 +75,7 @@ export function PlayerSelectionForm({
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2 rounded-lg border">
+      <div className="space-y-2 rounded-lg border bg-card">
         {players.map((player) => {
           const checked = state.playerIds.includes(player.id);
           return (

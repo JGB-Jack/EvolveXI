@@ -102,8 +102,8 @@ export function SessionDashboard({
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Session dashboard</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-semibold text-white">Session dashboard</h1>
+        <p className="text-white/70">
           {sessionLabel} &middot; {session.date}
         </p>
         <div className="mt-2 flex flex-wrap gap-1">
@@ -153,7 +153,7 @@ export function SessionDashboard({
         ))}
       </div>
 
-      <div className="hidden sm:block">
+      <Card className="hidden sm:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -210,10 +210,10 @@ export function SessionDashboard({
             ))}
           </TableBody>
         </Table>
-      </div>
+      </Card>
 
       <div>
-        <h2 className="mb-4 text-lg font-semibold">Player profiles</h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">Player profiles</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {playerScores.map(({ player, pillarAverages }) => {
             const data = pillarIds.map((id) => ({

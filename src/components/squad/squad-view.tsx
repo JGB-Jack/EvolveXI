@@ -105,8 +105,8 @@ export function SquadView({
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold">Your Squad</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-semibold text-white">Your Squad</h1>
+          <p className="text-white/70">
             {teamName} &middot; {teamAgeBand}
           </p>
         </div>
@@ -137,8 +137,8 @@ export function SquadView({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Your Squad</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-semibold text-white">Your Squad</h1>
+          <p className="text-white/70">
             {teamName} &middot; {teamAgeBand}
           </p>
         </div>
@@ -191,7 +191,7 @@ export function SquadView({
         ))}
       </div>
 
-      <div className="hidden sm:block">
+      <Card className="hidden sm:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -255,7 +255,7 @@ export function SquadView({
             ))}
           </TableBody>
         </Table>
-      </div>
+      </Card>
 
       <PlayerFormSheet
         open={sheetOpen}

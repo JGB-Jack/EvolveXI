@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -181,19 +182,21 @@ export function AssessmentForm({
     <div className="mx-auto max-w-2xl space-y-6 pb-24">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">
+          <h1 className="text-xl font-semibold text-white">
             {player.first_name} {player.last_name}
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-white/70">
             {POSITION_LABEL[player.primary_position]} &middot; {sessionLabel}{" "}
             &middot; {session.date}
           </p>
         </div>
-        <div className="text-right text-sm text-muted-foreground">
+        <div className="text-right text-sm text-white/70">
           Player {currentIndex + 1} of {players.length}
         </div>
       </div>
 
+      <Card>
+      <CardContent>
       <Accordion defaultValue={visiblePillars.map((p) => p.id)}>
         {visiblePillars.map((pillar) => (
           <AccordionItem key={pillar.id} value={pillar.id}>
@@ -306,6 +309,8 @@ export function AssessmentForm({
           onBlur={handleStandoutBlur}
         />
       </div>
+      </CardContent>
+      </Card>
 
       <div className="fixed inset-x-0 bottom-0 border-t bg-background p-4">
         <div className="mx-auto flex max-w-2xl items-center justify-between">

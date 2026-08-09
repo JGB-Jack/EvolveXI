@@ -57,8 +57,8 @@ export default async function SessionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Sessions</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-semibold text-white">Sessions</h1>
+          <p className="text-white/70">
             Your assessment session history.
           </p>
         </div>
@@ -136,7 +136,7 @@ export default async function SessionsPage() {
             ))}
           </div>
 
-          <div className="hidden sm:block">
+          <Card className="hidden sm:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -200,7 +200,7 @@ export default async function SessionsPage() {
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </Card>
         </>
       )}
     </div>

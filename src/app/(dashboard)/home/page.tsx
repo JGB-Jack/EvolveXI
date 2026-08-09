@@ -26,8 +26,8 @@ export default async function HomePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Welcome, {name}</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-semibold text-white">Welcome, {name}</h1>
+        <p className="text-white/70">
           {team?.name} &middot; {team?.age_band}
         </p>
       </div>

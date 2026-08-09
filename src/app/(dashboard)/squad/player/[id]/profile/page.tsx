@@ -37,6 +37,7 @@ export default async function PlayerProfilePage({
       <Button
         variant="ghost"
         size="sm"
+        className="text-white hover:text-white"
         render={<Link href="/squad" />}
       >
         <ArrowLeft className="size-4" />
@@ -44,10 +45,10 @@ export default async function PlayerProfilePage({
       </Button>
 
       <div>
-        <h1 className="text-2xl font-semibold">
+        <h1 className="text-2xl font-semibold text-white">
           {player.first_name} {player.last_name}
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-white/70">
           {POSITION_LABEL[player.primary_position]}
           {player.secondary_position &&
             ` / ${POSITION_LABEL[player.secondary_position]}`}

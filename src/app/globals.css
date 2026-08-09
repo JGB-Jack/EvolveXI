@@ -129,13 +129,16 @@
   }
 }
 
-/* Floodlit pitch photo backdrop for app backgrounds, with a scrim so
-   text and cards sitting directly on it stay readable. */
+/* Floodlit pitch photo backdrop for app backgrounds. Deliberately a
+   fixed dark scrim regardless of light/dark theme -- headline text
+   sitting directly on it is styled white inline (text-white / text-white/70)
+   to match; cards remain theme-aware since they sit on top with their
+   own background. */
 .pitch-bg {
   background-color: var(--background);
   background-image: linear-gradient(
-      color-mix(in oklch, var(--background) 60%, transparent),
-      color-mix(in oklch, var(--background) 60%, transparent)
+      rgba(8, 16, 11, 0.62),
+      rgba(8, 16, 11, 0.62)
     ),
     url("/pitch-bg.jpg");
   background-size: cover;

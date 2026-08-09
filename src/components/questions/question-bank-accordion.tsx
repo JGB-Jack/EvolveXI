@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { QuestionEditor, type TeamQuestionRow } from "@/components/onboarding/question-editor";
 import { AddQuestionButton } from "@/components/onboarding/add-question-button";
@@ -51,6 +52,8 @@ export function QuestionBankAccordion({
   }
 
   return (
+    <Card>
+      <CardContent>
     <Accordion
       defaultValue={defaultExpanded ? PILLAR_ORDER.map((p) => p.id) : []}
     >
@@ -112,5 +115,7 @@ export function QuestionBankAccordion({
         );
       })}
     </Accordion>
+      </CardContent>
+    </Card>
   );
 }
