@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Home, Users, ClipboardList, FileText, Settings } from "lucide-react";
 
 const MENU_ITEMS = [
@@ -36,13 +36,9 @@ export default async function HomePage() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         {MENU_ITEMS.map(({ href, label, icon: Icon }) => (
           <Link key={href} href={href} className="block">
-            <Card className="items-center gap-3 py-8 text-center transition-colors hover:bg-muted/50">
+            <Card className="flex flex-col items-center justify-center gap-2 py-8 transition-colors hover:bg-muted/50">
               <Icon className="size-8 text-primary" />
-              <CardHeader className="p-0">
-                <CardTitle className="text-base font-medium">
-                  {label}
-                </CardTitle>
-              </CardHeader>
+              <span className="text-base font-medium">{label}</span>
             </Card>
           </Link>
         ))}
