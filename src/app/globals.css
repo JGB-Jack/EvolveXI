@@ -134,8 +134,8 @@
 .pitch-bg {
   background-color: var(--background);
   background-image: linear-gradient(
-      color-mix(in oklch, var(--background) 91%, transparent),
-      color-mix(in oklch, var(--background) 91%, transparent)
+      color-mix(in oklch, var(--background) 60%, transparent),
+      color-mix(in oklch, var(--background) 60%, transparent)
     ),
     url("/pitch-bg.jpg");
   background-size: cover;
