@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +19,8 @@ export function NavBar({
   name: string;
   email: string;
 }) {
+  const pathname = usePathname();
+  const isHome = pathname === "/home";
   const initials = name
     ? name
         .split(" ")
@@ -31,7 +36,17 @@ export function NavBar({
         <span className="text-lg font-semibold tracking-tight text-primary-foreground">
           EvolveXI
         </span>
-        <DropdownMenu>
+        <div className="flex items-center gap-1">
+          {!isHome && (
+            <Link
+              href="/home"
+              className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary-foreground/10"
+            >
+              <ChevronLeft className="size-4" />
+              Home
+            </Link>
+          )}
+          <DropdownMenu>
           <DropdownMenuTrigger
             render={
               <Button
@@ -57,7 +72,8 @@ export function NavBar({
               </button>
             </form>
           </DropdownMenuContent>
-        </DropdownMenu>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
   );
