@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import {
   Card,
@@ -32,12 +33,17 @@ export default async function HomePage() {
 
   const { data: inProgress } = await supabase
     .from("sessions")
-    .select("id, date, type")
+    .select("id, date, type, session_players(player_id, completed_at)")
     .eq("team_id", team!.id)
     .is("completed_at", null)
     .order("date", { ascending: false })
     .limit(1)
     .maybeSingle();
+
+  const resumePlayerId = inProgress
+    ? (inProgress.session_players.find((sp) => !sp.completed_at) ??
+        inProgress.session_players[0])?.player_id
+    : null;
 
   return (
     <div className="space-y-6">
@@ -63,15 +69,20 @@ export default async function HomePage() {
         </Card>
       </div>
 
-      {inProgress && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Resume in-progress session</CardTitle>
-            <CardDescription>
-              {inProgress.type} &middot; {inProgress.date}
-            </CardDescription>
-          </CardHeader>
-        </Card>
+      {inProgress && resumePlayerId && (
+        <Link
+          href={`/sessions/${inProgress.id}/assess/${resumePlayerId}`}
+          className="block"
+        >
+          <Card className="transition-colors hover:bg-muted/50">
+            <CardHeader>
+              <CardTitle>Resume in-progress session</CardTitle>
+              <CardDescription>
+                {inProgress.type} &middot; {inProgress.date}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
       )}
     </div>
   );
