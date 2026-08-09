@@ -129,14 +129,16 @@
   }
 }
 
-/* Subtle mown-grass pitch texture for app backgrounds. */
+/* Floodlit pitch photo backdrop for app backgrounds, with a scrim so
+   text and cards sitting directly on it stay readable. */
 .pitch-bg {
   background-color: var(--background);
-  background-image: repeating-linear-gradient(
-    120deg,
-    color-mix(in oklch, var(--primary) 7%, var(--background)) 0px,
-    color-mix(in oklch, var(--primary) 7%, var(--background)) 48px,
-    var(--background) 48px,
-    var(--background) 96px
-  );
+  background-image: linear-gradient(
+      color-mix(in oklch, var(--background) 82%, transparent),
+      color-mix(in oklch, var(--background) 82%, transparent)
+    ),
+    url("/pitch-bg.jpg");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
 }
