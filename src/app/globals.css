@@ -128,3 +128,15 @@
     @apply font-sans;
   }
 }
+
+/* Subtle mown-grass pitch texture for app backgrounds. */
+.pitch-bg {
+  background-color: var(--background);
+  background-image: repeating-linear-gradient(
+    120deg,
+    color-mix(in oklch, var(--primary) 7%, var(--background)) 0px,
+    color-mix(in oklch, var(--primary) 7%, var(--background)) 48px,
+    var(--background) 48px,
+    var(--background) 96px
+  );
+}

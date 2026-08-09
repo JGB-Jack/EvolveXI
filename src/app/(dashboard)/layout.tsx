@@ -29,7 +29,7 @@ export default async function DashboardLayout({
   const name = (user.user_metadata?.full_name as string) ?? "";
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="pitch-bg min-h-screen">
       <NavBar name={name} email={user.email ?? ""} />
       <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
     </div>
