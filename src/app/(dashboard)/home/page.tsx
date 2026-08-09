@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
-import { Home, Users, ClipboardList, FileText, Settings } from "lucide-react";
+import { Users, ClipboardList, FileText, Settings } from "lucide-react";
 
 const MENU_ITEMS = [
-  { href: "/home", label: "Home", icon: Home },
   { href: "/squad", label: "Squad", icon: Users },
   { href: "/sessions", label: "Sessions", icon: ClipboardList },
   { href: "/reports", label: "Reports", icon: FileText },
@@ -33,7 +32,7 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {MENU_ITEMS.map(({ href, label, icon: Icon }) => (
           <Link key={href} href={href} className="block">
             <Card className="flex flex-col items-center justify-center gap-2 py-8 transition-colors hover:bg-muted/50">
