@@ -1,6 +1,4 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -75,13 +73,6 @@ export default async function HomePage() {
           </CardHeader>
         </Card>
       )}
-
-      <div className="flex gap-3">
-        <Button render={<Link href="/squad" />}>Go to squad</Button>
-        <Button variant="outline" render={<Link href="/sessions" />}>
-          View sessions
-        </Button>
-      </div>
     </div>
   );
 }
