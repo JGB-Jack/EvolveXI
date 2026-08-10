@@ -63,3 +63,13 @@ export async function archivePlayer(id: string) {
 
   if (error) throw new Error(error.message);
 }
+
+export async function restorePlayer(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("players")
+    .update({ active: true, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+}

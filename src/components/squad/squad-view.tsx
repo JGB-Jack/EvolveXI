@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { archivePlayer } from "@/lib/actions/players";
+import { archivePlayer, restorePlayer } from "@/lib/actions/players";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -36,16 +36,25 @@ const POSITION_LABEL: Record<string, string> = {
 
 type SortKey = "name" | "position" | "squad_number";
 
+type ArchivedPlayer = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  primary_position: string;
+};
+
 export function SquadView({
   teamId,
   teamName,
   teamAgeBand,
   players,
+  archivedPlayers,
 }: {
   teamId: string;
   teamName: string;
   teamAgeBand: string;
   players: EditablePlayer[];
+  archivedPlayers: ArchivedPlayer[];
 }) {
   const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -101,6 +110,54 @@ export function SquadView({
     }
   }
 
+  async function handleRestore(player: ArchivedPlayer) {
+    try {
+      await restorePlayer(player.id);
+      toast.success(`${player.first_name} restored`);
+      router.refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to restore");
+    }
+  }
+
+  const archivedSection = archivedPlayers.length > 0 && (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">
+          Archived players ({archivedPlayers.length})
+        </CardTitle>
+        <CardDescription>
+          Archived players are hidden from your squad but their history is
+          kept. Restore anyone archived by mistake.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {archivedPlayers.map((player) => (
+          <div
+            key={player.id}
+            className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2"
+          >
+            <span className="min-w-0 truncate">
+              {player.first_name} {player.last_name}
+              <span className="text-muted-foreground">
+                {" "}
+                &middot; {POSITION_LABEL[player.primary_position]}
+              </span>
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              className="shrink-0"
+              onClick={() => handleRestore(player)}
+            >
+              Restore
+            </Button>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+
   if (players.length === 0) {
     return (
       <div className="space-y-6">
@@ -123,6 +180,7 @@ export function SquadView({
           <Plus className="size-4" />
           Add player
         </Button>
+        {archivedSection}
         <PlayerFormSheet
           open={sheetOpen}
           onOpenChange={setSheetOpen}
@@ -256,6 +314,8 @@ export function SquadView({
           </TableBody>
         </Table>
       </Card>
+
+      {archivedSection}
 
       <PlayerFormSheet
         open={sheetOpen}

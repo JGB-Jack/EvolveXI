@@ -36,7 +36,7 @@ export default async function HomePage() {
         {MENU_ITEMS.map(({ href, label, icon: Icon }) => (
           <Link key={href} href={href} className="block">
             <Card className="flex flex-col items-center justify-center gap-2 py-8 transition-colors hover:bg-muted/50">
-              <Icon className="size-8 text-primary" />
+              <Icon className="size-10 text-primary" />
               <span className="text-base font-medium">{label}</span>
             </Card>
           </Link>

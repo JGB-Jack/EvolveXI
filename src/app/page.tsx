@@ -8,11 +8,11 @@ export default function LandingPage() {
         EvolveXI
       </span>
       <h1 className="max-w-xl text-4xl font-semibold tracking-tight">
-        Know what to look for. Develop better players.
+        Watch. Assess. Develop.
       </h1>
       <p className="max-w-md text-muted-foreground">
-        The player assessment app that teaches grassroots coaches what good
-        looks like — for every age group from U6 to U17.
+        The player assessment app that guides grassroots football coaches to
+        what good looks like - from U6 to U17.
       </p>
       <div className="flex gap-3">
         <Button render={<Link href="/register" />} size="lg">

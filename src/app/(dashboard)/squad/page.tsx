@@ -29,12 +29,24 @@ export default async function SquadPage() {
     throw new Error(error.message);
   }
 
+  const { data: archivedPlayers, error: archivedError } = await supabase
+    .from("players")
+    .select("id, first_name, last_name, primary_position")
+    .eq("team_id", team.id)
+    .eq("active", false)
+    .order("updated_at", { ascending: false });
+
+  if (archivedError) {
+    throw new Error(archivedError.message);
+  }
+
   return (
     <SquadView
       teamId={team.id}
       teamName={team.name}
       teamAgeBand={team.age_band}
       players={players ?? []}
+      archivedPlayers={archivedPlayers ?? []}
     />
   );
 }

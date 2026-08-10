@@ -5,32 +5,32 @@ import { useState } from "react";
 import { useSessionWizard } from "@/components/sessions/session-wizard-context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Target, Zap, Brain, Sparkles, Users, Check } from "lucide-react";
+import { Volleyball, Activity, Compass, Brain, Users, Check } from "lucide-react";
 
 const PILLARS = [
   {
     id: "technical",
     name: "Technical",
     description: "Ball control, passing, shooting",
-    icon: Target,
+    icon: Volleyball,
   },
   {
     id: "physical",
     name: "Physical",
     description: "Speed, stamina, strength, agility",
-    icon: Zap,
+    icon: Activity,
   },
   {
     id: "tactical",
     name: "Tactical",
     description: "Positioning, decision-making, game understanding",
-    icon: Brain,
+    icon: Compass,
   },
   {
     id: "psychological",
     name: "Psychological",
     description: "Composure, resilience, confidence",
-    icon: Sparkles,
+    icon: Brain,
   },
   {
     id: "social",
@@ -91,10 +91,8 @@ export default function SessionPillarsPage() {
               type="button"
               onClick={() => toggle(pillar.id)}
               className={cn(
-                "relative flex flex-col gap-2 rounded-lg border-2 p-4 text-left transition-colors",
-                selected
-                  ? "border-primary bg-primary/5"
-                  : "border-border bg-background",
+                "relative flex flex-col gap-2 rounded-lg border-2 bg-background p-4 text-left transition-colors",
+                selected ? "border-primary" : "border-border",
               )}
             >
               {selected && (

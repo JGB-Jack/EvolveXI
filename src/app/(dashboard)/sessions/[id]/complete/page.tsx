@@ -47,7 +47,7 @@ export default async function SessionCompletePage({
       </Card>
       <div className="mt-6 flex flex-col gap-3">
         <Button size="lg" render={<Link href={`/sessions/${sessionId}/dashboard`} />}>
-          View squad dashboard
+          View dashboard
         </Button>
         <Button size="lg" variant="outline" render={<Link href="/home" />}>
           Back to home
