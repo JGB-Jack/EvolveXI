@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Card } from "@/components/ui/card";
-import { Users, ClipboardList, FileText, Settings } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { UserCheck, Star, Play } from "lucide-react";
+import { SquadPillarChart } from "@/components/home/squad-pillar-chart";
 
-const MENU_ITEMS = [
-  { href: "/squad", label: "Squad", icon: Users },
-  { href: "/sessions", label: "Sessions", icon: ClipboardList },
-  { href: "/reports", label: "Reports", icon: FileText },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
+const PILLAR_NAME: Record<string, string> = {
+  technical: "Technical",
+  physical: "Physical",
+  tactical: "Tactical",
+  psychological: "Psychological",
+  social: "Social",
+};
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -19,9 +22,112 @@ export default async function HomePage() {
 
   const { data: team } = await supabase
     .from("teams")
-    .select("name, age_band")
+    .select("id, name, age_band")
     .eq("coach_id", user!.id)
     .single();
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const [
+    { count: squadCount },
+    { data: inProgress },
+    { data: assessmentRows },
+    { data: recentlyAssessed },
+  ] = await Promise.all([
+    supabase
+      .from("players")
+      .select("*", { count: "exact", head: true })
+      .eq("team_id", team!.id)
+      .eq("active", true),
+    supabase
+      .from("sessions")
+      .select(
+        "id, type, opponent, date, session_players(player_id, completed_at)",
+      )
+      .eq("team_id", team!.id)
+      .is("completed_at", null)
+      .order("date", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    // Every rating ever recorded for this team, across all completed
+    // sessions and players - a single session's ratings aren't
+    // representative of the whole squad.
+    supabase
+      .from("assessments")
+      .select("score, team_questions(pillar_id), sessions!inner(team_id)")
+      .eq("sessions.team_id", team!.id),
+    // Distinct players whose ratings were finished in the last 30 days.
+    supabase
+      .from("session_players")
+      .select("player_id, sessions!inner(team_id)")
+      .eq("sessions.team_id", team!.id)
+      .not("completed_at", "is", null)
+      .gte("completed_at", thirtyDaysAgo.toISOString()),
+  ]);
+
+  const resumePlayerId = inProgress?.session_players.find(
+    (sp: { player_id: string; completed_at: string | null }) => !sp.completed_at,
+  )?.player_id;
+  const resumeLabel = inProgress
+    ? inProgress.opponent
+      ? `${inProgress.type} vs ${inProgress.opponent}`
+      : inProgress.type
+    : null;
+
+  let squadAverage: number | null = null;
+  let pillarData: { pillar: string; score: number }[] = [];
+
+  if (assessmentRows && assessmentRows.length > 0) {
+    const totalsByPillar = new Map<string, { sum: number; count: number }>();
+    let overallSum = 0;
+    for (const row of assessmentRows) {
+      overallSum += row.score;
+      // Supabase returns this embed as an array for some relationship
+      // shapes and a single object for others - normalize with concat,
+      // which appends a lone object as-is but spreads an array.
+      const pillarId = ([] as { pillar_id: string }[])
+        .concat(row.team_questions ?? [])[0]?.pillar_id;
+      if (pillarId) {
+        const entry = totalsByPillar.get(pillarId) ?? { sum: 0, count: 0 };
+        entry.sum += row.score;
+        entry.count += 1;
+        totalsByPillar.set(pillarId, entry);
+      }
+    }
+    squadAverage = overallSum / assessmentRows.length;
+    pillarData = Array.from(totalsByPillar.entries()).map(
+      ([pillarId, { sum, count }]) => ({
+        pillar: PILLAR_NAME[pillarId] ?? pillarId,
+        score: sum / count,
+      }),
+    );
+  }
+
+  const assessedPlayerIds = new Set(
+    (recentlyAssessed ?? []).map(
+      (row: { player_id: string }) => row.player_id,
+    ),
+  );
+  const assessedPercent =
+    squadCount && squadCount > 0
+      ? Math.round((assessedPlayerIds.size / squadCount) * 100)
+      : 0;
+
+  const STATS = [
+    {
+      label: "Players assessed in last month",
+      value: `${assessedPercent}%`,
+      icon: UserCheck,
+      href: "/squad",
+    },
+    {
+      label: "Squad average score",
+      value: squadAverage !== null ? `${squadAverage.toFixed(1)}/5` : "-",
+      icon: Star,
+      href: "/sessions",
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -32,15 +138,43 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {MENU_ITEMS.map(({ href, label, icon: Icon }) => (
-          <Link key={href} href={href} className="block">
-            <Card className="flex flex-col items-center justify-center gap-2 py-8 transition-colors hover:bg-muted/50">
-              <Icon className="size-10 text-primary" />
-              <span className="text-base font-medium">{label}</span>
+      <div className="space-y-3">
+        {inProgress && resumePlayerId && (
+          <Card>
+            <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
+              <div>
+                <p className="font-medium">Latest open session</p>
+                <p className="text-sm text-muted-foreground">
+                  {resumeLabel} &middot; {inProgress.date}
+                </p>
+              </div>
+              <Button
+                render={
+                  <Link href={`/sessions/${inProgress.id}/assess/${resumePlayerId}`} />
+                }
+              >
+                <Play className="size-4" />
+                Resume session
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {STATS.map(({ label, value, icon: Icon, href }) => (
+          <Link key={label} href={href} className="block">
+            <Card className="transition-colors hover:bg-muted/50">
+              <CardContent className="flex items-center justify-between gap-3 py-4">
+                <div className="flex items-center gap-3">
+                  <Icon className="size-5 text-primary" />
+                  <span className="font-medium">{label}</span>
+                </div>
+                <span className="text-xl font-semibold">{value}</span>
+              </CardContent>
             </Card>
           </Link>
         ))}
+
+        {pillarData.length > 0 && <SquadPillarChart data={pillarData} />}
       </div>
     </div>
   );

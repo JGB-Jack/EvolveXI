@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NavBar } from "@/components/nav-bar";
+import { DashboardShell } from "@/components/dashboard-shell";
 
 export default async function DashboardLayout({
   children,
@@ -26,12 +27,10 @@ export default async function DashboardLayout({
     redirect("/onboarding/team");
   }
 
-  const name = (user.user_metadata?.full_name as string) ?? "";
-
   return (
     <div className="pitch-bg min-h-screen">
-      <NavBar name={name} email={user.email ?? ""} />
-      <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+      <NavBar />
+      <DashboardShell>{children}</DashboardShell>
     </div>
   );
 }

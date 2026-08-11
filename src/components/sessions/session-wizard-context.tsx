@@ -18,7 +18,7 @@ const DEFAULT_STATE: SessionWizardState = {
   type: "Training",
   opponent: "",
   notes: "",
-  pillarIds: ["technical", "physical", "tactical", "psychological", "social"],
+  pillarIds: [],
   playerIds: [],
 };
 

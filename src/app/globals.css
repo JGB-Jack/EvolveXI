@@ -145,3 +145,20 @@
   background-position: center top;
   background-repeat: no-repeat;
 }
+
+/* Splash page intro: each element fades/slides in on its own delay
+   (set inline per element) so they appear one after another. */
+@keyframes fade-up-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-step {
+  animation: fade-up-in 0.8s ease-out both;
+}
