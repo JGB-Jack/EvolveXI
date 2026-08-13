@@ -31,9 +31,9 @@ export default function LandingPage() {
         className="fade-in-step max-w-md text-muted-foreground"
         style={{ animationDelay: "3.6s" }}
       >
-        Grassroots youth football coach: Watch, assess, and develop players
-        across 5 pillars with detailed, AI-assisted player development
-        reports.
+        The app for grassroots youth football coaches: watch, assess, and
+        accelerate player improvement with AI-assisted development reports.
+        Learn what &apos;good&apos; looks like, grow with your players.
       </p>
       <div className="flex gap-3">
         <Button render={<Link href="/register" />} size="lg">

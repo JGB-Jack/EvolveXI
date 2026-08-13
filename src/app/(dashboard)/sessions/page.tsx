@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { archiveSession, restoreSession } from "@/lib/actions/sessions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -69,6 +70,16 @@ export default async function SessionsPage() {
       "id, date, type, opponent, completed_at, session_pillars(pillar_id), session_players(player_id, players(first_name, last_name))",
     )
     .eq("team_id", team.id)
+    .is("archived_at", null)
+    .order("date", { ascending: false });
+
+  const { data: archivedSessions } = await supabase
+    .from("sessions")
+    .select(
+      "id, date, type, opponent, session_players(player_id, players(first_name, last_name))",
+    )
+    .eq("team_id", team.id)
+    .not("archived_at", "is", null)
     .order("date", { ascending: false });
 
   const hasSessions = (sessions?.length ?? 0) > 0;
@@ -133,29 +144,36 @@ export default async function SessionsPage() {
                   >
                     {playerNamesSummary(session.session_players)}
                   </p>
-                  {session.completed_at ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full"
-                      render={<Link href={`/sessions/${session.id}/dashboard`} />}
-                    >
-                      Dashboard
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full"
-                      render={
-                        <Link
-                          href={`/sessions/${session.id}/assess/${session.session_players[0]?.player_id}`}
-                        />
-                      }
-                    >
-                      Resume
-                    </Button>
-                  )}
+                  <div className="flex gap-2">
+                    {session.completed_at ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        render={<Link href={`/sessions/${session.id}/dashboard`} />}
+                      >
+                        Dashboard
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        render={
+                          <Link
+                            href={`/sessions/${session.id}/assess/${session.session_players[0]?.player_id}`}
+                          />
+                        }
+                      >
+                        Resume
+                      </Button>
+                    )}
+                    <form action={archiveSession.bind(null, session.id)}>
+                      <Button type="submit" size="sm" variant="ghost">
+                        Archive
+                      </Button>
+                    </form>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -225,6 +243,14 @@ export default async function SessionsPage() {
                           Resume
                         </Button>
                       )}
+                      <form
+                        action={archiveSession.bind(null, session.id)}
+                        className="inline"
+                      >
+                        <Button type="submit" size="sm" variant="ghost">
+                          Archive
+                        </Button>
+                      </form>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -232,6 +258,47 @@ export default async function SessionsPage() {
             </Table>
           </Card>
         </>
+      )}
+
+      {archivedSessions && archivedSessions.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              Archived sessions ({archivedSessions.length})
+            </CardTitle>
+            <CardDescription>
+              Archived sessions are hidden from your session history but
+              their data is kept. Restore anyone archived by mistake.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {archivedSessions.map((session) => (
+              <div
+                key={session.id}
+                className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2"
+              >
+                <div className="min-w-0">
+                  <p className="truncate">
+                    {session.type}
+                    {session.opponent ? ` vs ${session.opponent}` : ""}
+                    <span className="text-muted-foreground"> &middot; {session.date}</span>
+                  </p>
+                  <p
+                    className="truncate text-sm text-muted-foreground"
+                    title={playerNamesFull(session.session_players)}
+                  >
+                    {playerNamesSummary(session.session_players)}
+                  </p>
+                </div>
+                <form action={restoreSession.bind(null, session.id)}>
+                  <Button type="submit" size="sm" variant="outline">
+                    Restore
+                  </Button>
+                </form>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       )}
     </div>
   );

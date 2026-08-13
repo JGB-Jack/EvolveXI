@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 export type CreateSessionInput = {
@@ -68,4 +69,24 @@ export async function createSession(
   }
 
   redirect(`/sessions/${session.id}/assess/${input.playerIds[0]}`);
+}
+
+export async function archiveSession(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("sessions")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/sessions");
+}
+
+export async function restoreSession(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("sessions")
+    .update({ archived_at: null })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/sessions");
 }
