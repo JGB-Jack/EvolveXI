@@ -20,7 +20,7 @@ export function SquadPillarChart({
       <CardHeader>
         <CardTitle className="text-base">Squad pillar breakdown</CardTitle>
         <CardDescription>
-          Averages across every completed session and player
+          Averages from each player&apos;s most recent session
         </CardDescription>
       </CardHeader>
       <CardContent className="h-72">

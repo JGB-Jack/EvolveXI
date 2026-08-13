@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, ClipboardList, FileText, Settings, CircleUserRound } from "lucide-react";
+import { Users, ClipboardList, FileText, ListOrdered, CircleUserRound } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 import {
   DropdownMenu,
@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { href: "/squad", label: "Squad", icon: Users },
   { href: "/sessions", label: "Sessions", icon: ClipboardList },
   { href: "/reports", label: "Reports", icon: FileText },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/rankings", label: "Ranking", icon: ListOrdered },
 ];
 
 const TAB_CLASSES =
@@ -53,6 +53,12 @@ export function BottomNav() {
             Profile
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="top">
+            <Link
+              href="/settings"
+              className="flex w-full items-center rounded-sm px-2 py-1.5 text-left text-sm hover:bg-muted"
+            >
+              Settings
+            </Link>
             <form action={signOut}>
               <button
                 type="submit"

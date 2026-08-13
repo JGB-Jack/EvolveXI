@@ -65,21 +65,20 @@ export function ReportsList({ reports }: { reports: Report[] }) {
         className="max-w-sm bg-background"
       />
       {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
-      <div className="space-y-3 sm:hidden">
+      <div className="space-y-1.5 sm:hidden">
         {filtered.map((r) => (
           <Card key={r.id}>
-            <CardContent className="flex items-center justify-between gap-3 py-4">
+            <CardContent className="flex items-center justify-between gap-3 py-1.5">
               <div className="min-w-0">
-                <p className="truncate font-medium">
+                <p className="truncate text-sm font-medium">
                   {r.players?.first_name} {r.players?.last_name}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="truncate text-xs text-muted-foreground">
                   {r.sessions?.type}
                   {r.sessions?.opponent ? ` vs ${r.sessions.opponent}` : ""}
                   {" · "}
                   {r.sessions?.date}
-                </p>
-                <p className="text-xs text-muted-foreground">
+                  {" · "}
                   Generated {new Date(r.created_at).toLocaleDateString()}
                 </p>
               </div>

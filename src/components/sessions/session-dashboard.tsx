@@ -27,6 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { scoreColorClass } from "@/lib/score-color";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -48,13 +49,6 @@ type PlayerScore = {
   pillarAverages: Record<string, number | null>;
   overall: number | null;
 };
-
-function scoreColorClass(score: number | null): string {
-  if (score === null) return "text-muted-foreground";
-  if (score >= 4) return "text-green-700 dark:text-green-400 font-semibold";
-  if (score >= 3) return "text-amber-700 dark:text-amber-400 font-semibold";
-  return "text-red-700 dark:text-red-400 font-semibold";
-}
 
 function formatScore(score: number | null): string {
   return score === null ? "-" : score.toFixed(1);

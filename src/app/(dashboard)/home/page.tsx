@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserCheck, Star, Play } from "lucide-react";
 import { SquadPillarChart } from "@/components/home/squad-pillar-chart";
+import { getLatestFormRows } from "@/lib/data/latest-form";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -32,7 +33,7 @@ export default async function HomePage() {
   const [
     { count: squadCount },
     { data: inProgress },
-    { data: assessmentRows },
+    latestFormRows,
     { data: recentlyAssessed },
   ] = await Promise.all([
     supabase
@@ -50,13 +51,10 @@ export default async function HomePage() {
       .order("date", { ascending: false })
       .limit(1)
       .maybeSingle(),
-    // Every rating ever recorded for this team, across all completed
-    // sessions and players - a single session's ratings aren't
-    // representative of the whole squad.
-    supabase
-      .from("assessments")
-      .select("score, team_questions(pillar_id), sessions!inner(team_id)")
-      .eq("sessions.team_id", team!.id),
+    // Each player's ratings from their own most recent completed session -
+    // a current-form snapshot rather than an all-time blend, since players
+    // aren't all assessed on the same schedule.
+    getLatestFormRows(supabase, team!.id),
     // Distinct players whose ratings were finished in the last 30 days.
     supabase
       .from("session_players")
@@ -65,6 +63,10 @@ export default async function HomePage() {
       .not("completed_at", "is", null)
       .gte("completed_at", thirtyDaysAgo.toISOString()),
   ]);
+
+  const assessmentRows = latestFormRows.filter(
+    (row) => row.player?.active !== false,
+  );
 
   const resumePlayerId = inProgress?.session_players.find(
     (sp: { player_id: string; completed_at: string | null }) => !sp.completed_at,
@@ -83,16 +85,11 @@ export default async function HomePage() {
     let overallSum = 0;
     for (const row of assessmentRows) {
       overallSum += row.score;
-      // Supabase returns this embed as an array for some relationship
-      // shapes and a single object for others - normalize with concat,
-      // which appends a lone object as-is but spreads an array.
-      const pillarId = ([] as { pillar_id: string }[])
-        .concat(row.team_questions ?? [])[0]?.pillar_id;
-      if (pillarId) {
-        const entry = totalsByPillar.get(pillarId) ?? { sum: 0, count: 0 };
+      if (row.pillar_id) {
+        const entry = totalsByPillar.get(row.pillar_id) ?? { sum: 0, count: 0 };
         entry.sum += row.score;
         entry.count += 1;
-        totalsByPillar.set(pillarId, entry);
+        totalsByPillar.set(row.pillar_id, entry);
       }
     }
     squadAverage = overallSum / assessmentRows.length;

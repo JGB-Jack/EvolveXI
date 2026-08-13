@@ -44,12 +44,17 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  render,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
   return (
     <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      render={render}
+      // A `render` override (e.g. rendering as a Link/<a>) means this isn't
+      // a native <button> element, which Base UI otherwise warns about.
+      nativeButton={render ? false : undefined}
       {...props}
     />
   )
