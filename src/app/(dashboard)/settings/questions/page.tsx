@@ -29,8 +29,8 @@ export default async function QuestionBankSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-white">Question bank</h1>
-        <p className="text-white/70">
+        <h1 className="text-2xl font-semibold text-foreground">Question bank</h1>
+        <p className="text-muted-foreground">
           {team.name} &middot; {team.age_band} &mdash; edit any question or
           anchor, or add your own. Changes apply to future sessions only.
         </p>

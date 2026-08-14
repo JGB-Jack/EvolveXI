@@ -182,15 +182,15 @@ export function AssessmentForm({
     <div className="mx-auto max-w-2xl space-y-6 pb-24">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-white">
+          <h1 className="text-xl font-semibold text-foreground">
             {player.first_name} {player.last_name}
           </h1>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-muted-foreground">
             {POSITION_LABEL[player.primary_position]} &middot; {sessionLabel}{" "}
             &middot; {session.date}
           </p>
         </div>
-        <div className="text-right text-sm text-white/70">
+        <div className="text-right text-sm text-muted-foreground">
           Player {currentIndex + 1} of {players.length}
         </div>
       </div>

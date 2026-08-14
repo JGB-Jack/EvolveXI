@@ -51,9 +51,11 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return sessions;
-    return sessions.filter((session) =>
-      playerNamesFull(session.session_players).toLowerCase().includes(q),
-    );
+    return sessions.filter((session) => {
+      const players = playerNamesFull(session.session_players).toLowerCase();
+      const opponent = session.opponent?.toLowerCase() ?? "";
+      return players.includes(q) || opponent.includes(q);
+    });
   }, [sessions, search]);
 
   if (sessions.length === 0) {
@@ -72,7 +74,7 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
   return (
     <div className="space-y-4">
       <Input
-        placeholder="Search by player name..."
+        placeholder="Search by player or opposition..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm bg-background"
@@ -83,7 +85,7 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
           <CardHeader>
             <CardTitle>No matching sessions</CardTitle>
             <CardDescription>
-              No sessions include a player matching &quot;{search}&quot;.
+              No sessions match &quot;{search}&quot;.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -92,7 +94,7 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
           {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
           <div className="space-y-1.5 sm:hidden">
             {filtered.map((session) => (
-              <Card key={session.id}>
+              <Card key={session.id} className="border-b-2 border-b-primary">
                 <CardContent className="space-y-1.5 py-2">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -111,9 +113,16 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
                       </p>
                     </div>
                     {session.completed_at ? (
-                      <Badge variant="outline" className="shrink-0">Complete</Badge>
+                      <Badge
+                        variant="outline"
+                        className="shrink-0 border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400"
+                      >
+                        Completed
+                      </Badge>
                     ) : (
-                      <Badge className="shrink-0">In progress</Badge>
+                      <Badge className="shrink-0 bg-amber-500 text-white dark:bg-amber-600">
+                        In progress
+                      </Badge>
                     )}
                   </div>
                   <div className="flex flex-wrap gap-1">
@@ -195,9 +204,16 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
                     </TableCell>
                     <TableCell>
                       {session.completed_at ? (
-                        <Badge variant="outline">Complete</Badge>
+                        <Badge
+                          variant="outline"
+                          className="border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400"
+                        >
+                          Completed
+                        </Badge>
                       ) : (
-                        <Badge>In progress</Badge>
+                        <Badge className="bg-amber-500 text-white dark:bg-amber-600">
+                          In progress
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-right">

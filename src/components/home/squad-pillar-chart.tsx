@@ -1,14 +1,10 @@
-"use client";
-
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-} from "recharts";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 export function SquadPillarChart({
   data,
@@ -16,32 +12,34 @@ export function SquadPillarChart({
   data: { pillar: string; score: number }[];
 }) {
   return (
-    <Card>
+    <Card className="border-b-2 border-b-primary">
       <CardHeader>
         <CardTitle className="text-base">Squad pillar breakdown</CardTitle>
         <CardDescription>
           Averages from each player&apos;s most recent session
         </CardDescription>
       </CardHeader>
-      <CardContent className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ bottom: 45 }}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="pillar"
-              tick={{ fontSize: 11 }}
-              interval={0}
-              angle={-35}
-              textAnchor="end"
-            />
-            <YAxis
-              domain={[0, 5]}
-              ticks={[0, 1, 2, 3, 4, 5]}
-              tick={{ fontSize: 10 }}
-            />
-            <Bar dataKey="score" fill="var(--primary)" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+      <CardContent>
+        <div className="flex items-end justify-between gap-2 px-1" style={{ height: 120 }}>
+          {data.map(({ pillar, score }) => (
+            <div key={pillar} className="flex flex-1 flex-col items-center gap-1.5">
+              <span className="text-xs font-bold tabular-nums text-primary">
+                {score.toFixed(1)}
+              </span>
+              <div
+                className="w-4 rounded-t-[4px] rounded-b-[2px]"
+                style={{
+                  height: `${(score / 5) * 88}px`,
+                  background:
+                    "linear-gradient(180deg, color-mix(in oklch, var(--primary), white 40%), color-mix(in oklch, var(--primary), black 20%))",
+                }}
+              />
+              <span className="text-[9px] font-bold tracking-wide text-muted-foreground uppercase">
+                {pillar.slice(0, 3)}
+              </span>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

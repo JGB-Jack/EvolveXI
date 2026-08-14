@@ -49,10 +49,10 @@ export default async function SessionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Sessions</h1>
-          <p className="text-white/70">
+          <h1 className="text-2xl font-semibold text-foreground">Sessions</h1>
+          <p className="text-muted-foreground">
             Your assessment session history.
           </p>
         </div>

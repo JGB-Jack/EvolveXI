@@ -1,15 +1,30 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Home } from "lucide-react";
 
 export function NavBar() {
+  const pathname = usePathname();
+  const showHome = pathname !== "/home";
+
   return (
-    <header className="bg-primary">
-      <div className="mx-auto flex max-w-6xl items-center px-4 py-3">
-        <Link
-          href="/home"
-          className="text-lg font-semibold tracking-tight text-primary-foreground"
-        >
+    <header className="primary-gradient">
+      <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 py-3">
+        <div>
+          {showHome && (
+            <Link
+              href="/home"
+              className="inline-flex items-center text-primary-foreground/90 hover:text-primary-foreground"
+            >
+              <Home className="size-5" />
+            </Link>
+          )}
+        </div>
+        <span className="text-xl font-semibold tracking-tight text-primary-foreground">
           EvolveXI
-        </Link>
+        </span>
+        <div />
       </div>
     </header>
   );

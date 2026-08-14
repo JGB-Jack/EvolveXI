@@ -35,11 +35,11 @@ export function ReportsList({ reports }: { reports: Report[] }) {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return reports;
-    return reports.filter((r) =>
-      `${r.players?.first_name} ${r.players?.last_name}`
-        .toLowerCase()
-        .includes(q),
-    );
+    return reports.filter((r) => {
+      const playerName = `${r.players?.first_name} ${r.players?.last_name}`.toLowerCase();
+      const opponent = r.sessions?.opponent?.toLowerCase() ?? "";
+      return playerName.includes(q) || opponent.includes(q);
+    });
   }, [reports, search]);
 
   if (reports.length === 0) {
@@ -59,7 +59,7 @@ export function ReportsList({ reports }: { reports: Report[] }) {
   return (
     <div className="space-y-4">
       <Input
-        placeholder="Search by player name..."
+        placeholder="Search by player or opposition..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm bg-background"
@@ -67,7 +67,7 @@ export function ReportsList({ reports }: { reports: Report[] }) {
       {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
       <div className="space-y-1.5 sm:hidden">
         {filtered.map((r) => (
-          <Card key={r.id}>
+          <Card key={r.id} className="border-b-2 border-b-primary">
             <CardContent className="flex items-center justify-between gap-3 py-1.5">
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">

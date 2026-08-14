@@ -44,8 +44,8 @@ export default async function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-white">Reports</h1>
-        <p className="text-white/70">
+        <h1 className="text-2xl font-semibold text-foreground">Reports</h1>
+        <p className="text-muted-foreground">
           All AI-generated player reports from your sessions.
         </p>
       </div>

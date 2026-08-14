@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { scoreColorClass } from "@/lib/score-color";
+import { scoreColorClass, scoreBarColorClass } from "@/lib/score-color";
 
 const POSITION_LABEL: Record<string, string> = {
   defence: "Defence",
@@ -68,7 +68,7 @@ export function RankingsTable({
       {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
       <div className="space-y-1.5 sm:hidden">
         {sorted.map((player, index) => (
-          <Card key={player.playerId}>
+          <Card key={player.playerId} className="border-b-2 border-b-primary">
             <CardContent className="space-y-0.5 py-1.5">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-medium">
@@ -82,15 +82,24 @@ export function RankingsTable({
                   {formatScore(player.overall)}
                 </span>
               </div>
-              <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs">
-                {pillars.map((pillar) => (
-                  <span key={pillar.id} className="text-muted-foreground">
-                    {pillar.name}{" "}
-                    <span className={scoreColorClass(player.pillarAverages[pillar.id])}>
-                      {formatScore(player.pillarAverages[pillar.id])}
-                    </span>
-                  </span>
-                ))}
+              <div className="flex items-end justify-between gap-1 pt-1" style={{ height: 46 }}>
+                {pillars.map((pillar) => {
+                  const score = player.pillarAverages[pillar.id];
+                  return (
+                    <div key={pillar.id} className="flex flex-1 flex-col items-center gap-1">
+                      <span className={cn("text-[9px] font-bold tabular-nums", scoreColorClass(score))}>
+                        {formatScore(score)}
+                      </span>
+                      <div
+                        className={cn("w-2.5 rounded-t-sm", scoreBarColorClass(score))}
+                        style={{ height: score !== null ? `${(score / 5) * 22}px` : 2 }}
+                      />
+                      <span className="text-[8px] font-semibold tracking-wide text-muted-foreground uppercase">
+                        {pillar.name.slice(0, 3)}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

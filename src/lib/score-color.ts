@@ -7,3 +7,11 @@ export function scoreColorClass(score: number | null): string {
   if (score >= 2.5) return "text-amber-700 dark:text-amber-400 font-semibold";
   return "text-red-700 dark:text-red-400 font-semibold";
 }
+
+// Same bands as scoreColorClass, as a solid fill for bars/dots instead of text.
+export function scoreBarColorClass(score: number | null): string {
+  if (score === null) return "bg-muted";
+  if (score >= 4) return "bg-green-600 dark:bg-green-500";
+  if (score >= 2.5) return "bg-amber-500 dark:bg-amber-500";
+  return "bg-red-600 dark:bg-red-500";
+}

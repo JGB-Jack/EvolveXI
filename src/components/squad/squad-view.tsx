@@ -25,7 +25,7 @@ import {
   PlayerFormSheet,
   type EditablePlayer,
 } from "@/components/squad/player-form-sheet";
-import { Plus } from "lucide-react";
+import { Plus, Shirt } from "lucide-react";
 
 const POSITION_LABEL: Record<string, string> = {
   defence: "Defence",
@@ -62,7 +62,7 @@ export function SquadView({
     null,
   );
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({
-    key: "name",
+    key: "squad_number",
     dir: 1,
   });
 
@@ -162,8 +162,8 @@ export function SquadView({
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Your Squad</h1>
-          <p className="text-white/70">
+          <h1 className="text-2xl font-semibold text-foreground">Your Squad</h1>
+          <p className="text-muted-foreground">
             {teamName} &middot; {teamAgeBand}
           </p>
         </div>
@@ -193,19 +193,22 @@ export function SquadView({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Your Squad</h1>
-          <p className="text-white/70">
+          <h1 className="text-2xl font-semibold text-foreground">Your Squad</h1>
+          <p className="text-muted-foreground">
             {teamName} &middot; {teamAgeBand}
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={openAdd}>
+          <Button variant="outline" onClick={openAdd} className="flex-1 sm:flex-none">
             <Plus className="size-4" />
             Add player
           </Button>
-          <Button render={<Link href="/sessions/new/details" />}>
+          <Button
+            render={<Link href="/sessions/new/details" />}
+            className="flex-1 sm:flex-none"
+          >
             Start assessment
           </Button>
         </div>
@@ -214,23 +217,33 @@ export function SquadView({
       {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
       <div className="space-y-3 sm:hidden">
         {sorted.map((player) => (
-          <Card key={player.id}>
+          <Card key={player.id} className="border-b-2 border-b-primary">
             <CardContent className="flex items-center justify-between gap-3 py-4">
-              <div className="min-w-0">
-                <button
-                  className="truncate font-medium underline-offset-2 hover:underline"
-                  onClick={() =>
-                    router.push(`/squad/player/${player.id}/profile`)
-                  }
-                >
-                  {player.first_name} {player.last_name}
-                </button>
-                <p className="text-sm text-muted-foreground">
-                  {POSITION_LABEL[player.primary_position]}
-                  {player.secondary_position &&
-                    ` / ${POSITION_LABEL[player.secondary_position]}`}
-                  {player.squad_number && ` · #${player.squad_number}`}
-                </p>
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="relative flex size-10 shrink-0 items-center justify-center">
+                  <Shirt
+                    className="absolute inset-0 size-10 fill-primary text-primary"
+                    strokeWidth={1.5}
+                  />
+                  <span className="relative mt-1.5 text-xs font-bold tabular-nums text-primary-foreground">
+                    {player.squad_number ?? "-"}
+                  </span>
+                </span>
+                <div className="min-w-0">
+                  <button
+                    className="truncate font-medium underline-offset-2 hover:underline"
+                    onClick={() =>
+                      router.push(`/squad/player/${player.id}/profile`)
+                    }
+                  >
+                    {player.first_name} {player.last_name}
+                  </button>
+                  <p className="text-sm text-muted-foreground">
+                    {POSITION_LABEL[player.primary_position]}
+                    {player.secondary_position &&
+                      ` / ${POSITION_LABEL[player.secondary_position]}`}
+                  </p>
+                </div>
               </div>
               <div className="flex shrink-0 gap-1">
                 <Button size="sm" variant="ghost" onClick={() => openEdit(player)}>
@@ -292,7 +305,9 @@ export function SquadView({
                   {player.secondary_position &&
                     ` / ${POSITION_LABEL[player.secondary_position]}`}
                 </TableCell>
-                <TableCell>{player.squad_number ?? "-"}</TableCell>
+                <TableCell className="font-bold tabular-nums text-primary">
+                  {player.squad_number ?? "-"}
+                </TableCell>
                 <TableCell className="text-right">
                   <Button
                     size="sm"

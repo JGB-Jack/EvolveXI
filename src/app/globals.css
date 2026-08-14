@@ -129,21 +129,29 @@
   }
 }
 
-/* Floodlit pitch photo backdrop for app backgrounds. Deliberately a
-   fixed dark scrim regardless of light/dark theme -- headline text
-   sitting directly on it is styled white inline (text-white / text-white/70)
-   to match; cards remain theme-aware since they sit on top with their
-   own background. */
+/* Turf-green gradient: lighter at the top, deeper at the bottom -- used
+   on the top banner and on every filled green button so the accent color
+   reads consistently across the app instead of a flat fill. */
+.primary-gradient {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--primary), white 22%),
+    color-mix(in oklch, var(--primary), black 18%)
+  );
+}
+
+/* Bright, sunlit-pitch backdrop for app backgrounds -- coaches use this
+   outdoors in daylight, where a dark background loses contrast to glare.
+   Headline text sitting directly on it uses the normal foreground/
+   muted-foreground tokens, same as cards. */
 .pitch-bg {
   background-color: var(--background);
-  background-image: linear-gradient(
-      rgba(8, 16, 11, 0.62),
-      rgba(8, 16, 11, 0.62)
-    ),
-    url("/pitch-bg.jpg");
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
+  background-image: radial-gradient(
+    ellipse at 50% -10%,
+    oklch(1 0 0) 0%,
+    oklch(0.97 0.015 152) 55%
+  );
+  background-attachment: fixed;
 }
 
 /* Splash page intro: each element fades/slides in on its own delay

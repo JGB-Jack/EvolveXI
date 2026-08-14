@@ -19,13 +19,13 @@ const NAV_ITEMS = [
 ];
 
 const TAB_CLASSES =
-  "flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium";
+  "relative flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium";
 
 export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-primary/15 bg-background">
       <div className="mx-auto flex max-w-6xl">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);
@@ -35,6 +35,9 @@ export function BottomNav() {
               href={href}
               className={cn(TAB_CLASSES, active ? "text-primary" : "text-muted-foreground")}
             >
+              {active && (
+                <span className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-primary" />
+              )}
               <Icon className="size-5" />
               {label}
             </Link>
