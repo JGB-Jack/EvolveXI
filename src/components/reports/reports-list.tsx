@@ -2,6 +2,9 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { deleteReport } from "@/lib/actions/reports";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +22,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Trash2 } from "lucide-react";
 
 type Report = {
   id: string;
@@ -30,7 +45,9 @@ type Report = {
 };
 
 export function ReportsList({ reports }: { reports: Report[] }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -41,6 +58,19 @@ export function ReportsList({ reports }: { reports: Report[] }) {
       return playerName.includes(q) || opponent.includes(q);
     });
   }, [reports, search]);
+
+  async function handleDelete(report: Report) {
+    setDeletingId(report.id);
+    try {
+      await deleteReport(report.id);
+      toast.success("Report deleted");
+      router.refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete report");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   if (reports.length === 0) {
     return (
@@ -82,16 +112,45 @@ export function ReportsList({ reports }: { reports: Report[] }) {
                   Generated {new Date(r.created_at).toLocaleDateString()}
                 </p>
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="shrink-0"
-                render={
-                  <Link href={`/sessions/${r.session_id}/report/${r.player_id}`} />
-                }
-              >
-                View
-              </Button>
+              <div className="flex shrink-0 gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  render={
+                    <Link href={`/sessions/${r.session_id}/report/${r.player_id}`} />
+                  }
+                >
+                  View
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger
+                    render={<Button size="icon-sm" variant="ghost" />}
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete this report?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {r.players?.first_name} {r.players?.last_name}&apos;s
+                        report from {r.sessions?.date} will be permanently
+                        deleted. Their ratings for this session aren&apos;t
+                        affected, so a new report can be generated later.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        onClick={() => handleDelete(r)}
+                        disabled={deletingId === r.id}
+                      >
+                        {deletingId === r.id ? "Deleting..." : "Delete"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -132,6 +191,35 @@ export function ReportsList({ reports }: { reports: Report[] }) {
                   >
                     View
                   </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger
+                      render={<Button size="sm" variant="ghost" />}
+                    >
+                      <Trash2 className="size-4 text-destructive" />
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete this report?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {r.players?.first_name} {r.players?.last_name}
+                          &apos;s report from {r.sessions?.date} will be
+                          permanently deleted. Their ratings for this session
+                          aren&apos;t affected, so a new report can be
+                          generated later.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          onClick={() => handleDelete(r)}
+                          disabled={deletingId === r.id}
+                        >
+                          {deletingId === r.id ? "Deleting..." : "Delete"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </TableCell>
               </TableRow>
             ))}

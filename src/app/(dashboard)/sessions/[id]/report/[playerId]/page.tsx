@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ReportView } from "@/components/sessions/report-view";
+import { getExpectedQuestionCount } from "@/lib/data/session-questions";
 import type { ReportContent } from "@/lib/claude/report";
 
 export default async function PlayerReportPage({
@@ -17,10 +18,13 @@ export default async function PlayerReportPage({
 
   const { data: session } = await supabase
     .from("sessions")
-    .select("id, date, type, opponent")
+    .select("id, date, type, opponent, team_id, teams(age_band)")
     .eq("id", sessionId)
     .single();
   if (!session) notFound();
+  const teamAgeBand = (
+    session.teams as unknown as { age_band: string } | null
+  )?.age_band ?? "";
 
   const { data: sessionPlayers } = await supabase
     .from("session_players")
@@ -55,6 +59,17 @@ export default async function PlayerReportPage({
     .eq("session_id", sessionId)
     .eq("player_id", playerId);
 
+  const { data: sessionPillars } = await supabase
+    .from("session_pillars")
+    .select("pillar_id")
+    .eq("session_id", sessionId);
+  const expectedQuestionCount = await getExpectedQuestionCount(supabase, {
+    teamId: session.team_id,
+    ageBand: teamAgeBand,
+    position: player.primary_position,
+    pillarIds: (sessionPillars ?? []).map((p) => p.pillar_id),
+  });
+
   const scoresByPillar = new Map<string, number[]>();
   for (const a of (assessments as unknown as
     | { score: number; team_questions: { pillar_id: string } }[]
@@ -86,6 +101,8 @@ export default async function PlayerReportPage({
       players={ordered}
       currentIndex={currentIndex}
       reportId={existingReport?.id ?? null}
+      hasScores={(assessments?.length ?? 0) > 0}
+      isComplete={(assessments?.length ?? 0) >= expectedQuestionCount}
       initialContent={initialContent}
       pillarAverages={pillarAverages}
     />

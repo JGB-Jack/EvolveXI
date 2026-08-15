@@ -17,7 +17,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Mail, Sparkles } from "lucide-react";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -48,6 +48,8 @@ export function ReportView({
   players,
   currentIndex,
   reportId: initialReportId,
+  hasScores,
+  isComplete,
   initialContent,
   pillarAverages,
 }: {
@@ -56,6 +58,8 @@ export function ReportView({
   players: Player[];
   currentIndex: number;
   reportId: string | null;
+  hasScores: boolean;
+  isComplete: boolean;
   initialContent: ReportContent | null;
   pillarAverages: Record<string, number>;
 }) {
@@ -157,7 +161,7 @@ export function ReportView({
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-24">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-foreground">
             {player.first_name} {player.last_name}
@@ -166,12 +170,50 @@ export function ReportView({
             {POSITION_LABEL[player.primary_position]} &middot; Report
           </p>
         </div>
-        <div className="text-right text-sm text-muted-foreground">
-          Player {currentIndex + 1} of {players.length}
+        <div className="flex flex-col items-end gap-2">
+          {content && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => toast.info("Sending reports is coming soon")}
+            >
+              <Mail className="size-4" />
+              Send
+            </Button>
+          )}
+          <div className="text-right text-sm text-muted-foreground">
+            Player {currentIndex + 1} of {players.length}
+          </div>
         </div>
       </div>
 
-      {!content && (
+      {!content && !hasScores && (
+        <Card>
+          <CardHeader>
+            <CardTitle>No scores recorded yet</CardTitle>
+            <CardDescription>
+              {player.first_name} hasn&apos;t been rated in this session, so
+              there&apos;s nothing for a report to be based on. Go back and
+              rate {player.first_name} first.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
+      {!content && hasScores && !isComplete && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Assessment not finished yet</CardTitle>
+            <CardDescription>
+              {player.first_name} hasn&apos;t been rated on every question
+              yet. Go back and answer every question before generating a
+              report.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
+      {!content && hasScores && isComplete && (
         <Card>
           <CardHeader>
             <CardTitle>Generate this player&apos;s report</CardTitle>

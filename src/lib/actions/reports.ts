@@ -1,11 +1,13 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
   generatePlayerReport,
   type PillarInput,
   type ReportContent,
 } from "@/lib/claude/report";
+import { getExpectedQuestionCount } from "@/lib/data/session-questions";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -49,6 +51,24 @@ export async function generateReport(sessionId: string, playerId: string) {
     .select("score, team_questions(pillar_id, question_text, anchor_1, anchor_2, anchor_3, anchor_4, anchor_5)")
     .eq("session_id", sessionId)
     .eq("player_id", playerId);
+
+  if (!assessments || assessments.length === 0) {
+    throw new Error(
+      "No scores have been recorded for this player in this session yet.",
+    );
+  }
+
+  const expectedQuestionCount = await getExpectedQuestionCount(supabase, {
+    teamId: session.team_id,
+    ageBand: team?.age_band ?? "",
+    position: player.primary_position,
+    pillarIds,
+  });
+  if (assessments.length < expectedQuestionCount) {
+    throw new Error(
+      "Not every question has been answered for this player yet - finish rating every question before generating a report.",
+    );
+  }
 
   const { data: pillarNotes } = await supabase
     .from("assessment_pillar_notes")
@@ -149,4 +169,14 @@ export async function saveReportEdits(
     })
     .eq("id", reportId);
   if (error) throw new Error(error.message);
+}
+
+// Reports have no restore path, unlike sessions/players - deleting one
+// only removes the generated write-up, not the underlying ratings, so a
+// coach can always regenerate it later once real scores exist.
+export async function deleteReport(reportId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("reports").delete().eq("id", reportId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/reports");
 }

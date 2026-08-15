@@ -83,12 +83,12 @@ export default async function HomePage() {
       }
     }
     squadAverage = overallSum / assessmentRows.length;
-    pillarData = Array.from(totalsByPillar.entries()).map(
-      ([pillarId, { sum, count }]) => ({
+    pillarData = Array.from(totalsByPillar.entries())
+      .map(([pillarId, { sum, count }]) => ({
         pillar: PILLAR_NAME[pillarId] ?? pillarId,
         score: sum / count,
-      }),
-    );
+      }))
+      .sort((a, b) => b.score - a.score);
   }
 
   // Same completed-session data everything else on this page uses (not a

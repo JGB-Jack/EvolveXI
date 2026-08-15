@@ -12,7 +12,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Plus } from "lucide-react";
 
 export default async function SessionsPage() {
   const supabase = await createClient();
@@ -57,7 +56,6 @@ export default async function SessionsPage() {
           </p>
         </div>
         <Button render={<Link href="/sessions/new/details" />}>
-          <Plus className="size-4" />
           New session
         </Button>
       </div>

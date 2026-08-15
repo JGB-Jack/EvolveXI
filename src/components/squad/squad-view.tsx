@@ -180,7 +180,7 @@ export function SquadView({
         </Card>
         <Button size="lg" onClick={openAdd}>
           <Plus className="size-4" />
-          Add player
+          Player
         </Button>
         {archivedSection}
         <PlayerFormSheet
@@ -205,13 +205,13 @@ export function SquadView({
         <div className="flex gap-2">
           <Button variant="outline" onClick={openAdd} className="flex-1 sm:flex-none">
             <Plus className="size-4" />
-            Add player
+            Player
           </Button>
           <Button
             render={<Link href="/sessions/new/details" />}
             className="flex-1 sm:flex-none"
           >
-            Start assessment
+            Assess
           </Button>
         </div>
       </div>
