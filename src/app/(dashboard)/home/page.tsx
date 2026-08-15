@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserCheck, Star, Play } from "lucide-react";
 import { SquadPillarChart } from "@/components/home/squad-pillar-chart";
+import { AboutCard } from "@/components/home/about-card";
 import { getLatestFormRows } from "@/lib/data/latest-form";
 
 const PILLAR_NAME: Record<string, string> = {
@@ -30,39 +31,28 @@ export default async function HomePage() {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const [
-    { count: squadCount },
-    { data: inProgress },
-    latestFormRows,
-    { data: recentlyAssessed },
-  ] = await Promise.all([
-    supabase
-      .from("players")
-      .select("*", { count: "exact", head: true })
-      .eq("team_id", team!.id)
-      .eq("active", true),
-    supabase
-      .from("sessions")
-      .select(
-        "id, type, opponent, date, session_players(player_id, completed_at)",
-      )
-      .eq("team_id", team!.id)
-      .is("completed_at", null)
-      .order("date", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    // Each player's ratings from their own most recent completed session -
-    // a current-form snapshot rather than an all-time blend, since players
-    // aren't all assessed on the same schedule.
-    getLatestFormRows(supabase, team!.id),
-    // Distinct players whose ratings were finished in the last 30 days.
-    supabase
-      .from("session_players")
-      .select("player_id, sessions!inner(team_id)")
-      .eq("sessions.team_id", team!.id)
-      .not("completed_at", "is", null)
-      .gte("completed_at", thirtyDaysAgo.toISOString()),
-  ]);
+  const [{ count: squadCount }, { data: inProgress }, latestFormRows] =
+    await Promise.all([
+      supabase
+        .from("players")
+        .select("*", { count: "exact", head: true })
+        .eq("team_id", team!.id)
+        .eq("active", true),
+      supabase
+        .from("sessions")
+        .select(
+          "id, type, opponent, date, session_players(player_id, completed_at)",
+        )
+        .eq("team_id", team!.id)
+        .is("completed_at", null)
+        .order("date", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      // Each player's ratings from their own most recent completed session -
+      // a current-form snapshot rather than an all-time blend, since players
+      // aren't all assessed on the same schedule.
+      getLatestFormRows(supabase, team!.id),
+    ]);
 
   const assessmentRows = latestFormRows.filter(
     (row) => row.player?.active !== false,
@@ -101,10 +91,15 @@ export default async function HomePage() {
     );
   }
 
+  // Same completed-session data everything else on this page uses (not a
+  // separate session_players-level query) - a player who's individually
+  // marked done but whose session isn't closed out yet shouldn't count
+  // as "assessed" here while also counting as "never assessed" below.
+  const thirtyDaysAgoDate = thirtyDaysAgo.toISOString().slice(0, 10);
   const assessedPlayerIds = new Set(
-    (recentlyAssessed ?? []).map(
-      (row: { player_id: string }) => row.player_id,
-    ),
+    assessmentRows
+      .filter((row) => row.session_date >= thirtyDaysAgoDate)
+      .map((row) => row.player_id),
   );
   const assessedPercent =
     squadCount && squadCount > 0
@@ -124,7 +119,7 @@ export default async function HomePage() {
 
   const STATS = [
     {
-      label: "Players assessed in last month",
+      label: "Players assessed in the last 30 days",
       value: `${assessedPercent}%`,
       icon: UserCheck,
       href: "/squad",
@@ -205,6 +200,8 @@ export default async function HomePage() {
         </div>
 
         {pillarData.length > 0 && <SquadPillarChart data={pillarData} />}
+
+        <AboutCard />
       </div>
     </div>
   );

@@ -40,6 +40,29 @@ export default async function SquadPage() {
     throw new Error(archivedError.message);
   }
 
+  // Distinct completed sessions each player has been rated in - same
+  // "session must be completed" definition used everywhere else, so a
+  // player who's individually done but whose session isn't closed out
+  // yet isn't counted as assessed here either.
+  const { data: assessmentSessions } = await supabase
+    .from("assessments")
+    .select("player_id, session_id, sessions!inner(team_id, completed_at)")
+    .eq("sessions.team_id", team.id)
+    .not("sessions.completed_at", "is", null);
+
+  const sessionsByPlayer = new Map<string, Set<string>>();
+  for (const row of assessmentSessions ?? []) {
+    const sessions = sessionsByPlayer.get(row.player_id) ?? new Set<string>();
+    sessions.add(row.session_id);
+    sessionsByPlayer.set(row.player_id, sessions);
+  }
+  const assessmentCounts = Object.fromEntries(
+    Array.from(sessionsByPlayer.entries()).map(([playerId, sessions]) => [
+      playerId,
+      sessions.size,
+    ]),
+  );
+
   return (
     <SquadView
       teamId={team.id}
@@ -47,6 +70,7 @@ export default async function SquadPage() {
       teamAgeBand={team.age_band}
       players={players ?? []}
       archivedPlayers={archivedPlayers ?? []}
+      assessmentCounts={assessmentCounts}
     />
   );
 }

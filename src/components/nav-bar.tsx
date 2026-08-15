@@ -9,7 +9,7 @@ export function NavBar() {
   const showHome = pathname !== "/home";
 
   return (
-    <header className="primary-gradient">
+    <header className="primary-gradient sticky top-0 z-40">
       <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 py-3">
         <div>
           {showHome && (

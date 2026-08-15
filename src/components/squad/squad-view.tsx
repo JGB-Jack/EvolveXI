@@ -49,12 +49,14 @@ export function SquadView({
   teamAgeBand,
   players,
   archivedPlayers,
+  assessmentCounts,
 }: {
   teamId: string;
   teamName: string;
   teamAgeBand: string;
   players: EditablePlayer[];
   archivedPlayers: ArchivedPlayer[];
+  assessmentCounts: Record<string, number>;
 }) {
   const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -243,6 +245,15 @@ export function SquadView({
                     {player.secondary_position &&
                       ` / ${POSITION_LABEL[player.secondary_position]}`}
                   </p>
+                  {(assessmentCounts[player.id] ?? 0) === 0 ? (
+                    <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                      Not yet assessed
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Assessed {assessmentCounts[player.id]}×
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex shrink-0 gap-1">
@@ -284,6 +295,7 @@ export function SquadView({
               >
                 Squad #
               </TableHead>
+              <TableHead>Assessed</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -307,6 +319,15 @@ export function SquadView({
                 </TableCell>
                 <TableCell className="font-bold tabular-nums text-primary">
                   {player.squad_number ?? "-"}
+                </TableCell>
+                <TableCell>
+                  {(assessmentCounts[player.id] ?? 0) === 0 ? (
+                    <span className="font-semibold text-amber-600 dark:text-amber-400">
+                      Not yet assessed
+                    </span>
+                  ) : (
+                    `${assessmentCounts[player.id]}×`
+                  )}
                 </TableCell>
                 <TableCell className="text-right">
                   <Button
