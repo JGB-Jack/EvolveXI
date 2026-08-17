@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   // opened from another device on the same network (e.g. testing on a
   // phone/tablet via this PC's LAN IP) instead of only localhost.
   allowedDevOrigins: ["192.168.0.88"],
+  // The floating "Rendering..." badge is dev-only noise that sits on top of
+  // the app's own bottom nav when testing on a phone - turn it off.
+  devIndicators: false,
 };
 
 export default nextConfig;

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getLatestFormRows } from "@/lib/data/latest-form";
 import { RankingsTable } from "@/components/rankings/rankings-table";
+import { ExportButton } from "@/components/rankings/export-button";
 import {
   Card,
   CardHeader,
@@ -92,12 +93,15 @@ export default async function RankingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">Rankings</h1>
-        <p className="text-muted-foreground">
-          Each pillar shows the player&apos;s most recent score for that
-          pillar.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">Rankings</h1>
+          <p className="text-muted-foreground">
+            Each pillar shows the player&apos;s most recent score for that
+            pillar.
+          </p>
+        </div>
+        <ExportButton />
       </div>
 
       {players.length === 0 ? (

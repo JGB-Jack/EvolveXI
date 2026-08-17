@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ReportView } from "@/components/sessions/report-view";
 import { getExpectedQuestionCount } from "@/lib/data/session-questions";
+import { getPlayerPillarAverages } from "@/lib/data/player-pillar-averages";
 import type { ReportContent } from "@/lib/claude/report";
 
 export default async function PlayerReportPage({
@@ -85,6 +86,12 @@ export default async function PlayerReportPage({
     ]),
   );
 
+  const currentDevelopment = await getPlayerPillarAverages(
+    supabase,
+    session.team_id,
+    playerId,
+  );
+
   let initialContent: ReportContent | null = null;
   if (existingReport) {
     try {
@@ -105,6 +112,7 @@ export default async function PlayerReportPage({
       isComplete={(assessments?.length ?? 0) >= expectedQuestionCount}
       initialContent={initialContent}
       pillarAverages={pillarAverages}
+      currentDevelopment={currentDevelopment}
     />
   );
 }

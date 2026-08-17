@@ -18,6 +18,9 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { ArrowLeft, Mail, Sparkles } from "lucide-react";
+import { PlayerProgressChart } from "@/components/squad/player-progress-chart";
+import { scoreColorClass } from "@/lib/score-color";
+import { cn } from "@/lib/utils";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -52,6 +55,7 @@ export function ReportView({
   isComplete,
   initialContent,
   pillarAverages,
+  currentDevelopment,
 }: {
   sessionId: string;
   player: Player;
@@ -62,9 +66,16 @@ export function ReportView({
   isComplete: boolean;
   initialContent: ReportContent | null;
   pillarAverages: Record<string, number>;
+  currentDevelopment: { pillarId: string; score: number }[];
 }) {
   const router = useRouter();
   const isLast = currentIndex === players.length - 1;
+
+  const developmentOverall =
+    currentDevelopment.length > 0
+      ? currentDevelopment.reduce((sum, p) => sum + p.score, 0) /
+        currentDevelopment.length
+      : null;
 
   const [content, setContent] = useState<ReportContent | null>(initialContent);
   const [reportId, setReportId] = useState<string | null>(initialReportId);
@@ -341,6 +352,43 @@ export function ReportView({
               />
             </CardContent>
           </Card>
+
+          {currentDevelopment.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between text-base">
+                  Current Development
+                  <span className={cn("text-lg", scoreColorClass(developmentOverall))}>
+                    {developmentOverall !== null
+                      ? developmentOverall.toFixed(1)
+                      : "-"}
+                  </span>
+                </CardTitle>
+                <CardDescription>
+                  {player.first_name}&apos;s most recent score for each
+                  pillar, across all sessions.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <PlayerProgressChart
+                  data={currentDevelopment.map(({ pillarId, score }) => ({
+                    pillar: PILLAR_NAME[pillarId] ?? pillarId,
+                    score,
+                  }))}
+                />
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                  {currentDevelopment.map(({ pillarId, score }) => (
+                    <span key={pillarId} className="text-muted-foreground">
+                      {PILLAR_NAME[pillarId] ?? pillarId}{" "}
+                      <span className={scoreColorClass(score)}>
+                        {score.toFixed(1)}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
 
