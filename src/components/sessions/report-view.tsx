@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -81,13 +81,44 @@ export function ReportView({
   const [reportId, setReportId] = useState<string | null>(initialReportId);
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
+    "idle",
+  );
   const [error, setError] = useState<string | null>(null);
+
+  // Skipped on mount and right after a fresh generation, since that content
+  // is already persisted by generateReport itself - only actual edits after
+  // that point need autosaving.
+  const skipNextAutosave = useRef(true);
+
+  useEffect(() => {
+    if (skipNextAutosave.current) {
+      skipNextAutosave.current = false;
+      return;
+    }
+    if (!content || !reportId) return;
+
+    setSaveStatus("saving");
+    const timeout = setTimeout(async () => {
+      try {
+        await saveReportEdits(reportId, content);
+        setSaveStatus("saved");
+      } catch (err) {
+        setSaveStatus("idle");
+        toast.error(err instanceof Error ? err.message : "Failed to save");
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content, reportId]);
 
   async function handleGenerate() {
     setGenerating(true);
     setError(null);
     try {
       const result = await generateReport(sessionId, player.id);
+      skipNextAutosave.current = true;
       setContent(result.content);
       setReportId(result.reportId);
     } catch (err) {
@@ -98,19 +129,6 @@ export function ReportView({
       );
     } finally {
       setGenerating(false);
-    }
-  }
-
-  async function handleSave() {
-    if (!content || !reportId) return;
-    setSaving(true);
-    try {
-      await saveReportEdits(reportId, content);
-      toast.success("Report saved");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save");
-    } finally {
-      setSaving(false);
     }
   }
 
@@ -156,8 +174,19 @@ export function ReportView({
   }
 
   async function handleNext() {
+    setSaving(true);
+    try {
+      if (content && reportId) {
+        await saveReportEdits(reportId, content);
+        setSaveStatus("saved");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save");
+      setSaving(false);
+      return;
+    }
+
     if (isLast) {
-      setSaving(true);
       try {
         await completeSession(sessionId);
         router.push(`/sessions/${sessionId}/complete`);
@@ -185,11 +214,11 @@ export function ReportView({
           {content && (
             <Button
               variant="outline"
-              size="sm"
+              size="icon-lg"
               onClick={() => toast.info("Sending reports is coming soon")}
+              aria-label="Send"
             >
-              <Mail className="size-4" />
-              Send
+              <Mail className="size-5" />
             </Button>
           )}
           <div className="text-right text-sm text-muted-foreground">
@@ -403,11 +432,15 @@ export function ReportView({
             <ArrowLeft className="size-4" />
             Back to ratings
           </Button>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
             {content && (
-              <Button variant="outline" onClick={handleSave} disabled={saving}>
-                {saving ? "Saving..." : "Save report"}
-              </Button>
+              <span className="text-xs text-muted-foreground">
+                {saveStatus === "saving"
+                  ? "Saving..."
+                  : saveStatus === "saved"
+                    ? "Saved"
+                    : ""}
+              </span>
             )}
             <Button onClick={handleNext} disabled={!content || saving}>
               {saving ? "Saving..." : isLast ? "Finish session" : "Next player"}

@@ -49,6 +49,12 @@
 }
 
 :root {
+  /* The app is deliberately always-light (built for outdoor daylight use),
+     so tell browsers not to auto-dark it -- without this, Android Chrome's
+     forced-dark mode darkens the page background while leaving baked-in
+     image pixels (like the logo) untouched, making dark text on a logo
+     image invisible against the auto-darkened background. */
+  color-scheme: light;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

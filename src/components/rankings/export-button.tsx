@@ -8,11 +8,11 @@ export function ExportButton() {
   return (
     <Button
       variant="outline"
-      size="sm"
+      size="icon-lg"
       onClick={() => toast.info("Exporting rankings is coming soon")}
+      aria-label="Export"
     >
-      <Download className="size-4" />
-      Export
+      <Download className="size-5" />
     </Button>
   );
 }

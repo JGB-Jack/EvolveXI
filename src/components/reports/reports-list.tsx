@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { deleteReport } from "@/lib/actions/reports";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -48,6 +49,20 @@ export function ReportsList({ reports }: { reports: Report[] }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // A player can have several reports across sessions - flag whichever one
+  // is each player's most recent so it's unambiguous regardless of search
+  // filtering or where the row falls in the (globally date-sorted) list.
+  const latestReportIds = useMemo(() => {
+    const latestByPlayer = new Map<string, { id: string; createdAt: string }>();
+    for (const r of reports) {
+      const current = latestByPlayer.get(r.player_id);
+      if (!current || r.created_at > current.createdAt) {
+        latestByPlayer.set(r.player_id, { id: r.id, createdAt: r.created_at });
+      }
+    }
+    return new Set(Array.from(latestByPlayer.values()).map((v) => v.id));
+  }, [reports]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -100,16 +115,22 @@ export function ReportsList({ reports }: { reports: Report[] }) {
           <Card key={r.id} className="border-b-2 border-b-primary">
             <CardContent className="flex items-center justify-between gap-3 py-1.5">
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium">
+                <p className="flex items-center gap-1.5 truncate text-sm font-medium">
                   {r.players?.first_name} {r.players?.last_name}
+                  {latestReportIds.has(r.id) && (
+                    <Badge className="shrink-0">Latest</Badge>
+                  )}
                 </p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {r.sessions?.type}
-                  {r.sessions?.opponent ? ` vs ${r.sessions.opponent}` : ""}
-                  {" · "}
-                  {r.sessions?.date}
-                  {" · "}
-                  Generated {new Date(r.created_at).toLocaleDateString()}
+                <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <span className="truncate">
+                    {r.sessions?.type}
+                    {r.sessions?.opponent ? ` vs ${r.sessions.opponent}` : ""}
+                    {" · "}
+                    {r.sessions?.date}
+                  </span>
+                  <span className="shrink-0">
+                    · Generated {new Date(r.created_at).toLocaleDateString()}
+                  </span>
                 </p>
               </div>
               <div className="flex shrink-0 gap-1">
@@ -170,7 +191,10 @@ export function ReportsList({ reports }: { reports: Report[] }) {
             {filtered.map((r) => (
               <TableRow key={r.id}>
                 <TableCell className="font-medium">
-                  {r.players?.first_name} {r.players?.last_name}
+                  <span className="flex items-center gap-1.5">
+                    {r.players?.first_name} {r.players?.last_name}
+                    {latestReportIds.has(r.id) && <Badge>Latest</Badge>}
+                  </span>
                 </TableCell>
                 <TableCell>
                   {r.sessions?.type}

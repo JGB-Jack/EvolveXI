@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -17,6 +17,12 @@ export const metadata: Metadata = {
   title: "EvolveXI — Watch. Assess. Develop.",
   description:
     "Player assessment and development tracking for grassroots football coaches.",
+};
+
+// Always-light app (built for outdoor daylight use) - tells the browser
+// not to auto-dark it when the device is in dark mode.
+export const viewport: Viewport = {
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
