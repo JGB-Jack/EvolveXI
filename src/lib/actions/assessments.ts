@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { refreshSquadInsight } from "@/lib/actions/squad-insight";
 
 export async function saveRating(
   sessionId: string,
@@ -74,6 +75,15 @@ export async function completeSession(sessionId: string) {
     .update({ completed_at: new Date().toISOString() })
     .eq("id", sessionId);
   if (error) throw new Error(error.message);
+
+  // Best-effort - the squad tip is a nice-to-have, so an AI hiccup here
+  // should never block a coach from finishing the session.
+  try {
+    await refreshSquadInsight(sessionId);
+  } catch (err) {
+    // Logged, not rethrown - Home just won't show an updated tip this time.
+    console.error("Failed to generate squad insight:", err);
+  }
 
   // A session going from "in progress" to "completed" changes what
   // getLatestFormRows returns for every player in it, which feeds Home,

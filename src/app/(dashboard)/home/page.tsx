@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { SquadPillarChart } from "@/components/home/squad-pillar-chart";
 import { AboutCard } from "@/components/home/about-card";
+import { SquadInsightButton } from "@/components/home/squad-insight-button";
 import { ProgressRing } from "@/components/home/progress-ring";
 import { KpiBar } from "@/components/home/kpi-bar";
 import { getLatestFormRows } from "@/lib/data/latest-form";
@@ -27,7 +28,7 @@ export default async function HomePage() {
 
   const { data: team } = await supabase
     .from("teams")
-    .select("id, name, age_band")
+    .select("id, name, age_band, latest_insight, latest_insight_generated_at")
     .eq("coach_id", user!.id)
     .single();
 
@@ -203,12 +204,20 @@ export default async function HomePage() {
             </Card>
           </Link>
 
-          <Link href="/rankings" className="block h-full">
-            <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
-              <CardContent className="space-y-1.5">
+          <Card className="h-full gap-2 border-b-2 border-b-primary py-4">
+            <CardContent className="space-y-1.5">
+              <div className="flex items-center justify-between gap-1">
                 <div className="text-xs font-semibold text-muted-foreground">
                   Focus area
                 </div>
+                {team?.latest_insight && (
+                  <SquadInsightButton
+                    tip={team.latest_insight}
+                    generatedAt={team.latest_insight_generated_at}
+                  />
+                )}
+              </div>
+              <Link href="/rankings" className="block transition-opacity hover:opacity-80">
                 <span className="text-xl font-bold tabular-nums text-primary">
                   {weakestPillar
                     ? `${weakestPillar.pillar} · ${weakestPillar.score.toFixed(1)}`
@@ -218,9 +227,9 @@ export default async function HomePage() {
                   percent={weakestPillar ? (weakestPillar.score / 5) * 100 : 0}
                   colorClass={focusAreaBarColor}
                 />
-              </CardContent>
-            </Card>
-          </Link>
+              </Link>
+            </CardContent>
+          </Card>
 
           <Link href="/squad" className="block h-full">
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
