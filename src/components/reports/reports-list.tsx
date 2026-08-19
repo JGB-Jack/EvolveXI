@@ -45,10 +45,13 @@ type Report = {
   players: { first_name: string; last_name: string } | null;
 };
 
+const RECENT_WINDOW_DAYS = 60;
+
 export function ReportsList({ reports }: { reports: Report[] }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
   // A player can have several reports across sessions - flag whichever one
   // is each player's most recent so it's unambiguous regardless of search
@@ -64,7 +67,16 @@ export function ReportsList({ reports }: { reports: Report[] }) {
     return new Set(Array.from(latestByPlayer.values()).map((v) => v.id));
   }, [reports]);
 
-  const filtered = useMemo(() => {
+  // Searching looks across every report regardless of the session's age, so
+  // a coach can always find an older one by name - the date window only
+  // applies to browsing without a search query.
+  const cutoffDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - RECENT_WINDOW_DAYS);
+    return d.toISOString().slice(0, 10);
+  }, []);
+
+  const searched = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return reports;
     return reports.filter((r) => {
@@ -73,6 +85,16 @@ export function ReportsList({ reports }: { reports: Report[] }) {
       return playerName.includes(q) || opponent.includes(q);
     });
   }, [reports, search]);
+
+  const isSearching = search.trim().length > 0;
+  const filtered = useMemo(() => {
+    if (isSearching || showAll) return searched;
+    return searched.filter((r) => (r.sessions?.date ?? "") >= cutoffDate);
+  }, [searched, isSearching, showAll, cutoffDate]);
+
+  const hiddenCount = isSearching
+    ? 0
+    : reports.filter((r) => (r.sessions?.date ?? "") < cutoffDate).length;
 
   async function handleDelete(report: Report) {
     setDeletingId(report.id);
@@ -109,6 +131,20 @@ export function ReportsList({ reports }: { reports: Report[] }) {
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm bg-background"
       />
+
+      {!isSearching && hiddenCount > 0 && (
+        <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+          <span>
+            {showAll
+              ? "Showing all reports"
+              : `Showing reports from the last ${RECENT_WINDOW_DAYS} days`}
+          </span>
+          <Button size="sm" variant="ghost" onClick={() => setShowAll((v) => !v)}>
+            {showAll ? "Show recent only" : `Show all (${hiddenCount} older)`}
+          </Button>
+        </div>
+      )}
+
       {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
       <div className="space-y-1.5 sm:hidden">
         {filtered.map((r) => (

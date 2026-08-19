@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, ClipboardList, FileText, ListOrdered, CircleUserRound } from "lucide-react";
-import { signOut } from "@/lib/actions/auth";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Users, ClipboardList, FileText, ListOrdered } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -19,59 +13,32 @@ const NAV_ITEMS = [
 ];
 
 const TAB_CLASSES =
-  "relative flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium";
+  "flex size-11 shrink-0 items-center justify-center rounded-full transition-colors";
 
 export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-primary/15 bg-background">
-      <div className="mx-auto flex max-w-6xl">
+    <nav className="primary-gradient fixed inset-x-4 bottom-4 z-40 rounded-full shadow-lg">
+      <div className="mx-auto flex max-w-6xl items-center justify-around p-2">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
-              className={cn(TAB_CLASSES, active ? "text-primary" : "text-muted-foreground")}
-            >
-              {active && (
-                <span className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-primary" />
+              aria-label={label}
+              className={cn(
+                TAB_CLASSES,
+                active
+                  ? "bg-primary-foreground text-primary"
+                  : "text-primary-foreground/70",
               )}
+            >
               <Icon className="size-5" />
-              {label}
             </Link>
           );
         })}
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <button
-                type="button"
-                className={cn(TAB_CLASSES, "text-muted-foreground")}
-              />
-            }
-          >
-            <CircleUserRound className="size-5" />
-            Profile
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side="top">
-            <Link
-              href="/settings"
-              className="flex w-full items-center rounded-sm px-2 py-1.5 text-left text-sm hover:bg-muted"
-            >
-              Settings
-            </Link>
-            <form action={signOut}>
-              <button
-                type="submit"
-                className="flex w-full items-center rounded-sm px-2 py-1.5 text-left text-sm hover:bg-muted"
-              >
-                Sign out
-              </button>
-            </form>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </nav>
   );

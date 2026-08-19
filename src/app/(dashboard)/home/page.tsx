@@ -2,10 +2,13 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserCheck, Star, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { SquadPillarChart } from "@/components/home/squad-pillar-chart";
 import { AboutCard } from "@/components/home/about-card";
+import { ProgressRing } from "@/components/home/progress-ring";
+import { KpiBar } from "@/components/home/kpi-bar";
 import { getLatestFormRows } from "@/lib/data/latest-form";
+import { scoreBarColorClass, scoreStrokeColorClass } from "@/lib/score-color";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -117,34 +120,23 @@ export default async function HomePage() {
     0,
   );
 
-  const STATS = [
-    {
-      label: "Players assessed in the last 30 days",
-      value: `${assessedPercent}%`,
-      icon: UserCheck,
-      href: "/squad",
-    },
-    {
-      label: "Squad average score",
-      value: squadAverage !== null ? `${squadAverage.toFixed(1)}/5` : "-",
-      icon: Star,
-      href: "/sessions",
-    },
-    {
-      label: "Focus area",
-      value: weakestPillar
-        ? `${weakestPillar.pillar} · ${weakestPillar.score.toFixed(1)}`
-        : "-",
-      icon: Star,
-      href: "/rankings",
-    },
-    {
-      label: "Players not yet assessed",
-      value: `${notYetAssessedCount}`,
-      icon: UserCheck,
-      href: "/squad",
-    },
-  ];
+  // Same red/amber/green banding used everywhere else, expressed relative
+  // to each tile's own scale (percent -> equivalent /5 score for the ring;
+  // /5 scores used directly for the bars).
+  const assessedRingColor = scoreStrokeColorClass((assessedPercent / 100) * 5);
+  const squadAverageBarColor = scoreBarColorClass(squadAverage);
+  const focusAreaBarColor = scoreBarColorClass(weakestPillar?.score ?? null);
+  const notYetAssessedPercent =
+    squadCount && squadCount > 0
+      ? (notYetAssessedCount / squadCount) * 100
+      : 0;
+  const notYetAssessedBarPercent =
+    notYetAssessedCount > 0
+      ? Math.max(notYetAssessedPercent, 6)
+      : 0;
+  const notYetAssessedBarColor = scoreBarColorClass(
+    notYetAssessedCount > 0 ? 0 : 5,
+  );
 
   return (
     <div className="space-y-6">
@@ -183,20 +175,69 @@ export default async function HomePage() {
         )}
 
         <div className="grid grid-cols-2 gap-3">
-          {STATS.map(({ label, value, href }) => (
-            <Link key={label} href={href} className="block h-full">
-              <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
-                <CardContent className="space-y-1.5">
-                  <div className="text-xs font-semibold text-muted-foreground">
-                    {label}
-                  </div>
-                  <span className="text-xl font-bold tabular-nums text-primary">
-                    {value}
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+          <Link href="/squad" className="block h-full">
+            <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
+              <CardContent className="flex items-center gap-3">
+                <ProgressRing percent={assessedPercent} colorClass={assessedRingColor} />
+                <div className="text-xs font-semibold text-muted-foreground">
+                  Players assessed in the last 30 days
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/sessions" className="block h-full">
+            <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
+              <CardContent className="space-y-1.5">
+                <div className="text-xs font-semibold text-muted-foreground">
+                  Squad average score
+                </div>
+                <span className="text-xl font-bold tabular-nums text-primary">
+                  {squadAverage !== null ? `${squadAverage.toFixed(1)}/5` : "-"}
+                </span>
+                <KpiBar
+                  percent={squadAverage !== null ? (squadAverage / 5) * 100 : 0}
+                  colorClass={squadAverageBarColor}
+                />
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/rankings" className="block h-full">
+            <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
+              <CardContent className="space-y-1.5">
+                <div className="text-xs font-semibold text-muted-foreground">
+                  Focus area
+                </div>
+                <span className="text-xl font-bold tabular-nums text-primary">
+                  {weakestPillar
+                    ? `${weakestPillar.pillar} · ${weakestPillar.score.toFixed(1)}`
+                    : "-"}
+                </span>
+                <KpiBar
+                  percent={weakestPillar ? (weakestPillar.score / 5) * 100 : 0}
+                  colorClass={focusAreaBarColor}
+                />
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/squad" className="block h-full">
+            <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
+              <CardContent className="space-y-1.5">
+                <div className="text-xs font-semibold text-muted-foreground">
+                  Players not yet assessed
+                </div>
+                <span className="text-xl font-bold tabular-nums text-primary">
+                  {notYetAssessedCount}
+                </span>
+                <KpiBar
+                  percent={notYetAssessedBarPercent}
+                  colorClass={notYetAssessedBarColor}
+                />
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {pillarData.length > 0 && <SquadPillarChart data={pillarData} />}

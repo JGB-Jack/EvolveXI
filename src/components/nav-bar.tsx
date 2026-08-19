@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home } from "lucide-react";
+import { Home, CircleUserRound } from "lucide-react";
+import { signOut } from "@/lib/actions/auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function NavBar() {
   const pathname = usePathname();
@@ -24,7 +30,37 @@ export function NavBar() {
         <span className="text-xl font-semibold tracking-tight text-primary-foreground">
           EvolveXI
         </span>
-        <div />
+        <div className="flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <button
+                  type="button"
+                  aria-label="Profile"
+                  className="inline-flex items-center text-primary-foreground/90 hover:text-primary-foreground"
+                />
+              }
+            >
+              <CircleUserRound className="size-5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <Link
+                href="/settings"
+                className="flex w-full items-center rounded-sm px-2 py-1.5 text-left text-sm hover:bg-muted"
+              >
+                Settings
+              </Link>
+              <form action={signOut}>
+                <button
+                  type="submit"
+                  className="flex w-full items-center rounded-sm px-2 py-1.5 text-left text-sm hover:bg-muted"
+                >
+                  Sign out
+                </button>
+              </form>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
   );

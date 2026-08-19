@@ -45,10 +45,22 @@ type Session = {
   }[];
 };
 
+const RECENT_WINDOW_DAYS = 60;
+
 export function SessionsList({ sessions }: { sessions: Session[] }) {
   const [search, setSearch] = useState("");
+  const [showAll, setShowAll] = useState(false);
 
-  const filtered = useMemo(() => {
+  // Searching looks across every session regardless of age, so a coach
+  // can always find an older one by name - the date window only applies
+  // to browsing without a search query.
+  const cutoffDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - RECENT_WINDOW_DAYS);
+    return d.toISOString().slice(0, 10);
+  }, []);
+
+  const searched = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return sessions;
     return sessions.filter((session) => {
@@ -57,6 +69,16 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
       return players.includes(q) || opponent.includes(q);
     });
   }, [sessions, search]);
+
+  const isSearching = search.trim().length > 0;
+  const filtered = useMemo(() => {
+    if (isSearching || showAll) return searched;
+    return searched.filter((session) => session.date >= cutoffDate);
+  }, [searched, isSearching, showAll, cutoffDate]);
+
+  const hiddenCount = isSearching
+    ? 0
+    : sessions.filter((s) => s.date < cutoffDate).length;
 
   if (sessions.length === 0) {
     return (
@@ -79,6 +101,19 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm bg-background"
       />
+
+      {!isSearching && hiddenCount > 0 && (
+        <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+          <span>
+            {showAll
+              ? "Showing all sessions"
+              : `Showing sessions from the last ${RECENT_WINDOW_DAYS} days`}
+          </span>
+          <Button size="sm" variant="ghost" onClick={() => setShowAll((v) => !v)}>
+            {showAll ? "Show recent only" : `Show all (${hiddenCount} older)`}
+          </Button>
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <Card>

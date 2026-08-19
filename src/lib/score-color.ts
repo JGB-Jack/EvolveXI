@@ -15,3 +15,11 @@ export function scoreBarColorClass(score: number | null): string {
   if (score >= 2.5) return "bg-amber-500 dark:bg-amber-500";
   return "bg-red-600 dark:bg-red-500";
 }
+
+// Same bands again, as a text/currentColor class for SVG strokes (progress rings).
+export function scoreStrokeColorClass(score: number | null): string {
+  if (score === null) return "text-muted-foreground";
+  if (score >= 4) return "text-green-600 dark:text-green-500";
+  if (score >= 2.5) return "text-amber-500 dark:text-amber-500";
+  return "text-red-600 dark:text-red-500";
+}
