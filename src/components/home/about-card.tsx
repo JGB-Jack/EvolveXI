@@ -17,7 +17,7 @@ export function AboutCard() {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <Card className="gap-0 overflow-hidden py-0">
+    <Card className="gap-0 overflow-hidden border-b-2 border-b-primary py-0">
       <button
         type="button"
         onClick={() => setExpanded((e) => !e)}

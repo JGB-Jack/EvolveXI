@@ -106,7 +106,7 @@ export function RankingsTable({
         ))}
       </div>
 
-      <Card className="hidden sm:block">
+      <Card className="hidden border-b-2 border-b-primary sm:block">
         <Table>
           <TableHeader>
             <TableRow>

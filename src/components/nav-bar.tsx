@@ -7,6 +7,7 @@ import { signOut } from "@/lib/actions/auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -44,19 +45,13 @@ export function NavBar() {
               <CircleUserRound className="size-5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <Link
-                href="/settings"
-                className="flex w-full items-center rounded-sm px-2 py-1.5 text-left text-sm hover:bg-muted"
-              >
+              <DropdownMenuItem render={<Link href="/settings" />}>
                 Settings
-              </Link>
+              </DropdownMenuItem>
               <form action={signOut}>
-                <button
-                  type="submit"
-                  className="flex w-full items-center rounded-sm px-2 py-1.5 text-left text-sm hover:bg-muted"
-                >
+                <DropdownMenuItem render={<button type="submit" />}>
                   Sign out
-                </button>
+                </DropdownMenuItem>
               </form>
             </DropdownMenuContent>
           </DropdownMenu>

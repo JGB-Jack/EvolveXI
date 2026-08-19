@@ -63,7 +63,7 @@ export default async function SessionsPage() {
       <SessionsList sessions={sessions ?? []} />
 
       {archivedSessions && archivedSessions.length > 0 && (
-        <Card>
+        <Card className="border-b-2 border-b-primary">
           <CardHeader>
             <CardTitle className="text-base">
               Archived sessions ({archivedSessions.length})

@@ -76,14 +76,13 @@ export async function completeSession(sessionId: string) {
     .eq("id", sessionId);
   if (error) throw new Error(error.message);
 
-  // Best-effort - the squad tip is a nice-to-have, so an AI hiccup here
-  // should never block a coach from finishing the session.
-  try {
-    await refreshSquadInsight(sessionId);
-  } catch (err) {
-    // Logged, not rethrown - Home just won't show an updated tip this time.
+  // Fire-and-forget - the squad tip is a nice-to-have, so a coach finishing
+  // a session should never sit waiting on an AI call (which got slower once
+  // this started pooling up to 14 days of data). Errors are logged, not
+  // thrown, since nothing here should affect what the coach sees next.
+  refreshSquadInsight(sessionId).catch((err) => {
     console.error("Failed to generate squad insight:", err);
-  }
+  });
 
   // A session going from "in progress" to "completed" changes what
   // getLatestFormRows returns for every player in it, which feeds Home,

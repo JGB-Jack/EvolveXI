@@ -105,7 +105,7 @@ export default async function RankingsPage() {
       </div>
 
       {players.length === 0 ? (
-        <Card>
+        <Card className="border-b-2 border-b-primary">
           <CardHeader>
             <CardTitle>No ratings yet</CardTitle>
             <CardDescription>

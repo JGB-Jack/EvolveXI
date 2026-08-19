@@ -135,7 +135,7 @@ export default async function HomePage() {
     notYetAssessedCount > 0
       ? Math.max(notYetAssessedPercent, 6)
       : 0;
-  const notYetAssessedBarColor = scoreBarColorClass(
+  const notYetAssessedRingColor = scoreStrokeColorClass(
     notYetAssessedCount > 0 ? 0 : 5,
   );
 
@@ -187,19 +187,18 @@ export default async function HomePage() {
             </Card>
           </Link>
 
-          <Link href="/sessions" className="block h-full">
+          <Link href="/squad" className="block h-full">
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
-              <CardContent className="space-y-1.5">
-                <div className="text-xs font-semibold text-muted-foreground">
-                  Squad average score
-                </div>
-                <span className="text-xl font-bold tabular-nums text-primary">
-                  {squadAverage !== null ? `${squadAverage.toFixed(1)}/5` : "-"}
-                </span>
-                <KpiBar
-                  percent={squadAverage !== null ? (squadAverage / 5) * 100 : 0}
-                  colorClass={squadAverageBarColor}
+              <CardContent className="flex items-center gap-3">
+                <ProgressRing
+                  percent={notYetAssessedBarPercent}
+                  colorClass={notYetAssessedRingColor}
+                  trackColorClass={assessedRingColor}
+                  label={`${notYetAssessedCount}/${squadCount ?? 0}`}
                 />
+                <div className="text-xs font-semibold text-muted-foreground">
+                  Players not yet assessed
+                </div>
               </CardContent>
             </Card>
           </Link>
@@ -231,18 +230,18 @@ export default async function HomePage() {
             </CardContent>
           </Card>
 
-          <Link href="/squad" className="block h-full">
+          <Link href="/sessions" className="block h-full">
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
               <CardContent className="space-y-1.5">
                 <div className="text-xs font-semibold text-muted-foreground">
-                  Players not yet assessed
+                  Squad average score
                 </div>
                 <span className="text-xl font-bold tabular-nums text-primary">
-                  {notYetAssessedCount}
+                  {squadAverage !== null ? `${squadAverage.toFixed(1)}/5` : "-"}
                 </span>
                 <KpiBar
-                  percent={notYetAssessedBarPercent}
-                  colorClass={notYetAssessedBarColor}
+                  percent={squadAverage !== null ? (squadAverage / 5) * 100 : 0}
+                  colorClass={squadAverageBarColor}
                 />
               </CardContent>
             </Card>

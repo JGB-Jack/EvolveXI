@@ -19,7 +19,7 @@ export default function SettingsPage() {
       </div>
 
       <Link href="/settings/questions" className="block">
-        <Card className="transition-colors hover:bg-muted/50">
+        <Card className="border-b-2 border-b-primary transition-colors hover:bg-muted/50">
           <CardHeader>
             <CardTitle>Question bank</CardTitle>
             <CardDescription>
@@ -29,7 +29,7 @@ export default function SettingsPage() {
         </Card>
       </Link>
 
-      <Card className="opacity-70">
+      <Card className="border-b-2 border-b-primary opacity-70">
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
             <CardTitle>Profile set up</CardTitle>
@@ -43,7 +43,7 @@ export default function SettingsPage() {
         </CardHeader>
       </Card>
 
-      <Card className="opacity-70">
+      <Card className="border-b-2 border-b-primary opacity-70">
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
             <CardTitle>Club set up</CardTitle>
@@ -57,7 +57,7 @@ export default function SettingsPage() {
         </CardHeader>
       </Card>
 
-      <Card className="opacity-70">
+      <Card className="border-b-2 border-b-primary opacity-70">
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
             <CardTitle>FAQs</CardTitle>

@@ -111,7 +111,7 @@ export function ReportsList({ reports }: { reports: Report[] }) {
 
   if (reports.length === 0) {
     return (
-      <Card>
+      <Card className="border-b-2 border-b-primary">
         <CardHeader>
           <CardTitle>No reports yet</CardTitle>
           <CardDescription>
@@ -213,7 +213,7 @@ export function ReportsList({ reports }: { reports: Report[] }) {
         ))}
       </div>
 
-      <Card className="hidden sm:block">
+      <Card className="hidden border-b-2 border-b-primary sm:block">
         <Table>
           <TableHeader>
             <TableRow>

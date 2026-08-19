@@ -112,7 +112,7 @@ export function SessionDashboard({
       {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
       <div className="space-y-3 sm:hidden">
         {sorted.map(({ player, pillarAverages, overall }) => (
-          <Card key={player.id}>
+          <Card key={player.id} className="border-b-2 border-b-primary">
             <CardContent className="space-y-3 py-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="font-medium">
@@ -147,7 +147,7 @@ export function SessionDashboard({
         ))}
       </div>
 
-      <Card className="hidden sm:block">
+      <Card className="hidden border-b-2 border-b-primary sm:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -215,7 +215,7 @@ export function SessionDashboard({
               score: pillarAverages[id] ?? 0,
             }));
             return (
-              <Card key={player.id}>
+              <Card key={player.id} className="border-b-2 border-b-primary">
                 <CardHeader>
                   <CardTitle className="text-base">
                     {player.first_name} {player.last_name}

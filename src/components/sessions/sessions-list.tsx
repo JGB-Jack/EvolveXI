@@ -82,7 +82,7 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
 
   if (sessions.length === 0) {
     return (
-      <Card>
+      <Card className="border-b-2 border-b-primary">
         <CardHeader>
           <CardTitle>No sessions yet</CardTitle>
           <CardDescription>
@@ -116,7 +116,7 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
       )}
 
       {filtered.length === 0 ? (
-        <Card>
+        <Card className="border-b-2 border-b-primary">
           <CardHeader>
             <CardTitle>No matching sessions</CardTitle>
             <CardDescription>
@@ -202,7 +202,7 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
             ))}
           </div>
 
-          <Card className="hidden sm:block">
+          <Card className="hidden border-b-2 border-b-primary sm:block">
             <Table>
               <TableHeader>
                 <TableRow>

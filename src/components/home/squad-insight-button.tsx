@@ -32,7 +32,8 @@ export function SquadInsightButton({
           <DialogTitle>Coach&apos;s tip</DialogTitle>
           {generatedAt && (
             <DialogDescription>
-              From your session on {new Date(generatedAt).toLocaleDateString()}
+              Based on your last 14 days of sessions &middot; updated{" "}
+              {new Date(generatedAt).toLocaleDateString()}
             </DialogDescription>
           )}
         </DialogHeader>

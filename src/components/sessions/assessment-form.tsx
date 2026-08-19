@@ -195,7 +195,7 @@ export function AssessmentForm({
         </div>
       </div>
 
-      <Card>
+      <Card className="border-b-2 border-b-primary">
       <CardContent>
       <Accordion defaultValue={visiblePillars.map((p) => p.id)}>
         {visiblePillars.map((pillar) => (

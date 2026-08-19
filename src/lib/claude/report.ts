@@ -37,6 +37,7 @@ Rules:
 - Base everything strictly on the ratings, anchor descriptions, and notes provided. Do not invent specific incidents that weren't mentioned, other than lightly building on the "standout moment" if one was given.
 - Choose the 2 development priorities based on which pillars genuinely need the most attention, considering ALL pillars given equally — do not default to Technical, Physical, or Tactical just because they're easier to write a drill for. If Psychological or Social scores or notes show a real area for growth, it deserves a priority slot just as much as a technical weakness.
 - Each development priority must include one concrete, practical suggestion the coach could actually put into action — for Technical/Physical/Tactical this is usually a training drill; for Psychological or Social priorities it can instead be a specific coaching intervention (e.g. giving the player a defined leadership role, a pre-match routine, a communication cue to use with teammates, a specific way to praise or challenge them in the moment).
+- Never state a specific match duration (e.g. "80 minutes", "90 minutes") — grassroots match lengths vary by age band and this isn't given as input. Say "the full game" or "the whole match" instead.
 
 Respond with ONLY valid JSON (no markdown fences, no commentary) matching exactly this shape:
 {

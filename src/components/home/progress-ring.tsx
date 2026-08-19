@@ -6,9 +6,13 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 export function ProgressRing({
   percent,
   colorClass,
+  trackColorClass = "text-muted",
+  label,
 }: {
   percent: number;
   colorClass: string;
+  trackColorClass?: string;
+  label?: string;
 }) {
   const clamped = Math.min(Math.max(percent, 0), 100);
   const offset = CIRCUMFERENCE * (1 - clamped / 100);
@@ -23,7 +27,7 @@ export function ProgressRing({
           fill="none"
           stroke="currentColor"
           strokeWidth="5"
-          className="text-muted"
+          className={trackColorClass}
         />
         <circle
           cx="25"
@@ -44,7 +48,7 @@ export function ProgressRing({
           colorClass,
         )}
       >
-        {Math.round(clamped)}%
+        {label ?? `${Math.round(clamped)}%`}
       </span>
     </div>
   );

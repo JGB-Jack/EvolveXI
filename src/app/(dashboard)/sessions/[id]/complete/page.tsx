@@ -35,7 +35,7 @@ export default async function SessionCompletePage({
 
   return (
     <div className="mx-auto max-w-md">
-      <Card>
+      <Card className="border-b-2 border-b-primary">
         <CardHeader className="items-center text-center">
           <CheckCircle2 className="size-12 text-green-600" />
           <CardTitle className="text-xl">Session complete</CardTitle>

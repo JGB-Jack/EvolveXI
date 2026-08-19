@@ -32,7 +32,7 @@ export default function SessionDetailsPage() {
 
   return (
     <div className="mx-auto max-w-lg">
-      <Card>
+      <Card className="border-b-2 border-b-primary">
         <CardHeader>
           <CardTitle>New Session</CardTitle>
           <CardDescription>

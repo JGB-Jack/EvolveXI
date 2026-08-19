@@ -52,7 +52,7 @@ export function QuestionBankAccordion({
   }
 
   return (
-    <Card>
+    <Card className="border-b-2 border-b-primary">
       <CardContent>
     <Accordion
       defaultValue={defaultExpanded ? PILLAR_ORDER.map((p) => p.id) : []}

@@ -84,7 +84,7 @@ export default async function PlayerProfilePage({
       </div>
 
       {pillarAverages.length === 0 ? (
-        <Card>
+        <Card className="border-b-2 border-b-primary">
           <CardHeader>
             <CardTitle>Assessment history</CardTitle>
             <CardDescription>
@@ -94,7 +94,7 @@ export default async function PlayerProfilePage({
           </CardHeader>
         </Card>
       ) : (
-        <Card>
+        <Card className="border-b-2 border-b-primary">
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-base">
               Current Development

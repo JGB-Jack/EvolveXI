@@ -228,7 +228,7 @@ export function ReportView({
       </div>
 
       {!content && !hasScores && (
-        <Card>
+        <Card className="border-b-2 border-b-primary">
           <CardHeader>
             <CardTitle>No scores recorded yet</CardTitle>
             <CardDescription>
@@ -241,7 +241,7 @@ export function ReportView({
       )}
 
       {!content && hasScores && !isComplete && (
-        <Card>
+        <Card className="border-b-2 border-b-primary">
           <CardHeader>
             <CardTitle>Assessment not finished yet</CardTitle>
             <CardDescription>
@@ -254,7 +254,7 @@ export function ReportView({
       )}
 
       {!content && hasScores && isComplete && (
-        <Card>
+        <Card className="border-b-2 border-b-primary">
           <CardHeader>
             <CardTitle>Generate this player&apos;s report</CardTitle>
             <CardDescription>
@@ -277,7 +277,7 @@ export function ReportView({
 
       {content && (
         <>
-          <Card>
+          <Card className="border-b-2 border-b-primary">
             <CardContent className="pt-4">
               <Textarea
                 value={content.summary}
@@ -296,7 +296,7 @@ export function ReportView({
                 PILLAR_ORDER.indexOf(b.pillar_id),
             )
             .map((p) => (
-            <Card key={p.pillar_id}>
+            <Card key={p.pillar_id} className="border-b-2 border-b-primary">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between text-base">
                   {PILLAR_NAME[p.pillar_id] ?? p.pillar_id}
@@ -317,7 +317,7 @@ export function ReportView({
             </Card>
           ))}
 
-          <Card>
+          <Card className="border-b-2 border-b-primary">
             <CardHeader>
               <CardTitle className="text-base">Key strengths</CardTitle>
             </CardHeader>
@@ -333,7 +333,7 @@ export function ReportView({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-b-2 border-b-primary">
             <CardHeader>
               <CardTitle className="text-base">Development priorities</CardTitle>
             </CardHeader>
@@ -363,7 +363,7 @@ export function ReportView({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-b-2 border-b-primary">
             <CardHeader>
               <CardTitle className="text-base">
                 Recommended training focus
@@ -383,7 +383,7 @@ export function ReportView({
           </Card>
 
           {currentDevelopment.length > 0 && (
-            <Card>
+            <Card className="border-b-2 border-b-primary">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between text-base">
                   Current Development

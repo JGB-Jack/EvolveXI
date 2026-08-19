@@ -16,18 +16,17 @@ export type SquadInsightPlayer = {
 export type SquadInsightInput = {
   teamName: string;
   ageBand: string;
-  sessionType: string;
-  sessionDate: string;
+  sessions: { type: string; date: string }[];
   players: SquadInsightPlayer[];
 };
 
-const SYSTEM_PROMPT = `You are an experienced, encouraging grassroots football coach reviewing every player's ratings and notes from a single session, looking for ONE pattern that shows up across MULTIPLE players.
+const SYSTEM_PROMPT = `You are an experienced, encouraging grassroots football coach reviewing every player's ratings and notes from the team's recent sessions, looking for ONE pattern that shows up across MULTIPLE players.
 
-Every player already gets their own individual development report with player-specific priorities, so your job is different: spot something shared across the squad that a coach reviewing individual reports one at a time would miss.
+Every player already gets their own individual development report with player-specific priorities, so your job is different: spot something shared across the squad that a coach reviewing individual reports one at a time would miss. Where useful, notice whether something is a recurring issue across sessions or a recent change.
 
 Rules:
 - The pattern must genuinely appear in at least two players' ratings, anchor descriptions, or notes - never invent one.
-- If nothing shared genuinely stands out, say plainly that this session didn't reveal a clear squad-wide pattern, rather than forcing one.
+- If nothing shared genuinely stands out, say plainly that recent sessions haven't revealed a clear squad-wide pattern, rather than forcing one.
 - Plain English, no jargon.
 - Include one concrete, practical suggestion the coach could act on next session.
 - 1-2 sentences maximum. This is a quick note, not a report.
@@ -36,6 +35,10 @@ Respond with ONLY valid JSON (no markdown fences, no commentary) matching exactl
 { "tip": "1-2 sentence squad-wide observation and suggestion" }`;
 
 function buildUserPrompt(input: SquadInsightInput): string {
+  const sessionLines = input.sessions
+    .map((s) => `  - ${s.date}: ${s.type}`)
+    .join("\n");
+
   const playerBlocks = input.players
     .map((player) => {
       const pillarBlocks = player.pillars
@@ -56,7 +59,8 @@ function buildUserPrompt(input: SquadInsightInput): string {
     .join("\n\n");
 
   return `Team: ${input.teamName} (${input.ageBand})
-Session: ${input.sessionType} on ${input.sessionDate}
+Sessions in the last 14 days:
+${sessionLines}
 
 ${playerBlocks}`;
 }

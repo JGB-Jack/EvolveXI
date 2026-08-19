@@ -123,7 +123,7 @@ export function SquadView({
   }
 
   const archivedSection = archivedPlayers.length > 0 && (
-    <Card>
+    <Card className="border-b-2 border-b-primary">
       <CardHeader>
         <CardTitle className="text-base">
           Archived players ({archivedPlayers.length})
@@ -169,7 +169,7 @@ export function SquadView({
             {teamName} &middot; {teamAgeBand}
           </p>
         </div>
-        <Card>
+        <Card className="border-b-2 border-b-primary">
           <CardHeader>
             <CardTitle>Add your players to get started.</CardTitle>
             <CardDescription>
@@ -217,30 +217,30 @@ export function SquadView({
       </div>
 
       {/* Card list: phones. Table: tablet/desktop, where the extra width fits. */}
-      <div className="space-y-3 sm:hidden">
+      <div className="space-y-1.5 sm:hidden">
         {sorted.map((player) => (
           <Card key={player.id} className="border-b-2 border-b-primary">
-            <CardContent className="flex items-center justify-between gap-3 py-4">
-              <div className="flex min-w-0 items-center gap-3">
-                <span className="relative flex size-10 shrink-0 items-center justify-center">
+            <CardContent className="flex items-center justify-between gap-3 py-2">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <span className="relative flex size-8 shrink-0 items-center justify-center">
                   <Shirt
-                    className="absolute inset-0 size-10 fill-primary text-primary"
+                    className="absolute inset-0 size-8 fill-primary text-primary"
                     strokeWidth={1.5}
                   />
-                  <span className="relative mt-1.5 text-xs font-bold tabular-nums text-primary-foreground">
+                  <span className="relative mt-1 text-[10px] font-bold tabular-nums text-primary-foreground">
                     {player.squad_number ?? "-"}
                   </span>
                 </span>
                 <div className="min-w-0">
                   <button
-                    className="truncate font-medium underline-offset-2 hover:underline"
+                    className="truncate text-sm font-medium underline-offset-2 hover:underline"
                     onClick={() =>
                       router.push(`/squad/player/${player.id}/profile`)
                     }
                   >
                     {player.first_name} {player.last_name}
                   </button>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="truncate text-xs text-muted-foreground">
                     {POSITION_LABEL[player.primary_position]}
                     {player.secondary_position &&
                       ` / ${POSITION_LABEL[player.secondary_position]}`}
@@ -273,7 +273,7 @@ export function SquadView({
         ))}
       </div>
 
-      <Card className="hidden sm:block">
+      <Card className="hidden border-b-2 border-b-primary sm:block">
         <Table>
           <TableHeader>
             <TableRow>
