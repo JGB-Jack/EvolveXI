@@ -21,7 +21,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           !hideBottomNav && "pb-24",
         )}
       >
-        {children}
+        {/* Keyed by route so the entrance animation replays on every
+            navigation, not just the first page load. */}
+        <div key={pathname} className="fade-in-step">
+          {children}
+        </div>
       </main>
       {!hideBottomNav && <BottomNav />}
     </>

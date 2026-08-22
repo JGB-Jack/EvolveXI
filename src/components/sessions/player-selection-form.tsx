@@ -7,6 +7,7 @@ import { createSession } from "@/lib/actions/sessions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { PlayerAvatar } from "@/components/player-avatar";
 
 const POSITION_LABEL: Record<string, string> = {
   defence: "Defence",
@@ -20,6 +21,7 @@ export type SquadPlayer = {
   first_name: string;
   last_name: string;
   primary_position: string;
+  squad_number: number | null;
 };
 
 export function PlayerSelectionForm({
@@ -92,6 +94,7 @@ export function PlayerSelectionForm({
                 checked={checked}
                 onCheckedChange={() => toggle(player.id)}
               />
+              <PlayerAvatar squadNumber={player.squad_number} />
               <span className="flex-1">
                 {player.first_name} {player.last_name}
               </span>

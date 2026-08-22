@@ -8,6 +8,7 @@ import { getPlayerPillarAverages } from "@/lib/data/player-pillar-averages";
 import { PlayerProgressChart } from "@/components/squad/player-progress-chart";
 import { scoreColorClass } from "@/lib/score-color";
 import { cn } from "@/lib/utils";
+import { PlayerAvatar } from "@/components/player-avatar";
 
 const POSITION_LABEL: Record<string, string> = {
   defence: "Defence",
@@ -70,17 +71,19 @@ export default async function PlayerProfilePage({
         Back to squad
       </Button>
 
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">
-          {player.first_name} {player.last_name}
-        </h1>
-        <p className="text-muted-foreground">
-          {POSITION_LABEL[player.primary_position]}
-          {player.secondary_position &&
-            ` / ${POSITION_LABEL[player.secondary_position]}`}
-          {player.squad_number != null && ` · #${player.squad_number}`}
-          {player.dob && ` · Born ${player.dob}`}
-        </p>
+      <div className="flex items-center gap-3">
+        <PlayerAvatar squadNumber={player.squad_number} size="lg" />
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">
+            {player.first_name} {player.last_name}
+          </h1>
+          <p className="text-muted-foreground">
+            {POSITION_LABEL[player.primary_position]}
+            {player.secondary_position &&
+              ` / ${POSITION_LABEL[player.secondary_position]}`}
+            {player.dob && ` · Born ${player.dob}`}
+          </p>
+        </div>
       </div>
 
       {pillarAverages.length === 0 ? (

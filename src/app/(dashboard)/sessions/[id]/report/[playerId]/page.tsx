@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ReportView } from "@/components/sessions/report-view";
 import { getExpectedQuestionCount } from "@/lib/data/session-questions";
 import { getPlayerPillarAverages } from "@/lib/data/player-pillar-averages";
+import { getPreviousSessionOverall } from "@/lib/data/previous-session-score";
 import type { ReportContent } from "@/lib/claude/report";
 
 export default async function PlayerReportPage({
@@ -29,7 +30,7 @@ export default async function PlayerReportPage({
 
   const { data: sessionPlayers } = await supabase
     .from("session_players")
-    .select("player_id, players(id, first_name, last_name, primary_position)")
+    .select("player_id, players(id, first_name, last_name, primary_position, squad_number)")
     .eq("session_id", sessionId);
 
   type PlayerRow = {
@@ -37,6 +38,7 @@ export default async function PlayerReportPage({
     first_name: string;
     last_name: string;
     primary_position: string;
+    squad_number: number | null;
   };
 
   const ordered = (sessionPlayers ?? [])
@@ -92,6 +94,18 @@ export default async function PlayerReportPage({
     playerId,
   );
 
+  const sessionScores = (assessments ?? []).map((a) => a.score);
+  const sessionOverall =
+    sessionScores.length > 0
+      ? sessionScores.reduce((sum, s) => sum + s, 0) / sessionScores.length
+      : null;
+  const previousSessionOverall = await getPreviousSessionOverall(
+    supabase,
+    session.team_id,
+    playerId,
+    sessionId,
+  );
+
   let initialContent: ReportContent | null = null;
   if (existingReport) {
     try {
@@ -113,6 +127,8 @@ export default async function PlayerReportPage({
       initialContent={initialContent}
       pillarAverages={pillarAverages}
       currentDevelopment={currentDevelopment}
+      sessionOverall={sessionOverall}
+      previousSessionOverall={previousSessionOverall}
     />
   );
 }

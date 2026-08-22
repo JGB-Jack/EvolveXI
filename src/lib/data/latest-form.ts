@@ -8,7 +8,13 @@ export type LatestFormRow = {
   pillar_id: string;
   session_date: string;
   player:
-    | { first_name: string; last_name: string; primary_position: string; active: boolean }
+    | {
+        first_name: string;
+        last_name: string;
+        primary_position: string;
+        active: boolean;
+        squad_number: number | null;
+      }
     | undefined;
 };
 
@@ -28,7 +34,7 @@ export async function getLatestFormRows(
   const { data } = await supabase
     .from("assessments")
     .select(
-      "player_id, session_id, score, team_questions(pillar_id), players(first_name, last_name, primary_position, active), sessions!inner(team_id, date, completed_at)",
+      "player_id, session_id, score, team_questions(pillar_id), players(first_name, last_name, primary_position, active, squad_number), sessions!inner(team_id, date, completed_at)",
     )
     .eq("sessions.team_id", teamId)
     .not("sessions.completed_at", "is", null);

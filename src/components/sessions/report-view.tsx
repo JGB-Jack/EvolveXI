@@ -18,10 +18,11 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { ArrowLeft, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, Mail, Sparkles, TrendingUp } from "lucide-react";
 import { PlayerProgressChart } from "@/components/squad/player-progress-chart";
 import { scoreColorClass } from "@/lib/score-color";
 import { cn } from "@/lib/utils";
+import { PlayerAvatar } from "@/components/player-avatar";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -44,6 +45,7 @@ type Player = {
   first_name: string;
   last_name: string;
   primary_position: string;
+  squad_number: number | null;
 };
 
 export function ReportView({
@@ -57,6 +59,8 @@ export function ReportView({
   initialContent,
   pillarAverages,
   currentDevelopment,
+  sessionOverall,
+  previousSessionOverall,
 }: {
   sessionId: string;
   player: Player;
@@ -68,6 +72,8 @@ export function ReportView({
   initialContent: ReportContent | null;
   pillarAverages: Record<string, number>;
   currentDevelopment: { pillarId: string; score: number }[];
+  sessionOverall: number | null;
+  previousSessionOverall: number | null;
 }) {
   const router = useRouter();
   const isLast = currentIndex === players.length - 1;
@@ -77,6 +83,11 @@ export function ReportView({
       ? currentDevelopment.reduce((sum, p) => sum + p.score, 0) /
         currentDevelopment.length
       : null;
+
+  const improved =
+    sessionOverall !== null &&
+    previousSessionOverall !== null &&
+    sessionOverall > previousSessionOverall;
 
   const [content, setContent] = useState<ReportContent | null>(initialContent);
   const [reportId, setReportId] = useState<string | null>(initialReportId);
@@ -207,13 +218,16 @@ export function ReportView({
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-24">
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground">
-            {player.first_name} {player.last_name}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {POSITION_LABEL[player.primary_position]} &middot; Report
-          </p>
+        <div className="flex items-center gap-3">
+          <PlayerAvatar squadNumber={player.squad_number} size="md" />
+          <div>
+            <h1 className="text-xl font-semibold text-foreground">
+              {player.first_name} {player.last_name}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {POSITION_LABEL[player.primary_position]} &middot; Report
+            </p>
+          </div>
         </div>
         <div className="flex flex-col items-end gap-2">
           {content && (
@@ -231,6 +245,14 @@ export function ReportView({
           </div>
         </div>
       </div>
+
+      {content && improved && sessionOverall !== null && previousSessionOverall !== null && (
+        <div className="animate-celebrate flex items-center gap-2 rounded-lg border-b-2 border-b-primary bg-primary/10 px-3 py-2 text-sm font-medium text-primary">
+          <TrendingUp className="size-4 shrink-0" />
+          Improved since last session &middot; {previousSessionOverall.toFixed(1)} &rarr;{" "}
+          {sessionOverall.toFixed(1)}
+        </div>
+      )}
 
       {!content && !hasScores && (
         <Card className="border-b-2 border-b-primary">

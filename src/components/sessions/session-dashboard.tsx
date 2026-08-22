@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { scoreColorClass } from "@/lib/score-color";
+import { PlayerAvatar } from "@/components/player-avatar";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -42,6 +43,7 @@ type Player = {
   first_name: string;
   last_name: string;
   primary_position: string;
+  squad_number: number | null;
 };
 
 type PlayerScore = {
@@ -115,9 +117,12 @@ export function SessionDashboard({
           <Card key={player.id} className="border-b-2 border-b-primary">
             <CardContent className="space-y-3 py-4">
               <div className="flex items-center justify-between gap-3">
-                <p className="font-medium">
-                  {player.first_name} {player.last_name}
-                </p>
+                <div className="flex items-center gap-2.5">
+                  <PlayerAvatar squadNumber={player.squad_number} />
+                  <p className="font-medium">
+                    {player.first_name} {player.last_name}
+                  </p>
+                </div>
                 <span className={cn("text-lg", scoreColorClass(overall))}>
                   {formatScore(overall)}
                 </span>
@@ -179,7 +184,10 @@ export function SessionDashboard({
             {sorted.map(({ player, pillarAverages, overall }) => (
               <TableRow key={player.id}>
                 <TableCell className="font-medium">
-                  {player.first_name} {player.last_name}
+                  <span className="flex items-center gap-2.5">
+                    <PlayerAvatar squadNumber={player.squad_number} />
+                    {player.first_name} {player.last_name}
+                  </span>
                 </TableCell>
                 {pillarIds.map((id) => (
                   <TableCell key={id} className={cn(scoreColorClass(pillarAverages[id]))}>
@@ -217,7 +225,8 @@ export function SessionDashboard({
             return (
               <Card key={player.id} className="border-b-2 border-b-primary">
                 <CardHeader>
-                  <CardTitle className="text-base">
+                  <CardTitle className="flex items-center gap-2.5 text-base">
+                    <PlayerAvatar squadNumber={player.squad_number} />
                     {player.first_name} {player.last_name}
                   </CardTitle>
                 </CardHeader>

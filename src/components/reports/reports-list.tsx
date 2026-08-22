@@ -35,6 +35,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
+import { PlayerAvatar } from "@/components/player-avatar";
 
 type Report = {
   id: string;
@@ -42,7 +43,11 @@ type Report = {
   player_id: string;
   created_at: string;
   sessions: { date: string; type: string; opponent: string | null } | null;
-  players: { first_name: string; last_name: string } | null;
+  players: {
+    first_name: string;
+    last_name: string;
+    squad_number: number | null;
+  } | null;
 };
 
 const RECENT_WINDOW_DAYS = 60;
@@ -150,24 +155,27 @@ export function ReportsList({ reports }: { reports: Report[] }) {
         {filtered.map((r) => (
           <Card key={r.id} className="border-b-2 border-b-primary">
             <CardContent className="flex items-center justify-between gap-3 py-1.5">
-              <div className="min-w-0">
-                <p className="flex items-center gap-1.5 truncate text-sm font-medium">
-                  {r.players?.first_name} {r.players?.last_name}
-                  {latestReportIds.has(r.id) && (
-                    <Badge className="shrink-0">Latest</Badge>
-                  )}
-                </p>
-                <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <span className="truncate">
-                    {r.sessions?.type}
-                    {r.sessions?.opponent ? ` vs ${r.sessions.opponent}` : ""}
-                    {" · "}
-                    {r.sessions?.date}
-                  </span>
-                  <span className="shrink-0">
-                    · Generated {new Date(r.created_at).toLocaleDateString()}
-                  </span>
-                </p>
+              <div className="flex min-w-0 items-center gap-2.5">
+                <PlayerAvatar squadNumber={r.players?.squad_number} />
+                <div className="min-w-0">
+                  <p className="flex items-center gap-1.5 truncate text-sm font-medium">
+                    {r.players?.first_name} {r.players?.last_name}
+                    {latestReportIds.has(r.id) && (
+                      <Badge className="shrink-0">Latest</Badge>
+                    )}
+                  </p>
+                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <span className="truncate">
+                      {r.sessions?.type}
+                      {r.sessions?.opponent ? ` vs ${r.sessions.opponent}` : ""}
+                      {" · "}
+                      {r.sessions?.date}
+                    </span>
+                    <span className="shrink-0">
+                      · Generated {new Date(r.created_at).toLocaleDateString()}
+                    </span>
+                  </p>
+                </div>
               </div>
               <div className="flex shrink-0 gap-1">
                 <Button
@@ -227,7 +235,8 @@ export function ReportsList({ reports }: { reports: Report[] }) {
             {filtered.map((r) => (
               <TableRow key={r.id}>
                 <TableCell className="font-medium">
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-2.5">
+                    <PlayerAvatar squadNumber={r.players?.squad_number} />
                     {r.players?.first_name} {r.players?.last_name}
                     {latestReportIds.has(r.id) && <Badge>Latest</Badge>}
                   </span>

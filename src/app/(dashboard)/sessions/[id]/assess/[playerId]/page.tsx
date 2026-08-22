@@ -31,7 +31,7 @@ export default async function AssessPlayerPage({
 
   const { data: sessionPlayers } = await supabase
     .from("session_players")
-    .select("player_id, standout_moment, players(id, first_name, last_name, primary_position)")
+    .select("player_id, standout_moment, players(id, first_name, last_name, primary_position, squad_number)")
     .eq("session_id", sessionId);
 
   type PlayerRow = {
@@ -39,6 +39,7 @@ export default async function AssessPlayerPage({
     first_name: string;
     last_name: string;
     primary_position: string;
+    squad_number: number | null;
   };
 
   const ordered = (sessionPlayers ?? [])
@@ -49,6 +50,7 @@ export default async function AssessPlayerPage({
         first_name: p.first_name,
         last_name: p.last_name,
         primary_position: p.primary_position,
+        squad_number: p.squad_number,
         standout_moment: sp.standout_moment as string | null,
       };
     })

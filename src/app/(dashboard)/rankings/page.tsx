@@ -23,6 +23,7 @@ type PlayerAgg = {
   playerId: string;
   name: string;
   position: string;
+  squadNumber: number | null;
   pillarSums: Record<string, { sum: number; count: number }>;
 };
 
@@ -51,6 +52,7 @@ export default async function RankingsPage() {
         playerId: row.player_id,
         name: `${row.player.first_name} ${row.player.last_name}`,
         position: row.player.primary_position,
+        squadNumber: row.player.squad_number,
         pillarSums: {},
       };
       byPlayer.set(row.player_id, agg);
@@ -86,6 +88,7 @@ export default async function RankingsPage() {
       playerId: p.playerId,
       name: p.name,
       position: p.position,
+      squadNumber: p.squadNumber,
       overall,
       pillarAverages,
     };

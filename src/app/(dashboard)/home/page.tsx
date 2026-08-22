@@ -35,7 +35,7 @@ export default async function HomePage() {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const [{ count: squadCount }, { data: inProgress }, latestFormRows] =
+  const [{ count: squadCount }, { data: inProgressSessions }, latestFormRows] =
     await Promise.all([
       supabase
         .from("players")
@@ -49,9 +49,7 @@ export default async function HomePage() {
         )
         .eq("team_id", team!.id)
         .is("completed_at", null)
-        .order("date", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
+        .order("date", { ascending: false }),
       // Each player's ratings from their own most recent completed session -
       // a current-form snapshot rather than an all-time blend, since players
       // aren't all assessed on the same schedule.
@@ -62,14 +60,29 @@ export default async function HomePage() {
     (row) => row.player?.active !== false,
   );
 
-  const resumePlayerId = inProgress?.session_players.find(
-    (sp: { player_id: string; completed_at: string | null }) => !sp.completed_at,
-  )?.player_id;
-  const resumeLabel = inProgress
-    ? inProgress.opponent
-      ? `${inProgress.type} vs ${inProgress.opponent}`
-      : inProgress.type
-    : null;
+  // A coach can have more than one session left open at once (e.g. forgot
+  // to finish one before starting another) - resume cards are shown for
+  // all of them, not just the most recent.
+  type ResumableSession = {
+    session: NonNullable<typeof inProgressSessions>[number];
+    resumePlayerId: string;
+    label: string;
+  };
+  const resumableSessions: ResumableSession[] = (inProgressSessions ?? [])
+    .map((session) => {
+      const resumePlayerId = session.session_players.find(
+        (sp: { player_id: string; completed_at: string | null }) =>
+          !sp.completed_at,
+      )?.player_id;
+      return {
+        session,
+        resumePlayerId,
+        label: session.opponent
+          ? `${session.type} vs ${session.opponent}`
+          : session.type,
+      };
+    })
+    .filter((s): s is ResumableSession => s.resumePlayerId !== undefined);
 
   let squadAverage: number | null = null;
   let pillarData: { pillar: string; score: number }[] = [];
@@ -139,6 +152,11 @@ export default async function HomePage() {
     notYetAssessedCount > 0 ? 0 : 5,
   );
 
+  // Sessions are ordered newest-first, so only the latest open one gets a
+  // card here - a coach who's left several open at once shouldn't have the
+  // home page cluttered with one per session.
+  const latestOpenSession = resumableSessions[0];
+
   return (
     <div className="space-y-6">
       <div>
@@ -149,23 +167,30 @@ export default async function HomePage() {
       </div>
 
       <div className="space-y-4">
-        {inProgress && resumePlayerId && (
-          <Card className="border-l-4 border-l-primary py-0">
-            <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
+        {latestOpenSession && (
+          <Card
+            className="fade-in-step border-b-2 border-b-primary py-0"
+            style={{ animationDelay: "0ms" }}
+          >
+            <CardContent className="flex flex-wrap items-center justify-between gap-3 py-2.5">
               <div>
                 <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-primary uppercase">
                   <span className="relative flex size-1.5">
                     <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
                     <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
                   </span>
-                  In progress
+                  Latest open session
                 </div>
-                <p className="font-medium">{resumeLabel}</p>
-                <p className="text-sm text-muted-foreground">{inProgress.date}</p>
+                <p className="font-medium">{latestOpenSession.label}</p>
+                <p className="text-sm text-muted-foreground">
+                  {latestOpenSession.session.date}
+                </p>
               </div>
               <Button
                 render={
-                  <Link href={`/sessions/${inProgress.id}/assess/${resumePlayerId}`} />
+                  <Link
+                    href={`/sessions/${latestOpenSession.session.id}/assess/${latestOpenSession.resumePlayerId}`}
+                  />
                 }
               >
                 <Play className="size-4" />
@@ -176,10 +201,18 @@ export default async function HomePage() {
         )}
 
         <div className="grid grid-cols-2 gap-3">
-          <Link href="/squad" className="block h-full">
+          <Link
+            href="/squad"
+            className="fade-in-step block h-full"
+            style={{ animationDelay: "60ms" }}
+          >
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
               <CardContent className="flex items-center gap-3">
-                <ProgressRing percent={assessedPercent} colorClass={assessedRingColor} />
+                <ProgressRing
+                  percent={assessedPercent}
+                  colorClass={assessedRingColor}
+                  trackColorClass="text-red-600 dark:text-red-500"
+                />
                 <div className="text-xs font-semibold text-muted-foreground">
                   Players assessed in the last 30 days
                 </div>
@@ -187,7 +220,11 @@ export default async function HomePage() {
             </Card>
           </Link>
 
-          <Link href="/squad" className="block h-full">
+          <Link
+            href="/squad"
+            className="fade-in-step block h-full"
+            style={{ animationDelay: "120ms" }}
+          >
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
               <CardContent className="flex items-center gap-3">
                 <ProgressRing
@@ -203,7 +240,10 @@ export default async function HomePage() {
             </Card>
           </Link>
 
-          <Card className="h-full gap-2 border-b-2 border-b-primary py-4">
+          <Card
+            className="fade-in-step h-full gap-2 border-b-2 border-b-primary py-4"
+            style={{ animationDelay: "180ms" }}
+          >
             <CardContent className="space-y-1.5">
               <div className="flex items-center justify-between gap-1">
                 <div className="text-xs font-semibold text-muted-foreground">
@@ -230,7 +270,11 @@ export default async function HomePage() {
             </CardContent>
           </Card>
 
-          <Link href="/sessions" className="block h-full">
+          <Link
+            href="/sessions"
+            className="fade-in-step block h-full"
+            style={{ animationDelay: "240ms" }}
+          >
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
               <CardContent className="space-y-1.5">
                 <div className="text-xs font-semibold text-muted-foreground">
@@ -248,9 +292,15 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        {pillarData.length > 0 && <SquadPillarChart data={pillarData} />}
+        {pillarData.length > 0 && (
+          <div className="fade-in-step" style={{ animationDelay: "300ms" }}>
+            <SquadPillarChart data={pillarData} />
+          </div>
+        )}
 
-        <AboutCard />
+        <div className="fade-in-step" style={{ animationDelay: "360ms" }}>
+          <AboutCard />
+        </div>
       </div>
     </div>
   );

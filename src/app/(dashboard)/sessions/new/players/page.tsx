@@ -19,7 +19,7 @@ export default async function SessionPlayersPage() {
 
   const { data: players } = await supabase
     .from("players")
-    .select("id, first_name, last_name, primary_position")
+    .select("id, first_name, last_name, primary_position, squad_number")
     .eq("team_id", team.id)
     .eq("active", true)
     .order("last_name");

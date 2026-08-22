@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { scoreColorClass, scoreBarColorClass } from "@/lib/score-color";
+import { PlayerAvatar } from "@/components/player-avatar";
 
 const POSITION_LABEL: Record<string, string> = {
   defence: "Defence",
@@ -24,6 +25,7 @@ type Player = {
   playerId: string;
   name: string;
   position: string;
+  squadNumber: number | null;
   overall: number;
   pillarAverages: Record<string, number | null>;
 };
@@ -69,20 +71,23 @@ export function RankingsTable({
       <div className="space-y-1.5 sm:hidden">
         {sorted.map((player, index) => (
           <Card key={player.playerId} className="border-b-2 border-b-primary">
-            <CardContent className="space-y-0.5 py-1.5">
+            <CardContent className="space-y-2 py-2">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-medium">
-                  <span className="text-muted-foreground">#{index + 1}</span>{" "}
-                  {player.name}
-                  <span className="ml-1.5 text-xs font-normal text-muted-foreground">
-                    {POSITION_LABEL[player.position] ?? player.position}
-                  </span>
-                </p>
-                <span className={cn("text-base", scoreColorClass(player.overall))}>
+                <div className="flex min-w-0 items-center gap-2">
+                  <PlayerAvatar squadNumber={player.squadNumber} />
+                  <p className="truncate text-sm font-medium">
+                    <span className="text-muted-foreground">#{index + 1}</span>{" "}
+                    {player.name}
+                    <span className="ml-1.5 text-xs font-normal text-muted-foreground">
+                      {POSITION_LABEL[player.position] ?? player.position}
+                    </span>
+                  </p>
+                </div>
+                <span className={cn("shrink-0 text-base", scoreColorClass(player.overall))}>
                   {formatScore(player.overall)}
                 </span>
               </div>
-              <div className="flex items-end justify-between gap-1 pt-1" style={{ height: 46 }}>
+              <div className="flex items-end justify-between gap-1" style={{ height: 46 }}>
                 {pillars.map((pillar) => {
                   const score = player.pillarAverages[pillar.id];
                   return (
@@ -139,7 +144,12 @@ export function RankingsTable({
             {sorted.map((player, index) => (
               <TableRow key={player.playerId}>
                 <TableCell className="text-muted-foreground">{index + 1}</TableCell>
-                <TableCell className="font-medium">{player.name}</TableCell>
+                <TableCell className="font-medium">
+                  <span className="flex items-center gap-2.5">
+                    <PlayerAvatar squadNumber={player.squadNumber} />
+                    {player.name}
+                  </span>
+                </TableCell>
                 <TableCell>
                   {POSITION_LABEL[player.position] ?? player.position}
                 </TableCell>

@@ -19,7 +19,7 @@ export default async function ReportsPage() {
   const { data: reports, error } = await supabase
     .from("reports")
     .select(
-      "id, session_id, player_id, created_at, sessions(date, type, opponent, team_id), players(first_name, last_name)",
+      "id, session_id, player_id, created_at, sessions(date, type, opponent, team_id), players(first_name, last_name, squad_number)",
     )
     .eq("sessions.team_id", team.id)
     .order("created_at", { ascending: false });
@@ -32,7 +32,11 @@ export default async function ReportsPage() {
     player_id: string;
     created_at: string;
     sessions: { date: string; type: string; opponent: string | null } | null;
-    players: { first_name: string; last_name: string } | null;
+    players: {
+      first_name: string;
+      last_name: string;
+      squad_number: number | null;
+    } | null;
   };
 
   // Embedded filter on a to-many join returns the parent row with a null

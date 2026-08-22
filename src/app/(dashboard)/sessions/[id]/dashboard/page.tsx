@@ -29,10 +29,16 @@ export default async function SessionDashboardPage({
 
   const { data: sessionPlayers } = await supabase
     .from("session_players")
-    .select("player_id, players(id, first_name, last_name, primary_position)")
+    .select("player_id, players(id, first_name, last_name, primary_position, squad_number)")
     .eq("session_id", sessionId);
 
-  type PlayerRow = { id: string; first_name: string; last_name: string; primary_position: string };
+  type PlayerRow = {
+    id: string;
+    first_name: string;
+    last_name: string;
+    primary_position: string;
+    squad_number: number | null;
+  };
   const players = (sessionPlayers ?? [])
     .map((sp) => sp.players as unknown as PlayerRow)
     .sort((a, b) => a.last_name.localeCompare(b.last_name));

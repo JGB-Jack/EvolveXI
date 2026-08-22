@@ -61,7 +61,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.48 0.11 152);
+  --primary: oklch(0.56 0.13 152);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -141,8 +141,8 @@
 .primary-gradient {
   background: linear-gradient(
     180deg,
-    color-mix(in oklch, var(--primary), white 22%),
-    color-mix(in oklch, var(--primary), black 18%)
+    color-mix(in oklch, var(--primary), white 25%),
+    color-mix(in oklch, var(--primary), black 10%)
   );
 }
 
@@ -175,4 +175,26 @@
 
 .fade-in-step {
   animation: fade-up-in 0.8s ease-out both;
+}
+
+/* Score-improved celebration banner: pops in with a little overshoot
+   rather than a plain fade, so it reads as a small win, not just content
+   loading in. */
+@keyframes celebrate-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-celebrate {
+  animation: celebrate-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }

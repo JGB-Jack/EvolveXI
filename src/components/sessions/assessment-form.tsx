@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, X, ChevronDown } from "lucide-react";
+import { PlayerAvatar } from "@/components/player-avatar";
 
 const PILLAR_ORDER = [
   { id: "technical", name: "Technical" },
@@ -55,6 +56,7 @@ type SessionPlayer = {
   first_name: string;
   last_name: string;
   primary_position: string;
+  squad_number: number | null;
   standout_moment: string | null;
 };
 
@@ -181,14 +183,17 @@ export function AssessmentForm({
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-24">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground">
-            {player.first_name} {player.last_name}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {POSITION_LABEL[player.primary_position]} &middot; {sessionLabel}{" "}
-            &middot; {session.date}
-          </p>
+        <div className="flex items-center gap-3">
+          <PlayerAvatar squadNumber={player.squad_number} size="md" />
+          <div>
+            <h1 className="text-xl font-semibold text-foreground">
+              {player.first_name} {player.last_name}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {POSITION_LABEL[player.primary_position]} &middot; {sessionLabel}{" "}
+              &middot; {session.date}
+            </p>
+          </div>
         </div>
         <div className="text-right text-sm text-muted-foreground">
           Player {currentIndex + 1} of {players.length}

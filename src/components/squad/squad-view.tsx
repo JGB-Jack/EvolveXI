@@ -25,7 +25,8 @@ import {
   PlayerFormSheet,
   type EditablePlayer,
 } from "@/components/squad/player-form-sheet";
-import { Plus, Shirt } from "lucide-react";
+import { Plus } from "lucide-react";
+import { PlayerAvatar } from "@/components/player-avatar";
 
 const POSITION_LABEL: Record<string, string> = {
   defence: "Defence",
@@ -222,15 +223,7 @@ export function SquadView({
           <Card key={player.id} className="border-b-2 border-b-primary">
             <CardContent className="flex items-center justify-between gap-3 py-2">
               <div className="flex min-w-0 items-center gap-2.5">
-                <span className="relative flex size-8 shrink-0 items-center justify-center">
-                  <Shirt
-                    className="absolute inset-0 size-8 fill-primary text-primary"
-                    strokeWidth={1.5}
-                  />
-                  <span className="relative mt-1 text-[10px] font-bold tabular-nums text-primary-foreground">
-                    {player.squad_number ?? "-"}
-                  </span>
-                </span>
+                <PlayerAvatar squadNumber={player.squad_number} />
                 <div className="min-w-0">
                   <button
                     className="truncate text-sm font-medium underline-offset-2 hover:underline"
@@ -304,11 +297,12 @@ export function SquadView({
               <TableRow key={player.id}>
                 <TableCell>
                   <button
-                    className="font-medium underline-offset-2 hover:underline"
+                    className="flex items-center gap-2.5 font-medium underline-offset-2 hover:underline"
                     onClick={() =>
                       router.push(`/squad/player/${player.id}/profile`)
                     }
                   >
+                    <PlayerAvatar squadNumber={player.squad_number} />
                     {player.first_name} {player.last_name}
                   </button>
                 </TableCell>
