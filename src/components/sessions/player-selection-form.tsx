@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSessionWizard } from "@/components/sessions/session-wizard-context";
 import { createSession } from "@/lib/actions/sessions";
@@ -34,13 +34,9 @@ export function PlayerSelectionForm({
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Default to the full squad selected the first time this step is seen.
-  useEffect(() => {
-    if (state.playerIds.length === 0 && players.length > 0) {
-      update({ playerIds: players.map((p) => p.id) });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [players]);
+  function selectAll() {
+    update({ playerIds: players.map((p) => p.id) });
+  }
 
   function toggle(playerId: string) {
     const selected = state.playerIds.includes(playerId);
@@ -75,6 +71,15 @@ export function PlayerSelectionForm({
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm text-muted-foreground">
+          {state.playerIds.length} of {players.length} selected
+        </Label>
+        <Button variant="outline" size="sm" onClick={selectAll}>
+          Select all
+        </Button>
+      </div>
+
       <div className="space-y-2 rounded-lg border bg-card">
         {players.map((player) => {
           const checked = state.playerIds.includes(player.id);
@@ -100,21 +105,16 @@ export function PlayerSelectionForm({
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <div className="flex items-center justify-between">
-        <Label className="text-sm text-muted-foreground">
-          {state.playerIds.length} of {players.length} selected
-        </Label>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => router.push("/sessions/new/pillars")}
-          >
-            Back
-          </Button>
-          <Button onClick={handleBegin} disabled={saving}>
-            {saving ? "Starting..." : "Begin session"}
-          </Button>
-        </div>
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="outline"
+          onClick={() => router.push("/sessions/new/pillars")}
+        >
+          Back
+        </Button>
+        <Button onClick={handleBegin} disabled={saving}>
+          {saving ? "Starting..." : "Begin session"}
+        </Button>
       </div>
     </div>
   );

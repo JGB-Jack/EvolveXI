@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { refreshSquadInsight } from "@/lib/actions/squad-insight";
 
 export async function saveRating(
   sessionId: string,
@@ -76,13 +75,11 @@ export async function completeSession(sessionId: string) {
     .eq("id", sessionId);
   if (error) throw new Error(error.message);
 
-  // Fire-and-forget - the squad tip is a nice-to-have, so a coach finishing
-  // a session should never sit waiting on an AI call (which got slower once
-  // this started pooling up to 14 days of data). Errors are logged, not
-  // thrown, since nothing here should affect what the coach sees next.
-  refreshSquadInsight(sessionId).catch((err) => {
-    console.error("Failed to generate squad insight:", err);
-  });
+  // The squad insight refresh (an AI call) used to fire from here without
+  // being awaited, but Next.js's server action lifecycle still ended up
+  // holding the "Finish session" button's request open until that AI call
+  // finished - so it's triggered by the client separately instead, see
+  // ReportView's handleNext, which never awaits it either.
 
   // A session going from "in progress" to "completed" changes what
   // getLatestFormRows returns for every player in it, which feeds Home,

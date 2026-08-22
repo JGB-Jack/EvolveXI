@@ -40,19 +40,34 @@ export async function getLatestFormRows(
       score: row.score as number,
       pillar_id: firstOf(row.team_questions)?.pillar_id,
       session_date: firstOf(row.sessions)?.date,
+      completed_at: firstOf(row.sessions)?.completed_at,
       player: firstOf(row.players),
     }))
     .filter(
-      (row): row is LatestFormRow & { session_id: string } =>
-        !!row.pillar_id && !!row.session_date,
+      (row): row is LatestFormRow & { session_id: string; completed_at: string } =>
+        !!row.pillar_id && !!row.session_date && !!row.completed_at,
     );
 
-  const latestByPlayerPillar = new Map<string, { sessionId: string; date: string }>();
+  // Coaches often enter the same match/training date for several sessions
+  // (e.g. testing, or backfilling), so session_date alone isn't a reliable
+  // tiebreaker - fall back to completed_at, a true timestamp, when dates match.
+  const latestByPlayerPillar = new Map<
+    string,
+    { sessionId: string; date: string; completedAt: string }
+  >();
   for (const row of enriched) {
     const key = `${row.player_id}::${row.pillar_id}`;
     const current = latestByPlayerPillar.get(key);
-    if (!current || row.session_date > current.date) {
-      latestByPlayerPillar.set(key, { sessionId: row.session_id, date: row.session_date });
+    const isNewer =
+      !current ||
+      row.session_date > current.date ||
+      (row.session_date === current.date && row.completed_at > current.completedAt);
+    if (isNewer) {
+      latestByPlayerPillar.set(key, {
+        sessionId: row.session_id,
+        date: row.session_date,
+        completedAt: row.completed_at,
+      });
     }
   }
 

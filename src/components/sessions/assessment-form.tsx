@@ -197,10 +197,18 @@ export function AssessmentForm({
 
       <Card className="border-b-2 border-b-primary">
       <CardContent>
-      <Accordion defaultValue={visiblePillars.map((p) => p.id)}>
+      <Accordion className="gap-2" defaultValue={visiblePillars.map((p) => p.id)}>
         {visiblePillars.map((pillar) => (
-          <AccordionItem key={pillar.id} value={pillar.id}>
-            <AccordionTrigger>{pillar.name}</AccordionTrigger>
+          <AccordionItem
+            key={pillar.id}
+            value={pillar.id}
+            className="not-last:border-b-0"
+          >
+            <AccordionTrigger className="rounded-lg bg-primary/10 px-3 py-3 hover:no-underline">
+              <span className="text-base font-bold tracking-wide text-primary uppercase">
+                {pillar.name}
+              </span>
+            </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-6">
                 {questionsByPillar.get(pillar.id)!.map((q) => {

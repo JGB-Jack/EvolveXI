@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { generateReport, saveReportEdits } from "@/lib/actions/reports";
 import { completeSession } from "@/lib/actions/assessments";
+import { refreshSquadInsight } from "@/lib/actions/squad-insight";
 import type { ReportContent } from "@/lib/claude/report";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -189,6 +190,10 @@ export function ReportView({
     if (isLast) {
       try {
         await completeSession(sessionId);
+        // Not awaited on purpose - this is a separate request the browser
+        // fires and forgets, so the AI call behind it can never hold up
+        // navigating to the complete screen below.
+        refreshSquadInsight(sessionId).catch(() => {});
         router.push(`/sessions/${sessionId}/complete`);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Failed to finish session");
@@ -395,7 +400,8 @@ export function ReportView({
                 </CardTitle>
                 <CardDescription>
                   {player.first_name}&apos;s most recent score for each
-                  pillar, across all sessions.
+                  pillar, across all sessions. Diagram will update on
+                  finishing session.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">

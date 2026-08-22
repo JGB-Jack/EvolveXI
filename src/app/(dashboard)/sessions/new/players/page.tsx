@@ -29,8 +29,7 @@ export default async function SessionPlayersPage() {
       <div>
         <h1 className="text-2xl font-semibold text-foreground">Select players</h1>
         <p className="text-muted-foreground">
-          All players are selected by default &mdash; deselect anyone
-          absent or injured.
+          Choose who&apos;s in this session, or use Select all.
         </p>
       </div>
       <PlayerSelectionForm teamId={team.id} players={players ?? []} />
