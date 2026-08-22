@@ -14,9 +14,9 @@ export function SquadPillarChart({
   return (
     <Card className="border-b-2 border-b-primary">
       <CardHeader>
-        <CardTitle className="text-base">Squad pillar breakdown</CardTitle>
+        <CardTitle className="text-base">Squad 5 Pillar Breakdown</CardTitle>
         <CardDescription>
-          Averages from each player&apos;s most recent session
+          Overall squad averages from most recent sessions
         </CardDescription>
       </CardHeader>
       <CardContent>

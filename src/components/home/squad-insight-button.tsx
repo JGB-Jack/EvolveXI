@@ -22,10 +22,10 @@ export function SquadInsightButton({
     <Dialog>
       <DialogTrigger
         render={
-          <Button size="icon-sm" variant="ghost" aria-label="Coach's tip" />
+          <Button size="icon" variant="ghost" aria-label="Coach's tip" />
         }
       >
-        <Sparkles className="size-4 text-primary" />
+        <Sparkles className="size-6 animate-sparkle text-primary" />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

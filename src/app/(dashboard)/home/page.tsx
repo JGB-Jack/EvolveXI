@@ -32,8 +32,8 @@ export default async function HomePage() {
     .eq("coach_id", user!.id)
     .single();
 
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const sixtyDaysAgo = new Date();
+  sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
   const [{ count: squadCount }, { data: inProgressSessions }, latestFormRows] =
     await Promise.all([
@@ -108,14 +108,18 @@ export default async function HomePage() {
       .sort((a, b) => b.score - a.score);
   }
 
-  // Same completed-session data everything else on this page uses (not a
-  // separate session_players-level query) - a player who's individually
-  // marked done but whose session isn't closed out yet shouldn't count
-  // as "assessed" here while also counting as "never assessed" below.
-  const thirtyDaysAgoDate = thirtyDaysAgo.toISOString().slice(0, 10);
+  // Both KPI rings below now share this same 60-day window, so they read
+  // as true complements of each other (assessed + not-assessed = squad),
+  // and "not yet assessed" stays a useful ongoing signal (who's gone
+  // stale) instead of permanently reading 0 once everyone's been rated
+  // once. Same completed-session data everything else on this page uses
+  // (not a separate session_players-level query) - a player who's
+  // individually marked done but whose session isn't closed out yet
+  // shouldn't count as "assessed" here.
+  const sixtyDaysAgoDate = sixtyDaysAgo.toISOString().slice(0, 10);
   const assessedPlayerIds = new Set(
     assessmentRows
-      .filter((row) => row.session_date >= thirtyDaysAgoDate)
+      .filter((row) => row.session_date >= sixtyDaysAgoDate)
       .map((row) => row.player_id),
   );
   const assessedPercent =
@@ -128,11 +132,25 @@ export default async function HomePage() {
     null,
   );
 
-  const everAssessedPlayerIds = new Set(assessmentRows.map((row) => row.player_id));
-  const notYetAssessedCount = Math.max(
-    (squadCount ?? 0) - everAssessedPlayerIds.size,
-    0,
-  );
+  // A player showing up in assessedPlayerIds might only have one pillar
+  // covered in the last 60 days - this tracks the stricter bar of having
+  // ALL 5 pillars freshly rated, which is a better signal of a genuinely
+  // up-to-date, well-rounded assessment than "assessed on at least one thing."
+  const recentPillarsByPlayer = new Map<string, Set<string>>();
+  for (const row of assessmentRows) {
+    if (row.session_date < sixtyDaysAgoDate) continue;
+    if (!recentPillarsByPlayer.has(row.player_id)) {
+      recentPillarsByPlayer.set(row.player_id, new Set());
+    }
+    recentPillarsByPlayer.get(row.player_id)!.add(row.pillar_id);
+  }
+  const fullyAssessedCount = Array.from(recentPillarsByPlayer.values()).filter(
+    (pillars) => Object.keys(PILLAR_NAME).every((id) => pillars.has(id)),
+  ).length;
+  const fullyAssessedPercent =
+    squadCount && squadCount > 0
+      ? Math.round((fullyAssessedCount / squadCount) * 100)
+      : 0;
 
   // Same red/amber/green banding used everywhere else, expressed relative
   // to each tile's own scale (percent -> equivalent /5 score for the ring;
@@ -140,17 +158,6 @@ export default async function HomePage() {
   const assessedRingColor = scoreStrokeColorClass((assessedPercent / 100) * 5);
   const squadAverageBarColor = scoreBarColorClass(squadAverage);
   const focusAreaBarColor = scoreBarColorClass(weakestPillar?.score ?? null);
-  const notYetAssessedPercent =
-    squadCount && squadCount > 0
-      ? (notYetAssessedCount / squadCount) * 100
-      : 0;
-  const notYetAssessedBarPercent =
-    notYetAssessedCount > 0
-      ? Math.max(notYetAssessedPercent, 6)
-      : 0;
-  const notYetAssessedRingColor = scoreStrokeColorClass(
-    notYetAssessedCount > 0 ? 0 : 5,
-  );
 
   // Sessions are ordered newest-first, so only the latest open one gets a
   // card here - a coach who's left several open at once shouldn't have the
@@ -169,7 +176,7 @@ export default async function HomePage() {
       <div className="space-y-4">
         {latestOpenSession && (
           <Card
-            className="fade-in-step border-b-2 border-b-primary py-0"
+            className="fade-in-strong border-b-2 border-b-primary py-0"
             style={{ animationDelay: "0ms" }}
           >
             <CardContent className="flex flex-wrap items-center justify-between gap-3 py-2.5">
@@ -203,7 +210,7 @@ export default async function HomePage() {
         <div className="grid grid-cols-2 gap-3">
           <Link
             href="/squad"
-            className="fade-in-step block h-full"
+            className="fade-in-strong block h-full"
             style={{ animationDelay: "60ms" }}
           >
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
@@ -214,7 +221,7 @@ export default async function HomePage() {
                   trackColorClass="text-red-600 dark:text-red-500"
                 />
                 <div className="text-xs font-semibold text-muted-foreground">
-                  Players assessed in the last 30 days
+                  Players assessed &mdash; last 60 days
                 </div>
               </CardContent>
             </Card>
@@ -222,26 +229,25 @@ export default async function HomePage() {
 
           <Link
             href="/squad"
-            className="fade-in-step block h-full"
+            className="fade-in-strong block h-full"
             style={{ animationDelay: "120ms" }}
           >
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
               <CardContent className="flex items-center gap-3">
                 <ProgressRing
-                  percent={notYetAssessedBarPercent}
-                  colorClass={notYetAssessedRingColor}
-                  trackColorClass={assessedRingColor}
-                  label={`${notYetAssessedCount}/${squadCount ?? 0}`}
+                  percent={fullyAssessedPercent}
+                  colorClass="text-primary"
+                  trackColorClass="text-red-600 dark:text-red-500"
                 />
                 <div className="text-xs font-semibold text-muted-foreground">
-                  Players not yet assessed
+                  Players assessed in all 5 pillars &mdash; last 60 days
                 </div>
               </CardContent>
             </Card>
           </Link>
 
           <Card
-            className="fade-in-step h-full gap-2 border-b-2 border-b-primary py-4"
+            className="fade-in-strong h-full gap-2 border-b-2 border-b-primary py-4"
             style={{ animationDelay: "180ms" }}
           >
             <CardContent className="space-y-1.5">
@@ -272,7 +278,7 @@ export default async function HomePage() {
 
           <Link
             href="/sessions"
-            className="fade-in-step block h-full"
+            className="fade-in-strong block h-full"
             style={{ animationDelay: "240ms" }}
           >
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
@@ -293,12 +299,12 @@ export default async function HomePage() {
         </div>
 
         {pillarData.length > 0 && (
-          <div className="fade-in-step" style={{ animationDelay: "300ms" }}>
+          <div className="fade-in-strong" style={{ animationDelay: "300ms" }}>
             <SquadPillarChart data={pillarData} />
           </div>
         )}
 
-        <div className="fade-in-step" style={{ animationDelay: "360ms" }}>
+        <div className="fade-in-strong" style={{ animationDelay: "360ms" }}>
           <AboutCard />
         </div>
       </div>

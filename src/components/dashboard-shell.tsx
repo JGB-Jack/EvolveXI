@@ -23,7 +23,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       >
         {/* Keyed by route so the entrance animation replays on every
             navigation, not just the first page load. */}
-        <div key={pathname} className="fade-in-step">
+        <div key={pathname} className="fade-in-strong">
           {children}
         </div>
       </main>
