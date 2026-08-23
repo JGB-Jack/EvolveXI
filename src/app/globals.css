@@ -152,12 +152,12 @@
    muted-foreground tokens, same as cards. */
 .pitch-bg {
   background-color: var(--background);
-  background-image: radial-gradient(
-    ellipse at 50% -10%,
-    oklch(1 0 0) 0%,
-    oklch(0.97 0.015 152) 55%
-  );
-  background-attachment: fixed;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
+    url("/soccer-doodle-background.png");
+  background-repeat: no-repeat, repeat;
+  background-size: cover, 400px auto;
+  background-attachment: fixed, fixed;
 }
 
 /* Splash page intro: each element fades/slides in on its own delay
