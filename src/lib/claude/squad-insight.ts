@@ -28,11 +28,12 @@ Rules:
 - The pattern must genuinely appear in at least two players' ratings, anchor descriptions, or notes - never invent one.
 - If nothing shared genuinely stands out, say plainly that recent sessions haven't revealed a clear squad-wide pattern, rather than forcing one.
 - Plain English, no jargon.
-- Include one concrete, practical suggestion the coach could act on next session.
-- 1-2 sentences maximum. This is a quick note, not a report.
+- Recommend ONE specific, named group drill that targets the pattern, with just enough setup detail (format, e.g. 4v2, grid size, key rule) that a coach could run it next session without looking it up elsewhere.
+- Age-appropriate for the given age band - keep instructions and setup simple for younger groups.
+- 2-3 sentences maximum: the observation, then the drill. This is a quick note, not a report.
 
 Respond with ONLY valid JSON (no markdown fences, no commentary) matching exactly this shape:
-{ "tip": "1-2 sentence squad-wide observation and suggestion" }`;
+{ "tip": "2-3 sentence squad-wide observation plus a named group drill recommendation" }`;
 
 function buildUserPrompt(input: SquadInsightInput): string {
   const sessionLines = input.sessions

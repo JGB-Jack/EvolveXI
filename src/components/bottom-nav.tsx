@@ -13,13 +13,13 @@ const NAV_ITEMS = [
 ];
 
 const TAB_CLASSES =
-  "flex size-11 shrink-0 items-center justify-center rounded-full transition-colors";
+  "flex flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-1.5 transition-colors";
 
 export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="primary-gradient fixed inset-x-4 bottom-4 z-40 rounded-full shadow-lg">
+    <nav className="primary-gradient fixed inset-x-4 bottom-4 z-40 rounded-3xl shadow-lg">
       <div className="mx-auto flex max-w-6xl items-center justify-around p-2">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);
@@ -36,6 +36,7 @@ export function BottomNav() {
               )}
             >
               <Icon className="size-5" />
+              <span className="text-[10px] font-medium">{label}</span>
             </Link>
           );
         })}

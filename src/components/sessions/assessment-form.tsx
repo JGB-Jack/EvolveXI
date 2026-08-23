@@ -312,7 +312,7 @@ export function AssessmentForm({
         ))}
       </Accordion>
 
-      <div className="space-y-2">
+      <div className="mt-6 space-y-2">
         <Label htmlFor="standout">Standout moment (optional)</Label>
         <Textarea
           id="standout"

@@ -86,8 +86,9 @@ export function PlayerSelectionForm({
         {players.map((player) => {
           const checked = state.playerIds.includes(player.id);
           return (
-            <label
+            <div
               key={player.id}
+              onClick={() => toggle(player.id)}
               className="flex cursor-pointer items-center gap-3 border-b px-4 py-3 last:border-b-0"
             >
               <Checkbox
@@ -101,7 +102,7 @@ export function PlayerSelectionForm({
               <span className="text-sm text-muted-foreground">
                 {POSITION_LABEL[player.primary_position]}
               </span>
-            </label>
+            </div>
           );
         })}
       </div>

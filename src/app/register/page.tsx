@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,11 +23,16 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 
+    if (!agreedToPrivacy) {
+      setError("Please confirm you've read the data notice below.");
+      return;
+    }
     if (password.length < 6) {
       setError("Password must be at least 6 characters.");
       return;
@@ -126,8 +132,34 @@ export default function RegisterPage() {
                 required
               />
             </div>
+            <div className="rounded-md border bg-muted/50 p-3 text-sm text-muted-foreground">
+              <p className="font-medium text-foreground">Data notice — pilot test period</p>
+              <p className="mt-1">
+                EvolveXI is currently in a short pilot test. Any data you
+                enter — including player names and dates of birth — is
+                stored only to run the app during this test, is not shared
+                with anyone outside the pilot, and will be permanently
+                deleted once the test period ends.
+              </p>
+            </div>
+            <label className="flex cursor-pointer items-start gap-2">
+              <Checkbox
+                checked={agreedToPrivacy}
+                onCheckedChange={(checked) =>
+                  setAgreedToPrivacy(checked === true)
+                }
+                className="mt-0.5"
+              />
+              <span className="text-sm">
+                I&apos;ve read the data notice above and agree to it.
+              </span>
+            </label>
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading || !agreedToPrivacy}
+            >
               {loading ? "Creating account..." : "Create account"}
             </Button>
           </form>

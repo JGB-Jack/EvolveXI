@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { BottomNav } from "@/components/bottom-nav";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +13,20 @@ const HIDES_BOTTOM_NAV = [/^\/sessions\/[^/]+\/assess\//, /^\/sessions\/[^/]+\/r
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hideBottomNav = HIDES_BOTTOM_NAV.some((pattern) => pattern.test(pathname));
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Restart the entrance animation on every navigation without unmounting
+  // the page subtree - keying this element by pathname used to force a
+  // full remount, which wiped out any state living inside it (like the
+  // multi-step session wizard's context) that's meant to persist across
+  // routes within the same layout.
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    el.style.animation = "none";
+    void el.offsetWidth; // force reflow so the animation removal registers
+    el.style.animation = "";
+  }, [pathname]);
 
   return (
     <>
@@ -21,9 +36,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           !hideBottomNav && "pb-24",
         )}
       >
-        {/* Keyed by route so the entrance animation replays on every
-            navigation, not just the first page load. */}
-        <div key={pathname} className="fade-in-strong">
+        <div ref={contentRef} className="fade-in-strong">
           {children}
         </div>
       </main>

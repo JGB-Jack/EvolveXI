@@ -86,9 +86,24 @@ export default async function HomePage() {
 
   let squadAverage: number | null = null;
   let pillarData: { pillar: string; score: number }[] = [];
+  const playersByPillar: Record<
+    string,
+    { playerId: string; name: string; squadNumber: number | null; score: number }[]
+  > = {};
 
   if (assessmentRows && assessmentRows.length > 0) {
     const totalsByPillar = new Map<string, { sum: number; count: number }>();
+    // Each pillar has several questions, so a player has several rows per
+    // pillar here - averaged per (pillar, player) below, otherwise the
+    // "top"/"bottom" popup could show the same player twice from two of
+    // their own question scores instead of two different players.
+    const totalsByPillarPlayer = new Map<
+      string,
+      Map<
+        string,
+        { sum: number; count: number; name: string; squadNumber: number | null }
+      >
+    >();
     let overallSum = 0;
     for (const row of assessmentRows) {
       overallSum += row.score;
@@ -97,6 +112,21 @@ export default async function HomePage() {
         entry.sum += row.score;
         entry.count += 1;
         totalsByPillar.set(row.pillar_id, entry);
+
+        if (row.player) {
+          const playerTotals =
+            totalsByPillarPlayer.get(row.pillar_id) ?? new Map();
+          totalsByPillarPlayer.set(row.pillar_id, playerTotals);
+          const playerEntry = playerTotals.get(row.player_id) ?? {
+            sum: 0,
+            count: 0,
+            name: `${row.player.first_name} ${row.player.last_name}`,
+            squadNumber: row.player.squad_number,
+          };
+          playerEntry.sum += row.score;
+          playerEntry.count += 1;
+          playerTotals.set(row.player_id, playerEntry);
+        }
       }
     }
     squadAverage = overallSum / assessmentRows.length;
@@ -106,6 +136,18 @@ export default async function HomePage() {
         score: sum / count,
       }))
       .sort((a, b) => b.score - a.score);
+
+    for (const [pillarId, playerTotals] of totalsByPillarPlayer.entries()) {
+      const pillarName = PILLAR_NAME[pillarId] ?? pillarId;
+      playersByPillar[pillarName] = Array.from(playerTotals.entries())
+        .map(([playerId, { sum, count, name, squadNumber }]) => ({
+          playerId,
+          name,
+          squadNumber,
+          score: sum / count,
+        }))
+        .sort((a, b) => b.score - a.score);
+    }
   }
 
   // Both KPI rings below now share this same 60-day window, so they read
@@ -214,7 +256,7 @@ export default async function HomePage() {
             style={{ animationDelay: "60ms" }}
           >
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
-              <CardContent className="flex items-center gap-3">
+              <CardContent className="flex items-start gap-3">
                 <ProgressRing
                   percent={assessedPercent}
                   colorClass={assessedRingColor}
@@ -233,10 +275,10 @@ export default async function HomePage() {
             style={{ animationDelay: "120ms" }}
           >
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
-              <CardContent className="flex items-center gap-3">
+              <CardContent className="flex items-start gap-3">
                 <ProgressRing
                   percent={fullyAssessedPercent}
-                  colorClass="text-primary"
+                  colorClass="text-green-600 dark:text-green-500"
                   trackColorClass="text-red-600 dark:text-red-500"
                 />
                 <div className="text-xs font-semibold text-muted-foreground">
@@ -251,7 +293,7 @@ export default async function HomePage() {
             style={{ animationDelay: "180ms" }}
           >
             <CardContent className="space-y-1.5">
-              <div className="flex items-center justify-between gap-1">
+              <div className="flex min-h-8 items-center justify-between gap-1">
                 <div className="text-xs font-semibold text-muted-foreground">
                   Focus area
                 </div>
@@ -283,7 +325,7 @@ export default async function HomePage() {
           >
             <Card className="h-full gap-2 border-b-2 border-b-primary py-4 transition-colors hover:bg-muted/50">
               <CardContent className="space-y-1.5">
-                <div className="text-xs font-semibold text-muted-foreground">
+                <div className="flex min-h-8 items-center text-xs font-semibold text-muted-foreground">
                   Squad average score
                 </div>
                 <span className="text-xl font-bold tabular-nums text-primary">
@@ -300,7 +342,7 @@ export default async function HomePage() {
 
         {pillarData.length > 0 && (
           <div className="fade-in-strong" style={{ animationDelay: "300ms" }}>
-            <SquadPillarChart data={pillarData} />
+            <SquadPillarChart data={pillarData} playersByPillar={playersByPillar} />
           </div>
         )}
 
