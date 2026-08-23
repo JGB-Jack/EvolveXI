@@ -49,7 +49,10 @@ export function NavBar() {
                 Settings
               </DropdownMenuItem>
               <form action={signOut}>
-                <DropdownMenuItem render={<button type="submit" />}>
+                <DropdownMenuItem
+                  nativeButton
+                  render={<button type="submit" />}
+                >
                   Sign out
                 </DropdownMenuItem>
               </form>
