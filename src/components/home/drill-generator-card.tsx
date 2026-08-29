@@ -59,12 +59,11 @@ export function DrillGeneratorCard() {
       <Card className="border-b-2 border-b-primary">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Sparkles className="size-4 text-primary" />
-            Fix a training or match issue
+            <Sparkles className="size-6 animate-sparkle text-primary" />
+            Ask the AI coach
           </CardTitle>
           <CardDescription>
-            Describe what you saw in training or at the weekend and get a
-            drill to work on it.
+            Team not clicking in matches? Get a drill to fix it.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -78,7 +77,7 @@ export function DrillGeneratorCard() {
         {!drill ? (
           <>
             <DialogHeader>
-              <DialogTitle>Fix a training or match issue</DialogTitle>
+              <DialogTitle>Ask the AI coach</DialogTitle>
               <DialogDescription>
                 What went wrong? Be as specific as you like.
               </DialogDescription>

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ResetTeamDialog } from "@/components/settings/reset-team-dialog";
+import { AboutCard } from "@/components/about-card";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -34,6 +35,8 @@ export default async function SettingsPage() {
           coming soon.
         </p>
       </div>
+
+      <AboutCard />
 
       <Link href="/settings/questions" className="block">
         <Card className="border-b-2 border-b-primary transition-colors hover:bg-muted/50">
@@ -80,7 +83,7 @@ export default async function SettingsPage() {
             <CardTitle>Pillar weighting</CardTitle>
             <CardDescription>
               Give some pillars more influence than others on overall
-              scores, to match how your team likes to coach.
+              scores to match your club or coaching ethos.
             </CardDescription>
           </div>
           <Badge className="bg-amber-500 text-white dark:bg-amber-600">
