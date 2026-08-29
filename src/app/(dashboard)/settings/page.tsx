@@ -1,13 +1,30 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
+  CardContent,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ResetTeamDialog } from "@/components/settings/reset-team-dialog";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: team } = await supabase
+    .from("teams")
+    .select("name, age_band")
+    .eq("coach_id", user.id)
+    .single();
+  if (!team) redirect("/onboarding/team");
+
   return (
     <div className="space-y-6">
       <div>
@@ -60,6 +77,21 @@ export default function SettingsPage() {
       <Card className="border-b-2 border-b-primary opacity-70">
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
+            <CardTitle>Pillar weighting</CardTitle>
+            <CardDescription>
+              Give some pillars more influence than others on overall
+              scores, to match how your team likes to coach.
+            </CardDescription>
+          </div>
+          <Badge className="bg-amber-500 text-white dark:bg-amber-600">
+            Coming soon
+          </Badge>
+        </CardHeader>
+      </Card>
+
+      <Card className="border-b-2 border-b-primary opacity-70">
+        <CardHeader className="flex-row items-center justify-between space-y-0">
+          <div>
             <CardTitle>FAQs</CardTitle>
             <CardDescription>
               Answers to common questions about using EvolveXI.
@@ -69,6 +101,22 @@ export default function SettingsPage() {
             Coming soon
           </Badge>
         </CardHeader>
+      </Card>
+
+      <Card className="border-b-2 border-b-destructive">
+        <CardHeader>
+          <CardTitle>Danger zone</CardTitle>
+          <CardDescription>
+            Wipe all players, sessions, reports, and questions to start
+            fresh with a new squad, optionally at a different age band.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResetTeamDialog
+            currentName={team.name}
+            currentAgeBand={team.age_band}
+          />
+        </CardContent>
       </Card>
     </div>
   );

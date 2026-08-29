@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { SquadPillarChart } from "@/components/home/squad-pillar-chart";
 import { AboutCard } from "@/components/home/about-card";
+import { DrillGeneratorCard } from "@/components/home/drill-generator-card";
 import { SquadInsightButton } from "@/components/home/squad-insight-button";
 import { ProgressRing } from "@/components/home/progress-ring";
 import { KpiBar } from "@/components/home/kpi-bar";
 import { getLatestFormRows } from "@/lib/data/latest-form";
-import { scoreBarColorClass, scoreStrokeColorClass } from "@/lib/score-color";
+import { scoreBarColorClass } from "@/lib/score-color";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -68,12 +69,13 @@ export default async function HomePage() {
     resumePlayerId: string;
     label: string;
   };
+  // Same target the Sessions page's own "Resume" button uses - the first
+  // player in the session, regardless of whether they've individually
+  // finished their rating. A session stays "in progress" until its own
+  // completed_at is set, even if every player has already been rated.
   const resumableSessions: ResumableSession[] = (inProgressSessions ?? [])
     .map((session) => {
-      const resumePlayerId = session.session_players.find(
-        (sp: { player_id: string; completed_at: string | null }) =>
-          !sp.completed_at,
-      )?.player_id;
+      const resumePlayerId = session.session_players[0]?.player_id;
       return {
         session,
         resumePlayerId,
@@ -195,9 +197,7 @@ export default async function HomePage() {
       : 0;
 
   // Same red/amber/green banding used everywhere else, expressed relative
-  // to each tile's own scale (percent -> equivalent /5 score for the ring;
-  // /5 scores used directly for the bars).
-  const assessedRingColor = scoreStrokeColorClass((assessedPercent / 100) * 5);
+  // to each tile's own scale (/5 scores used directly for the bars).
   const squadAverageBarColor = scoreBarColorClass(squadAverage);
   const focusAreaBarColor = scoreBarColorClass(weakestPillar?.score ?? null);
 
@@ -259,7 +259,7 @@ export default async function HomePage() {
               <CardContent className="flex items-start gap-3">
                 <ProgressRing
                   percent={assessedPercent}
-                  colorClass={assessedRingColor}
+                  colorClass="text-green-600 dark:text-green-500"
                   trackColorClass="text-red-600 dark:text-red-500"
                 />
                 <div className="text-xs font-semibold text-muted-foreground">
@@ -295,7 +295,7 @@ export default async function HomePage() {
             <CardContent className="space-y-1.5">
               <div className="flex min-h-8 items-center justify-between gap-1">
                 <div className="text-xs font-semibold text-muted-foreground">
-                  Focus area
+                  Squad focus area
                 </div>
                 {team?.latest_insight && (
                   <SquadInsightButton
@@ -347,6 +347,10 @@ export default async function HomePage() {
         )}
 
         <div className="fade-in-strong" style={{ animationDelay: "360ms" }}>
+          <DrillGeneratorCard />
+        </div>
+
+        <div className="fade-in-strong" style={{ animationDelay: "420ms" }}>
           <AboutCard />
         </div>
       </div>

@@ -55,6 +55,7 @@ export function QuestionBankAccordion({
     <Card className="border-b-2 border-b-primary">
       <CardContent>
     <Accordion
+      multiple
       defaultValue={defaultExpanded ? PILLAR_ORDER.map((p) => p.id) : []}
     >
       {PILLAR_ORDER.map((pillar) => {
