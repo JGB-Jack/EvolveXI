@@ -53,6 +53,22 @@ function stripCodeFences(text: string): string {
   return fenced ? fenced[1] : trimmed;
 }
 
+// Sonnet occasionally adds a stray sentence before or after the JSON
+// despite being told not to - fall back to the outermost {...} span rather
+// than failing outright on what's otherwise a perfectly good response.
+function extractJsonObject(text: string): string {
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end < start) return text;
+  return text.slice(start, end + 1);
+}
+
+// Trailing commas before a closing brace/bracket are invalid JSON but a
+// common model slip (leftover from writing it like a JS object literal).
+function removeTrailingCommas(text: string): string {
+  return text.replace(/,(\s*[}\]])/g, "$1");
+}
+
 export async function generateDrill(input: DrillInput): Promise<DrillOutput> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -63,7 +79,7 @@ export async function generateDrill(input: DrillInput): Promise<DrillOutput> {
 
   const message = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 1000,
+    max_tokens: 2000,
     system: SYSTEM_PROMPT,
     messages: [
       {
@@ -82,7 +98,14 @@ export async function generateDrill(input: DrillInput): Promise<DrillOutput> {
   try {
     parsed = JSON.parse(stripCodeFences(textBlock.text));
   } catch {
-    throw new Error("Claude's response wasn't valid JSON.");
+    try {
+      parsed = JSON.parse(
+        removeTrailingCommas(extractJsonObject(textBlock.text)),
+      );
+    } catch {
+      console.error("[generateDrill] unparsable response:", textBlock.text);
+      throw new Error("Claude's response wasn't valid JSON.");
+    }
   }
 
   if (!parsed.name || !parsed.coachingPoint || !parsed.setup || !parsed.constraint) {
