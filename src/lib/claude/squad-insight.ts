@@ -5,7 +5,7 @@ const MODEL = "claude-haiku-4-5-20251001";
 export type SquadInsightPillar = {
   pillarName: string;
   notes: string;
-  questions: { question_text: string; anchor: string; score: number }[];
+  questions: { question_text: string; anchor: string; score: number; date: string }[];
 };
 
 export type SquadInsightPlayer = {
@@ -26,6 +26,7 @@ Every player already gets their own individual development report with player-sp
 
 Rules:
 - The pattern must genuinely appear in at least two players' ratings, anchor descriptions, or notes - never invent one.
+- Every question and note is tagged with the date it's from. Only describe something as "improving" or "dropping" if you can point to the same or a closely related question scored differently on two different dates for that player - never infer a trend direction you can't actually trace to dated evidence.
 - If nothing shared genuinely stands out, say plainly that recent sessions haven't revealed a clear squad-wide pattern, rather than forcing one.
 - Plain English, no jargon.
 - Recommend ONE specific, named group drill that targets the pattern, with just enough setup detail (format, e.g. 4v2, grid size, key rule) that a coach could run it next session without looking it up elsewhere.
@@ -47,7 +48,7 @@ function buildUserPrompt(input: SquadInsightInput): string {
           const qLines = p.questions
             .map(
               (q) =>
-                `    - "${q.question_text}" — scored ${q.score}/5: ${q.anchor}`,
+                `    - [${q.date}] "${q.question_text}" — scored ${q.score}/5: ${q.anchor}`,
             )
             .join("\n");
           return `  ${p.pillarName}:\n${qLines}${

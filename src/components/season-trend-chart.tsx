@@ -22,7 +22,9 @@ export function SeasonTrendChart({
     return (
       <p className="text-sm text-muted-foreground">
         Needs at least 2 completed sessions to show a trend &mdash;{" "}
-        {playerFirstName} has {data.length} so far.
+        {playerFirstName} has {data.length} so far. Only sessions marked
+        as finished count, so this updates once the current session is
+        finished.
       </p>
     );
   }

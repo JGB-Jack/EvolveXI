@@ -15,6 +15,7 @@ const WINDOW_DAYS = 14;
 
 type AssessmentRow = {
   player_id: string;
+  session_id: string;
   score: number;
   team_questions: {
     pillar_id: string;
@@ -141,6 +142,7 @@ export async function refreshSquadInsight(sessionId: string) {
                 question_text: a.team_questions.question_text,
                 anchor: anchors[a.score - 1],
                 score: a.score,
+                date: sessionDateById.get(a.session_id) ?? "",
               };
             }),
         })),
