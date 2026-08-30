@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { getPlayerPillarAverages } from "@/lib/data/player-pillar-averages";
+import { getPlayerScoreHistory } from "@/lib/data/player-score-history";
 import { PlayerProgressChart } from "@/components/squad/player-progress-chart";
+import { SeasonTrendChart } from "@/components/season-trend-chart";
 import { scoreColorClass } from "@/lib/score-color";
 import { cn } from "@/lib/utils";
 import { PlayerAvatar } from "@/components/player-avatar";
@@ -50,6 +52,7 @@ export default async function PlayerProfilePage({
     player.team_id,
     id,
   );
+  const scoreHistory = await getPlayerScoreHistory(supabase, player.team_id, id);
 
   const chartData = pillarAverages.map(({ pillarId, score }) => ({
     pillar: PILLAR_NAME[pillarId] ?? pillarId,
@@ -122,6 +125,24 @@ export default async function PlayerProfilePage({
                 </span>
               ))}
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {scoreHistory.length > 0 && (
+        <Card className="border-b-2 border-b-primary">
+          <CardHeader>
+            <CardTitle className="text-base">Season trend</CardTitle>
+            <CardDescription>
+              {player.first_name}&apos;s overall score across every
+              completed session this season.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SeasonTrendChart
+              data={scoreHistory}
+              playerFirstName={player.first_name}
+            />
           </CardContent>
         </Card>
       )}

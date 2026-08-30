@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { ArrowLeft, Mail, Sparkles, TrendingUp } from "lucide-react";
 import { PlayerProgressChart } from "@/components/squad/player-progress-chart";
+import { SeasonTrendChart } from "@/components/season-trend-chart";
 import { scoreColorClass } from "@/lib/score-color";
 import { cn } from "@/lib/utils";
 import { PlayerAvatar } from "@/components/player-avatar";
@@ -61,6 +62,7 @@ export function ReportView({
   currentDevelopment,
   sessionOverall,
   previousSessionOverall,
+  scoreHistory,
 }: {
   sessionId: string;
   player: Player;
@@ -74,6 +76,7 @@ export function ReportView({
   currentDevelopment: { pillarId: string; score: number }[];
   sessionOverall: number | null;
   previousSessionOverall: number | null;
+  scoreHistory: { date: string; score: number }[];
 }) {
   const router = useRouter();
   const isLast = currentIndex === players.length - 1;
@@ -443,6 +446,24 @@ export function ReportView({
                     </span>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {scoreHistory.length > 0 && (
+            <Card className="border-b-2 border-b-primary">
+              <CardHeader>
+                <CardTitle className="text-base">Season trend</CardTitle>
+                <CardDescription>
+                  {player.first_name}&apos;s overall score across every
+                  completed session this season.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SeasonTrendChart
+                  data={scoreHistory}
+                  playerFirstName={player.first_name}
+                />
               </CardContent>
             </Card>
           )}

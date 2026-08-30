@@ -27,9 +27,11 @@ export default async function DashboardLayout({
     redirect("/onboarding/team");
   }
 
+  const userName = (user.user_metadata?.full_name as string) ?? "";
+
   return (
     <div className="pitch-bg min-h-screen">
-      <NavBar />
+      <NavBar userName={userName} />
       <DashboardShell>{children}</DashboardShell>
     </div>
   );

@@ -4,6 +4,7 @@ import { ReportView } from "@/components/sessions/report-view";
 import { getExpectedQuestionCount } from "@/lib/data/session-questions";
 import { getPlayerPillarAverages } from "@/lib/data/player-pillar-averages";
 import { getPreviousSessionOverall } from "@/lib/data/previous-session-score";
+import { getPlayerScoreHistory } from "@/lib/data/player-score-history";
 import type { ReportContent } from "@/lib/claude/report";
 
 export default async function PlayerReportPage({
@@ -105,6 +106,11 @@ export default async function PlayerReportPage({
     playerId,
     sessionId,
   );
+  const scoreHistory = await getPlayerScoreHistory(
+    supabase,
+    session.team_id,
+    playerId,
+  );
 
   let initialContent: ReportContent | null = null;
   if (existingReport) {
@@ -129,6 +135,7 @@ export default async function PlayerReportPage({
       currentDevelopment={currentDevelopment}
       sessionOverall={sessionOverall}
       previousSessionOverall={previousSessionOverall}
+      scoreHistory={scoreHistory}
     />
   );
 }
