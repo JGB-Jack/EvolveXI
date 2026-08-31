@@ -84,7 +84,7 @@ export function ResetTeamDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="reset-name">Team name</Label>
+            <Label htmlFor="reset-name">New team name</Label>
             <Input
               id="reset-name"
               value={name}
@@ -93,7 +93,7 @@ export function ResetTeamDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="reset-age-band">Age band</Label>
+            <Label htmlFor="reset-age-band">New age band</Label>
             <Select value={ageBand} onValueChange={(v) => setAgeBand(v ?? "")}>
               <SelectTrigger id="reset-age-band" className="w-full">
                 <SelectValue placeholder="Select an age band" />
@@ -113,8 +113,7 @@ export function ResetTeamDialog({
           >
             <Checkbox
               checked={confirmed}
-              onCheckedChange={(checked) => setConfirmed(checked === true)}
-              className="mt-0.5"
+              className="pointer-events-none mt-0.5"
             />
             <span className="text-sm">
               I understand this permanently deletes all current players,

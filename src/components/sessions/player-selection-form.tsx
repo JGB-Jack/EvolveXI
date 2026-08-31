@@ -91,10 +91,7 @@ export function PlayerSelectionForm({
               onClick={() => toggle(player.id)}
               className="flex cursor-pointer items-center gap-3 border-b px-4 py-3 last:border-b-0"
             >
-              <Checkbox
-                checked={checked}
-                onCheckedChange={() => toggle(player.id)}
-              />
+              <Checkbox checked={checked} className="pointer-events-none" />
               <PlayerAvatar squadNumber={player.squad_number} />
               <span className="flex-1">
                 {player.first_name} {player.last_name}

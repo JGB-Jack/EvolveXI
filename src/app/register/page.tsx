@@ -55,10 +55,26 @@ export default function RegisterPage() {
     setLoading(false);
 
     if (error) {
+      const status = (error as { status?: number }).status;
+      let message: string;
+      if (status && status >= 500) {
+        // Supabase's SDK wraps 5xx responses as AuthRetryableFetchError and
+        // its .message is a useless literal "{}" - it discards the real
+        // reason from the server's response body. A signup 500 here is
+        // almost always the confirmation email failing to send (e.g.
+        // Resend's sandbox mode only allows sending to the account's own
+        // verified address), so say that instead of showing "{}".
+        message =
+          "Couldn't send the confirmation email (server error). If you're using Resend in sandbox mode, it only allows sending to the account's own verified email - check your Resend dashboard.";
+      } else {
+        message =
+          (typeof error.message === "string" && error.message) ||
+          "Something went wrong creating your account. Please try again.";
+      }
       setError(
-        error.message.toLowerCase().includes("already registered")
+        message.toLowerCase().includes("already registered")
           ? "An account with this email already exists."
-          : error.message,
+          : message,
       );
       return;
     }
@@ -142,18 +158,18 @@ export default function RegisterPage() {
                 deleted once the test period ends.
               </p>
             </div>
-            <label className="flex cursor-pointer items-start gap-2">
+            <div
+              onClick={() => setAgreedToPrivacy((v) => !v)}
+              className="flex cursor-pointer items-start gap-2"
+            >
               <Checkbox
                 checked={agreedToPrivacy}
-                onCheckedChange={(checked) =>
-                  setAgreedToPrivacy(checked === true)
-                }
-                className="mt-0.5"
+                className="pointer-events-none mt-0.5"
               />
               <span className="text-sm">
                 I&apos;ve read the data notice above and agree to it.
               </span>
-            </label>
+            </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button
               type="submit"

@@ -70,7 +70,7 @@ export async function createTeam(
     return { error: tqError.message };
   }
 
-  redirect("/onboarding/questions");
+  redirect("/squad");
 }
 
 export async function updateTeamQuestion(
