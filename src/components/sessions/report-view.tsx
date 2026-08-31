@@ -370,7 +370,7 @@ export function ReportView({
             <CardContent className="space-y-4">
               {content.priorities.map((p, i) => (
                 <div key={i} className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">
+                  <Label className="text-sm font-bold text-foreground">
                     Priority {i + 1}
                   </Label>
                   <Textarea
@@ -378,7 +378,7 @@ export function ReportView({
                     onChange={(e) => updatePriority(i, "text", e.target.value)}
                     className="min-h-12"
                   />
-                  <Label className="text-xs text-muted-foreground">
+                  <Label className="text-sm font-bold text-foreground">
                     Practice suggestion
                   </Label>
                   <Textarea
