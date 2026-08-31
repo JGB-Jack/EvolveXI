@@ -304,7 +304,7 @@ export default async function HomePage() {
                 )}
               </div>
               <Link href="/rankings" className="block transition-opacity hover:opacity-80">
-                <span className="text-xl font-bold tabular-nums text-primary">
+                <span className="text-xs font-bold tabular-nums text-primary">
                   {weakestPillar
                     ? `${weakestPillar.pillar} · ${weakestPillar.score.toFixed(1)}`
                     : "-"}
@@ -327,7 +327,7 @@ export default async function HomePage() {
                 <div className="flex min-h-8 items-center text-xs font-semibold text-muted-foreground">
                   Squad average score
                 </div>
-                <span className="text-xl font-bold tabular-nums text-primary">
+                <span className="text-xs font-bold tabular-nums text-primary">
                   {squadAverage !== null ? `${squadAverage.toFixed(1)}/5` : "-"}
                 </span>
                 <KpiBar
