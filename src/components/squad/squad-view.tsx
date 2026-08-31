@@ -175,7 +175,8 @@ export function SquadView({
             <CardTitle>Add your players to get started.</CardTitle>
             <CardDescription>
               Once your squad is set up you can begin running assessment
-              sessions.
+              sessions. You can review, edit, or add your own questions
+              anytime from Settings.
             </CardDescription>
           </CardHeader>
         </Card>
