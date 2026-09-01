@@ -20,12 +20,19 @@ export type PillarInput = {
 export type ReportInput = {
   playerName: string;
   position: string;
+  gender: string | null;
   ageBand: string;
   sessionType: string;
   sessionDate: string;
   pillars: PillarInput[];
   standoutMoment: string;
 };
+
+function pronounInstruction(gender: string | null): string {
+  if (gender === "male") return "Use he/him/his when referring to the player.";
+  if (gender === "female") return "Use she/her/hers when referring to the player.";
+  return "The player's gender isn't specified - use they/them/theirs when referring to the player.";
+}
 
 const SYSTEM_PROMPT = `You are an experienced, encouraging grassroots football coach writing a player development report for another coach to read and share with the player and their parent.
 
@@ -67,6 +74,7 @@ function buildUserPrompt(input: ReportInput): string {
 
   return `Player: ${input.playerName}
 Position: ${input.position}
+Pronouns: ${pronounInstruction(input.gender)}
 Age band: ${input.ageBand}
 Session: ${input.sessionType} on ${input.sessionDate}
 

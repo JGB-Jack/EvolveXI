@@ -6,6 +6,7 @@ export type PlayerFields = {
   first_name: string;
   last_name: string;
   dob: string | null;
+  gender: string;
   primary_position: string;
   secondary_position: string | null;
   squad_number: number | null;
@@ -20,6 +21,9 @@ export async function addPlayer(
   }
   if (!fields.primary_position) {
     return { error: "Primary position is required." };
+  }
+  if (!fields.gender) {
+    return { error: "Gender is required." };
   }
 
   const supabase = await createClient();
@@ -42,6 +46,9 @@ export async function updatePlayer(
   }
   if (!fields.primary_position) {
     return { error: "Primary position is required." };
+  }
+  if (!fields.gender) {
+    return { error: "Gender is required." };
   }
 
   const supabase = await createClient();

@@ -20,7 +20,7 @@ export default async function SquadPage() {
   const { data: players, error } = await supabase
     .from("players")
     .select(
-      "id, first_name, last_name, dob, primary_position, secondary_position, squad_number",
+      "id, first_name, last_name, dob, gender, primary_position, secondary_position, squad_number",
     )
     .eq("team_id", team.id)
     .eq("active", true);

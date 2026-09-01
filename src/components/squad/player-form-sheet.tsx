@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { addPlayer, updatePlayer, type PlayerFields } from "@/lib/actions/players";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,6 +36,7 @@ export type EditablePlayer = {
   first_name: string;
   last_name: string;
   dob: string | null;
+  gender: string | null;
   primary_position: string;
   secondary_position: string | null;
   squad_number: number | null;
@@ -44,6 +46,7 @@ const EMPTY_FORM = {
   first_name: "",
   last_name: "",
   dob: "",
+  gender: "",
   primary_position: "",
   secondary_position: "none",
   squad_number: "",
@@ -73,6 +76,7 @@ export function PlayerFormSheet({
           first_name: player.first_name,
           last_name: player.last_name,
           dob: player.dob ?? "",
+          gender: player.gender ?? "",
           primary_position: player.primary_position,
           secondary_position: player.secondary_position ?? "none",
           squad_number: player.squad_number?.toString() ?? "",
@@ -88,6 +92,7 @@ export function PlayerFormSheet({
       first_name: form.first_name,
       last_name: form.last_name,
       dob: form.dob || null,
+      gender: form.gender,
       primary_position: form.primary_position,
       secondary_position:
         form.secondary_position === "none" ? null : form.secondary_position,
@@ -168,6 +173,30 @@ export function PlayerFormSheet({
               value={form.dob}
               onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Gender</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { value: "male", label: "Male" },
+                { value: "female", label: "Female" },
+              ].map((g) => (
+                <button
+                  key={g.value}
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, gender: g.value }))}
+                  className={cn(
+                    "rounded-lg border-2 px-3 py-2 text-sm font-medium transition-colors",
+                    form.gender === g.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground",
+                  )}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">

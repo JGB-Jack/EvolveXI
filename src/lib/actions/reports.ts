@@ -29,7 +29,7 @@ export async function generateReport(sessionId: string, playerId: string) {
 
   const { data: player } = await supabase
     .from("players")
-    .select("first_name, last_name, primary_position")
+    .select("first_name, last_name, primary_position, gender")
     .eq("id", playerId)
     .single();
   if (!player) throw new Error("Player not found.");
@@ -127,6 +127,7 @@ export async function generateReport(sessionId: string, playerId: string) {
   const content = await generatePlayerReport({
     playerName: `${player.first_name} ${player.last_name}`,
     position: player.primary_position,
+    gender: player.gender,
     ageBand: team?.age_band ?? "",
     sessionType: session.type,
     sessionDate: session.date,
