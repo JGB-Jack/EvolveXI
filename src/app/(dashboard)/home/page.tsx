@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { SquadPillarChart } from "@/components/home/squad-pillar-chart";
-import { DrillGeneratorCard } from "@/components/home/drill-generator-card";
 import { SquadInsightButton } from "@/components/home/squad-insight-button";
 import { ProgressRing } from "@/components/home/progress-ring";
 import { KpiBar } from "@/components/home/kpi-bar";
@@ -344,10 +343,6 @@ export default async function HomePage() {
             <SquadPillarChart data={pillarData} playersByPillar={playersByPillar} />
           </div>
         )}
-
-        <div className="fade-in-strong" style={{ animationDelay: "360ms" }}>
-          <DrillGeneratorCard />
-        </div>
       </div>
     </div>
   );

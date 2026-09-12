@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, ClipboardList, FileText, ListOrdered } from "lucide-react";
+import { Users, ClipboardList, FileText, ListOrdered, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/sessions", label: "Sessions", icon: ClipboardList },
   { href: "/reports", label: "Reports", icon: FileText },
   { href: "/rankings", label: "Ranking", icon: ListOrdered },
+  { href: "/ideas", label: "Inspiration", icon: Lightbulb },
 ];
 
 const TAB_CLASSES =

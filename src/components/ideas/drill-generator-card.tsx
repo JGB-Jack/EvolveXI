@@ -109,7 +109,7 @@ export function DrillGeneratorCard() {
           <>
             <DialogHeader>
               <DialogTitle>{drill.name}</DialogTitle>
-              <DialogDescription>{drill.target}</DialogDescription>
+              <DialogDescription className="sr-only">{drill.target}</DialogDescription>
             </DialogHeader>
             <div className="space-y-1.5 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -120,6 +120,12 @@ export function DrillGeneratorCard() {
                 <Users className="size-4" />
                 {drill.format}
               </div>
+            </div>
+            <div className="border-t pt-3">
+              <p className="mb-1 text-sm font-semibold text-muted-foreground">
+                Objective
+              </p>
+              <p className="text-sm">{drill.target}</p>
             </div>
             <div className="border-t pt-3">
               <p className="mb-1 text-sm font-semibold text-muted-foreground">

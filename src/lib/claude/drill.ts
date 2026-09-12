@@ -41,7 +41,7 @@ Rules:
 - "constraint" is the ONE specific rule that forces players to fix the issue (e.g. a touch limit, a zone they can't enter, a pass they must make first) - this is what makes the drill work, not just "play normally".
 - "coachingPoint" names the exact moment to intervene and an exact phrase or question to say to players - not general encouragement like "encourage good decisions".
 - "duration" is a realistic single session chunk, e.g. "8 minutes" or "10-12 minutes".
-- "target" is one short sentence restating the problem this drill fixes, in the coach's own terms.
+- "target" is one short sentence stating the objective - what the players are working to achieve - phrased as a positive goal, not a restatement of the problem. E.g. write "Move the ball through midfield with short passes before going forward" rather than "Players keep smashing long balls instead of building through midfield".
 - Plain English, no jargon.
 
 Respond with ONLY valid JSON (no markdown fences, no commentary) matching exactly this shape:
