@@ -21,7 +21,6 @@ import {
 import { ArrowLeft, Mail, Sparkles, TrendingUp } from "lucide-react";
 import { PlayerProgressChart } from "@/components/squad/player-progress-chart";
 import { SeasonTrendChart } from "@/components/season-trend-chart";
-import { scoreColorClass } from "@/lib/score-color";
 import { cn } from "@/lib/utils";
 import { PlayerAvatar } from "@/components/player-avatar";
 
@@ -417,7 +416,12 @@ export function ReportView({
               <CardHeader>
                 <CardTitle className="flex items-center justify-between text-base">
                   Current Development
-                  <span className={cn("text-lg", scoreColorClass(developmentOverall))}>
+                  <span
+                    className={cn(
+                      "text-lg font-semibold",
+                      developmentOverall !== null ? "text-primary" : "text-muted-foreground",
+                    )}
+                  >
                     {developmentOverall !== null
                       ? developmentOverall.toFixed(1)
                       : "-"}
@@ -440,7 +444,7 @@ export function ReportView({
                   {currentDevelopment.map(({ pillarId, score }) => (
                     <span key={pillarId} className="text-muted-foreground">
                       {PILLAR_NAME[pillarId] ?? pillarId}{" "}
-                      <span className={scoreColorClass(score)}>
+                      <span className="font-semibold text-primary">
                         {score.toFixed(1)}
                       </span>
                     </span>

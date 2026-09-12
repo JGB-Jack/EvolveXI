@@ -11,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { scoreColorClass } from "@/lib/score-color";
 import { PlayerAvatar } from "@/components/player-avatar";
 
 const POSITION_LABEL: Record<string, string> = {
@@ -161,7 +160,12 @@ export function RankingsTable({
                 {pillars.map((pillar) => (
                   <TableCell
                     key={pillar.id}
-                    className={cn(scoreColorClass(player.pillarAverages[pillar.id]))}
+                    className={cn(
+                      "font-semibold",
+                      player.pillarAverages[pillar.id] !== null
+                        ? "text-primary"
+                        : "text-muted-foreground",
+                    )}
                   >
                     {formatScore(player.pillarAverages[pillar.id])}
                   </TableCell>
