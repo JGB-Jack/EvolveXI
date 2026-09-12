@@ -7,6 +7,10 @@ import {
   type PillarInput,
   type ReportContent,
 } from "@/lib/claude/report";
+import {
+  generateParentSuggestions,
+  type ParentReportContent,
+} from "@/lib/claude/parent-report";
 import { getExpectedQuestionCount } from "@/lib/data/session-questions";
 
 const PILLAR_NAME: Record<string, string> = {
@@ -145,6 +149,11 @@ export async function generateReport(sessionId: string, playerId: string) {
         player_id: playerId,
         generated_text: contentJson,
         edited_text: contentJson,
+        // A fresh coach report invalidates any parent version generated
+        // from the old priorities - regenerate it again once the coach
+        // report settles.
+        parent_generated_text: null,
+        parent_edited_text: null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "session_id,player_id" },
@@ -166,6 +175,84 @@ export async function saveReportEdits(
     .from("reports")
     .update({
       edited_text: JSON.stringify(content),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", reportId);
+  if (error) throw new Error(error.message);
+}
+
+export async function generateParentReport(
+  reportId: string,
+): Promise<ParentReportContent> {
+  const supabase = await createClient();
+
+  const { data: report } = await supabase
+    .from("reports")
+    .select("session_id, player_id, edited_text")
+    .eq("id", reportId)
+    .single();
+  if (!report) throw new Error("Report not found.");
+
+  const coachContent: ReportContent = JSON.parse(report.edited_text);
+
+  const { data: player } = await supabase
+    .from("players")
+    .select("first_name, gender")
+    .eq("id", report.player_id)
+    .single();
+  if (!player) throw new Error("Player not found.");
+
+  const { data: session } = await supabase
+    .from("sessions")
+    .select("team_id")
+    .eq("id", report.session_id)
+    .single();
+  const { data: team } = await supabase
+    .from("teams")
+    .select("age_band")
+    .eq("id", session?.team_id)
+    .single();
+
+  const suggestions = await generateParentSuggestions({
+    playerName: player.first_name,
+    gender: player.gender,
+    ageBand: team?.age_band ?? "",
+    priorities: coachContent.priorities.map((p) => ({ text: p.text })),
+  });
+
+  const parentContent: ParentReportContent = {
+    summary: coachContent.summary,
+    pillars: coachContent.pillars,
+    strengths: coachContent.strengths,
+    priorities: coachContent.priorities.map((p, i) => ({
+      text: p.text,
+      selfPractice: suggestions[i],
+    })),
+  };
+
+  const parentJson = JSON.stringify(parentContent);
+  const { error } = await supabase
+    .from("reports")
+    .update({
+      parent_generated_text: parentJson,
+      parent_edited_text: parentJson,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", reportId);
+  if (error) throw new Error(error.message);
+
+  return parentContent;
+}
+
+export async function saveParentReportEdits(
+  reportId: string,
+  content: ParentReportContent,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("reports")
+    .update({
+      parent_edited_text: JSON.stringify(content),
       updated_at: new Date().toISOString(),
     })
     .eq("id", reportId);

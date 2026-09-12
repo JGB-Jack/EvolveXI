@@ -6,6 +6,7 @@ import { getPlayerPillarAverages } from "@/lib/data/player-pillar-averages";
 import { getPreviousSessionOverall } from "@/lib/data/previous-session-score";
 import { getPlayerScoreHistory } from "@/lib/data/player-score-history";
 import type { ReportContent } from "@/lib/claude/report";
+import type { ParentReportContent } from "@/lib/claude/parent-report";
 
 export default async function PlayerReportPage({
   params,
@@ -52,7 +53,7 @@ export default async function PlayerReportPage({
 
   const { data: existingReport } = await supabase
     .from("reports")
-    .select("id, edited_text")
+    .select("id, edited_text, parent_edited_text")
     .eq("session_id", sessionId)
     .eq("player_id", playerId)
     .maybeSingle();
@@ -121,6 +122,15 @@ export default async function PlayerReportPage({
     }
   }
 
+  let initialParentContent: ParentReportContent | null = null;
+  if (existingReport?.parent_edited_text) {
+    try {
+      initialParentContent = JSON.parse(existingReport.parent_edited_text);
+    } catch {
+      initialParentContent = null;
+    }
+  }
+
   return (
     <ReportView
       sessionId={session.id}
@@ -131,6 +141,7 @@ export default async function PlayerReportPage({
       hasScores={(assessments?.length ?? 0) > 0}
       isComplete={(assessments?.length ?? 0) >= expectedQuestionCount}
       initialContent={initialContent}
+      initialParentContent={initialParentContent}
       pillarAverages={pillarAverages}
       currentDevelopment={currentDevelopment}
       sessionOverall={sessionOverall}

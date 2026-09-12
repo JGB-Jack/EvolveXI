@@ -4,10 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { generateReport, saveReportEdits } from "@/lib/actions/reports";
+import {
+  generateReport,
+  saveReportEdits,
+  generateParentReport,
+  saveParentReportEdits,
+} from "@/lib/actions/reports";
 import { completeSession } from "@/lib/actions/assessments";
 import { refreshSquadInsight } from "@/lib/actions/squad-insight";
 import type { ReportContent } from "@/lib/claude/report";
+import type { ParentReportContent } from "@/lib/claude/parent-report";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -57,6 +63,7 @@ export function ReportView({
   hasScores,
   isComplete,
   initialContent,
+  initialParentContent,
   pillarAverages,
   currentDevelopment,
   sessionOverall,
@@ -71,6 +78,7 @@ export function ReportView({
   hasScores: boolean;
   isComplete: boolean;
   initialContent: ReportContent | null;
+  initialParentContent: ParentReportContent | null;
   pillarAverages: Record<string, number>;
   currentDevelopment: { pillarId: string; score: number }[];
   sessionOverall: number | null;
@@ -100,6 +108,13 @@ export function ReportView({
   );
   const [error, setError] = useState<string | null>(null);
 
+  const [view, setView] = useState<"coach" | "parent">("coach");
+  const [parentContent, setParentContent] = useState<ParentReportContent | null>(
+    initialParentContent,
+  );
+  const [generatingParent, setGeneratingParent] = useState(false);
+  const [parentError, setParentError] = useState<string | null>(null);
+
   // Skipped on mount and right after a fresh generation, since that content
   // is already persisted by generateReport itself - only actual edits after
   // that point need autosaving.
@@ -127,6 +142,32 @@ export function ReportView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content, reportId]);
 
+  // Same pattern as the coach report's autosave above - skipped right after
+  // a fresh generation, since generateParentReport already persisted that.
+  const skipNextParentAutosave = useRef(true);
+
+  useEffect(() => {
+    if (skipNextParentAutosave.current) {
+      skipNextParentAutosave.current = false;
+      return;
+    }
+    if (!parentContent || !reportId) return;
+
+    setSaveStatus("saving");
+    const timeout = setTimeout(async () => {
+      try {
+        await saveParentReportEdits(reportId, parentContent);
+        setSaveStatus("saved");
+      } catch (err) {
+        setSaveStatus("idle");
+        toast.error(err instanceof Error ? err.message : "Failed to save");
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parentContent, reportId]);
+
   async function handleGenerate() {
     setGenerating(true);
     setError(null);
@@ -135,6 +176,11 @@ export function ReportView({
       skipNextAutosave.current = true;
       setContent(result.content);
       setReportId(result.reportId);
+      // The coach report just changed, so any previously generated parent
+      // version (built from the old priorities) is stale - generateReport
+      // already cleared it server-side, mirror that locally.
+      setParentContent(null);
+      setView("coach");
     } catch (err) {
       setError(
         err instanceof Error
@@ -144,6 +190,70 @@ export function ReportView({
     } finally {
       setGenerating(false);
     }
+  }
+
+  async function handleGenerateParent() {
+    if (!reportId) return;
+    setGeneratingParent(true);
+    setParentError(null);
+    try {
+      const result = await generateParentReport(reportId);
+      skipNextParentAutosave.current = true;
+      setParentContent(result);
+    } catch (err) {
+      setParentError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong writing the parent version.",
+      );
+    } finally {
+      setGeneratingParent(false);
+    }
+  }
+
+  function updateParentSummary(summary: string) {
+    setParentContent((c) => (c ? { ...c, summary } : c));
+  }
+
+  function updateParentPillarNarrative(pillarId: string, narrative: string) {
+    setParentContent((c) =>
+      c
+        ? {
+            ...c,
+            pillars: c.pillars.map((p) =>
+              p.pillar_id === pillarId ? { ...p, narrative } : p,
+            ),
+          }
+        : c,
+    );
+  }
+
+  function updateParentStrength(index: number, value: string) {
+    setParentContent((c) =>
+      c
+        ? {
+            ...c,
+            strengths: c.strengths.map((s, i) => (i === index ? value : s)),
+          }
+        : c,
+    );
+  }
+
+  function updateParentPriority(
+    index: number,
+    field: "text" | "selfPractice",
+    value: string,
+  ) {
+    setParentContent((c) =>
+      c
+        ? {
+            ...c,
+            priorities: c.priorities.map((p, i) =>
+              i === index ? { ...p, [field]: value } : p,
+            ),
+          }
+        : c,
+    );
   }
 
   function updatePillarNarrative(pillarId: string, narrative: string) {
@@ -193,6 +303,9 @@ export function ReportView({
       if (content && reportId) {
         await saveReportEdits(reportId, content);
         setSaveStatus("saved");
+      }
+      if (parentContent && reportId) {
+        await saveParentReportEdits(reportId, parentContent);
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to save");
@@ -305,6 +418,35 @@ export function ReportView({
       )}
 
       {content && (
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setView("coach")}
+            className={cn(
+              "rounded-full px-3 py-1 text-sm font-medium transition-colors",
+              view === "coach"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground",
+            )}
+          >
+            Coach
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("parent")}
+            className={cn(
+              "rounded-full px-3 py-1 text-sm font-medium transition-colors",
+              view === "parent"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground",
+            )}
+          >
+            Parent
+          </button>
+        </div>
+      )}
+
+      {content && view === "coach" && (
         <>
           <Card className="border-b-2 border-b-primary">
             <CardContent className="pt-4">
@@ -410,7 +552,123 @@ export function ReportView({
               />
             </CardContent>
           </Card>
+        </>
+      )}
 
+      {content && view === "parent" && !parentContent && (
+        <Card className="border-b-2 border-b-primary">
+          <CardHeader>
+            <CardTitle>Generate a parent-friendly version</CardTitle>
+            <CardDescription>
+              Same summary and strengths, but development priorities come
+              with something {player.first_name} can practice alone, away
+              from training and matches - no coach jargon or team drills.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {parentError && (
+              <p className="mb-4 text-sm text-destructive">{parentError}</p>
+            )}
+            <Button onClick={handleGenerateParent} disabled={generatingParent}>
+              <Sparkles className="size-4" />
+              {generatingParent ? "Writing..." : "Generate parent version"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {content && view === "parent" && parentContent && (
+        <>
+          <Card className="border-b-2 border-b-primary">
+            <CardContent className="pt-4">
+              <Textarea
+                value={parentContent.summary}
+                onChange={(e) => updateParentSummary(e.target.value)}
+                className="min-h-20"
+              />
+            </CardContent>
+          </Card>
+
+          {[...parentContent.pillars]
+            .sort(
+              (a, b) =>
+                PILLAR_ORDER.indexOf(a.pillar_id) -
+                PILLAR_ORDER.indexOf(b.pillar_id),
+            )
+            .map((p) => (
+              <Card key={p.pillar_id} className="border-b-2 border-b-primary">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between text-base">
+                    {PILLAR_NAME[p.pillar_id] ?? p.pillar_id}
+                    <span className="text-sm font-normal text-muted-foreground">
+                      {(pillarAverages[p.pillar_id] ?? 0).toFixed(1)}/5
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={p.narrative}
+                    onChange={(e) =>
+                      updateParentPillarNarrative(p.pillar_id, e.target.value)
+                    }
+                    className="min-h-16"
+                  />
+                </CardContent>
+              </Card>
+            ))}
+
+          <Card className="border-b-2 border-b-primary">
+            <CardHeader>
+              <CardTitle className="text-base">Key strengths</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {parentContent.strengths.map((s, i) => (
+                <Textarea
+                  key={i}
+                  value={s}
+                  onChange={(e) => updateParentStrength(i, e.target.value)}
+                  className="min-h-12"
+                />
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-b-2 border-b-primary">
+            <CardHeader>
+              <CardTitle className="text-base">Things to work on</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {parentContent.priorities.map((p, i) => (
+                <div key={i} className="space-y-2">
+                  <Label className="text-sm font-bold text-foreground">
+                    Priority {i + 1}
+                  </Label>
+                  <Textarea
+                    value={p.text}
+                    onChange={(e) =>
+                      updateParentPriority(i, "text", e.target.value)
+                    }
+                    className="min-h-12"
+                  />
+                  <Label className="text-sm font-bold text-foreground">
+                    Practice on your own
+                  </Label>
+                  <Textarea
+                    value={p.selfPractice}
+                    onChange={(e) =>
+                      updateParentPriority(i, "selfPractice", e.target.value)
+                    }
+                    className="min-h-12"
+                  />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </>
+      )}
+
+      {content && (
+        <>
           {currentDevelopment.length > 0 && (
             <Card className="border-b-2 border-b-primary">
               <CardHeader>
