@@ -150,7 +150,7 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
                     {session.completed_at ? (
                       <Badge
                         variant="outline"
-                        className="shrink-0 border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400"
+                        className="shrink-0 border-primary/30 bg-primary/10 text-primary"
                       >
                         Completed
                       </Badge>
@@ -241,7 +241,7 @@ export function SessionsList({ sessions }: { sessions: Session[] }) {
                       {session.completed_at ? (
                         <Badge
                           variant="outline"
-                          className="border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400"
+                          className="border-primary/30 bg-primary/10 text-primary"
                         >
                           Completed
                         </Badge>

@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { scoreColorClass, scoreBarColorClass } from "@/lib/score-color";
+import { scoreColorClass } from "@/lib/score-color";
 import { PlayerAvatar } from "@/components/player-avatar";
 
 const POSITION_LABEL: Record<string, string> = {
@@ -83,7 +83,7 @@ export function RankingsTable({
                     </span>
                   </p>
                 </div>
-                <span className={cn("shrink-0 text-base", scoreColorClass(player.overall))}>
+                <span className="shrink-0 text-base font-semibold text-primary">
                   {formatScore(player.overall)}
                 </span>
               </div>
@@ -92,11 +92,16 @@ export function RankingsTable({
                   const score = player.pillarAverages[pillar.id];
                   return (
                     <div key={pillar.id} className="flex flex-1 flex-col items-center gap-1">
-                      <span className={cn("text-[9px] font-bold tabular-nums", scoreColorClass(score))}>
+                      <span
+                        className={cn(
+                          "text-[9px] font-bold tabular-nums",
+                          score !== null ? "text-primary" : "text-muted-foreground",
+                        )}
+                      >
                         {formatScore(score)}
                       </span>
                       <div
-                        className={cn("w-2.5 rounded-t-sm", scoreBarColorClass(score))}
+                        className={cn("w-2.5 rounded-t-sm", score !== null ? "bg-primary" : "bg-muted")}
                         style={{ height: score !== null ? `${(score / 5) * 22}px` : 2 }}
                       />
                       <span className="text-[8px] font-semibold tracking-wide text-muted-foreground uppercase">
@@ -161,7 +166,7 @@ export function RankingsTable({
                     {formatScore(player.pillarAverages[pillar.id])}
                   </TableCell>
                 ))}
-                <TableCell className={cn(scoreColorClass(player.overall))}>
+                <TableCell className="font-semibold text-primary">
                   {formatScore(player.overall)}
                 </TableCell>
               </TableRow>

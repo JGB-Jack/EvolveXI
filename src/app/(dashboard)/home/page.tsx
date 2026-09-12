@@ -257,8 +257,8 @@ export default async function HomePage() {
               <CardContent className="flex items-start gap-3">
                 <ProgressRing
                   percent={assessedPercent}
-                  colorClass="text-green-600 dark:text-green-500"
-                  trackColorClass="text-red-600 dark:text-red-500"
+                  colorClass="text-primary"
+                  trackColorClass="text-[color-mix(in_oklch,var(--primary),white_55%)]"
                 />
                 <div className="text-xs font-semibold text-muted-foreground">
                   Players assessed &mdash; last 60 days
@@ -276,8 +276,8 @@ export default async function HomePage() {
               <CardContent className="flex items-start gap-3">
                 <ProgressRing
                   percent={fullyAssessedPercent}
-                  colorClass="text-green-600 dark:text-green-500"
-                  trackColorClass="text-red-600 dark:text-red-500"
+                  colorClass="text-primary"
+                  trackColorClass="text-[color-mix(in_oklch,var(--primary),white_55%)]"
                 />
                 <div className="text-xs font-semibold text-muted-foreground">
                   Players assessed in all 5 pillars &mdash; last 60 days
