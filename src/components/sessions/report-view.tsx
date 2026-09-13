@@ -58,6 +58,7 @@ type Player = {
 
 export function ReportView({
   sessionId,
+  sessionDate,
   player,
   players,
   currentIndex,
@@ -73,6 +74,7 @@ export function ReportView({
   scoreHistory,
 }: {
   sessionId: string;
+  sessionDate: string;
   player: Player;
   players: Player[];
   currentIndex: number;
@@ -309,6 +311,7 @@ export function ReportView({
         <ReportDocument
           playerName={`${player.first_name} ${player.last_name}`}
           position={POSITION_LABEL[player.primary_position]}
+          sessionDate={sessionDate}
           view={view}
           content={activeContent}
           pillarAverages={pillarAverages}

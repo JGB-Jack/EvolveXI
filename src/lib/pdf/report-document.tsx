@@ -21,9 +21,23 @@ function sortByPillarOrder<T extends { pillar_id: string }>(pillars: T[]): T[] {
   );
 }
 
+function formatDate(value: string): string {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function formatDateTime(value: Date): string {
+  return `${value.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}, ${value.toLocaleTimeString(
+    "en-GB",
+    { hour: "2-digit", minute: "2-digit" },
+  )}`;
+}
+
 export function ReportDocument({
   playerName,
   position,
+  sessionDate,
   view,
   content,
   pillarAverages,
@@ -32,6 +46,7 @@ export function ReportDocument({
 }: {
   playerName: string;
   position: string;
+  sessionDate: string;
   view: "coach" | "parent";
   content: ReportContent | ParentReportContent;
   pillarAverages: Record<string, number>;
@@ -40,6 +55,9 @@ export function ReportDocument({
 }) {
   const isCoach = view === "coach";
   const trainingFocus = "trainingFocus" in content ? content.trainingFocus : null;
+  // Rendered fresh every time a PDF is generated, so this is effectively
+  // the download timestamp - there's no separate "generated at" to store.
+  const generatedAt = formatDateTime(new Date());
 
   return (
     <Document title={`${playerName} - ${isCoach ? "Coach" : "Parent"} report`}>
@@ -49,6 +67,10 @@ export function ReportDocument({
         <View style={pdfStyles.metaRow}>
           <Text style={pdfStyles.metaItem}>{position}</Text>
           <Text style={pdfStyles.metaItem}>{isCoach ? "Coach report" : "Parent report"}</Text>
+        </View>
+        <View style={{ marginBottom: 10 }}>
+          <Text style={pdfStyles.metaItem}>Assessed {formatDate(sessionDate)}</Text>
+          <Text style={pdfStyles.metaItem}>PDF generated {generatedAt}</Text>
         </View>
 
         <Text style={pdfStyles.fieldLabel}>Summary</Text>

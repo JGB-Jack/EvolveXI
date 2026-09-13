@@ -134,6 +134,7 @@ export default async function PlayerReportPage({
   return (
     <ReportView
       sessionId={session.id}
+      sessionDate={session.date}
       player={player}
       players={ordered}
       currentIndex={currentIndex}
