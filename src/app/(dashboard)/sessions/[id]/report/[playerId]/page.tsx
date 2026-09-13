@@ -8,6 +8,12 @@ import { getPlayerScoreHistory } from "@/lib/data/player-score-history";
 import type { ReportContent } from "@/lib/claude/report";
 import type { ParentReportContent } from "@/lib/claude/parent-report";
 
+// Without this, Vercel's default serverless function timeout (10s on the
+// free/Hobby plan) can kill the report-generation Server Actions before
+// Claude finishes - the client then just sees a hung request until its own
+// withTimeout fires. 60s is the Hobby plan's max.
+export const maxDuration = 60;
+
 export default async function PlayerReportPage({
   params,
 }: {

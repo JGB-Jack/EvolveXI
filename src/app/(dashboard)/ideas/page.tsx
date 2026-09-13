@@ -1,6 +1,12 @@
 import { DrillGeneratorCard } from "@/components/ideas/drill-generator-card";
 import { SessionBuilderCard } from "@/components/ideas/session-builder-card";
 
+// Without this, Vercel's default serverless function timeout (10s on the
+// free/Hobby plan) can kill the drill/session Server Actions before Sonnet
+// 5 finishes generating - the client then just sees a hung request until
+// its own withTimeout fires. 60s is the Hobby plan's max.
+export const maxDuration = 60;
+
 export default function IdeasPage() {
   return (
     <div className="space-y-6">
