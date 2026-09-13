@@ -29,6 +29,7 @@ export function BottomNav() {
               key={href}
               href={href}
               aria-label={label}
+              prefetch={false}
               className={cn(
                 TAB_CLASSES,
                 active

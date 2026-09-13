@@ -447,7 +447,7 @@ export function ReportView({
       )}
 
       {content && view === "coach" && (
-        <>
+        <div key="coach" className="fade-in-strong space-y-6">
           <Card className="border-b-2 border-b-primary">
             <CardContent className="pt-4">
               <Textarea
@@ -552,11 +552,11 @@ export function ReportView({
               />
             </CardContent>
           </Card>
-        </>
+        </div>
       )}
 
       {content && view === "parent" && !parentContent && (
-        <Card className="border-b-2 border-b-primary">
+        <Card key="parent-empty" className="fade-in-strong border-b-2 border-b-primary">
           <CardHeader>
             <CardTitle>Generate a parent-friendly version</CardTitle>
             <CardDescription>
@@ -578,7 +578,7 @@ export function ReportView({
       )}
 
       {content && view === "parent" && parentContent && (
-        <>
+        <div key="parent" className="fade-in-strong space-y-6">
           <Card className="border-b-2 border-b-primary">
             <CardContent className="pt-4">
               <Textarea
@@ -664,7 +664,7 @@ export function ReportView({
               ))}
             </CardContent>
           </Card>
-        </>
+        </div>
       )}
 
       {content && (

@@ -30,6 +30,7 @@ export function NavBar({ userName }: { userName: string }) {
           {showHome && (
             <Link
               href="/home"
+              prefetch={false}
               className="inline-flex items-center text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground"
             >
               Home
