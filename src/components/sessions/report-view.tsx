@@ -29,6 +29,8 @@ import { PlayerProgressChart } from "@/components/squad/player-progress-chart";
 import { SeasonTrendChart } from "@/components/season-trend-chart";
 import { cn, withTimeout } from "@/lib/utils";
 import { PlayerAvatar } from "@/components/player-avatar";
+import { generateAndOpenPdf } from "@/lib/pdf/generate-and-open";
+import { ReportDocument } from "@/lib/pdf/report-document";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -114,6 +116,7 @@ export function ReportView({
   );
   const [generatingParent, setGeneratingParent] = useState(false);
   const [parentError, setParentError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   // Skipped on mount and right after a fresh generation, since that content
   // is already persisted by generateReport itself - only actual edits after
@@ -297,6 +300,29 @@ export function ReportView({
     );
   }
 
+  async function handleDownload() {
+    const activeContent = view === "coach" ? content : parentContent;
+    if (!activeContent) return;
+    setDownloading(true);
+    try {
+      await generateAndOpenPdf(
+        <ReportDocument
+          playerName={`${player.first_name} ${player.last_name}`}
+          position={POSITION_LABEL[player.primary_position]}
+          view={view}
+          content={activeContent}
+          pillarAverages={pillarAverages}
+          currentDevelopment={currentDevelopment}
+          scoreHistory={scoreHistory}
+        />,
+      );
+    } catch {
+      toast.error("Couldn't create the PDF - try again.");
+    } finally {
+      setDownloading(false);
+    }
+  }
+
   async function handleNext() {
     setSaving(true);
     try {
@@ -349,7 +375,8 @@ export function ReportView({
             <Button
               variant="outline"
               size="icon-lg"
-              onClick={() => toast.info("Downloading reports is coming soon")}
+              onClick={handleDownload}
+              disabled={downloading || (view === "parent" && !parentContent)}
               aria-label="Download"
             >
               <Download className="size-5" />

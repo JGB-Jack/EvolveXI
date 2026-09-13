@@ -17,6 +17,8 @@ import {
 import { Sparkles, Clock, Users, Download } from "lucide-react";
 import { withTimeout } from "@/lib/utils";
 import { toast } from "sonner";
+import { generateAndOpenPdf } from "@/lib/pdf/generate-and-open";
+import { DrillDocument } from "@/lib/pdf/drill-document";
 
 const QUICK_ISSUES = [
   "Too many touches on the ball",
@@ -30,6 +32,7 @@ export function DrillGeneratorCard() {
   const [drill, setDrill] = useState<DrillOutput | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   async function handleGenerate() {
     setError(null);
@@ -56,6 +59,18 @@ export function DrillGeneratorCard() {
   function handleTryAnother() {
     setDrill(null);
     setError(null);
+  }
+
+  async function handleDownload() {
+    if (!drill) return;
+    setDownloading(true);
+    try {
+      await generateAndOpenPdf(<DrillDocument drill={drill} />);
+    } catch {
+      toast.error("Couldn't create the PDF - try again.");
+    } finally {
+      setDownloading(false);
+    }
   }
 
   function handleOpenChange(open: boolean) {
@@ -127,7 +142,8 @@ export function DrillGeneratorCard() {
               <Button
                 variant="outline"
                 size="icon-lg"
-                onClick={() => toast.info("Downloading drills is coming soon")}
+                onClick={handleDownload}
+                disabled={downloading}
                 aria-label="Download"
               >
                 <Download className="size-5" />

@@ -29,6 +29,8 @@ import {
 import { Lightbulb, Clock, Users, Download } from "lucide-react";
 import { cn, withTimeout } from "@/lib/utils";
 import { toast } from "sonner";
+import { generateAndOpenPdf } from "@/lib/pdf/generate-and-open";
+import { SessionDocument } from "@/lib/pdf/session-document";
 
 const PITCH_SIZES: { value: PitchSize; label: string }[] = [
   { value: "quarter", label: "Quarter pitch" },
@@ -78,6 +80,7 @@ export function SessionBuilderCard() {
   const [plan, setPlan] = useState<SessionPlan | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   function toggleKit(key: keyof SessionKit) {
     setKit((k) => ({ ...k, [key]: !k[key] }));
@@ -140,6 +143,18 @@ export function SessionBuilderCard() {
   function handleTryAnother() {
     setPlan(null);
     setError(null);
+  }
+
+  async function handleDownload() {
+    if (!plan) return;
+    setDownloading(true);
+    try {
+      await generateAndOpenPdf(<SessionDocument plan={plan} />);
+    } catch {
+      toast.error("Couldn't create the PDF - try again.");
+    } finally {
+      setDownloading(false);
+    }
   }
 
   function handleOpenChange(open: boolean) {
@@ -320,7 +335,8 @@ export function SessionBuilderCard() {
               <Button
                 variant="outline"
                 size="icon-lg"
-                onClick={() => toast.info("Downloading sessions is coming soon")}
+                onClick={handleDownload}
+                disabled={downloading}
                 aria-label="Download"
               >
                 <Download className="size-5" />
