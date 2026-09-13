@@ -2,7 +2,7 @@
 
 import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +25,6 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const justConfirmed = searchParams.get("confirmed") === "1";
   const [email, setEmail] = useState("");
@@ -55,8 +54,11 @@ function LoginForm() {
       return;
     }
 
-    router.push("/home");
-    router.refresh();
+    // A full page load rather than router.push - a client-side transition
+    // can race ahead of the session cookie the sign-in call just set,
+    // making the dashboard's own server-side auth check see no session yet
+    // and bounce straight back to /login (looks like "nothing happened").
+    window.location.href = "/home";
   }
 
   return (

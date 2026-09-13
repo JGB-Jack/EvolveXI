@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { resetTeamForNewSquad } from "@/lib/actions/team";
+import { withTimeout } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,12 +60,33 @@ export function ResetTeamDialog({
     }
 
     setLoading(true);
-    const result = await resetTeamForNewSquad(name, ageBand);
-    if (result?.error) {
-      setError(result.error);
+    try {
+      // A dropped connection mid-request would otherwise leave this
+      // awaiting forever, with no way to tell whether the reset actually
+      // went through.
+      const result = await withTimeout(resetTeamForNewSquad(name, ageBand), 15000);
+      if (result?.error) {
+        setError(result.error);
+        setLoading(false);
+      }
+      // On success the action redirects server-side.
+    } catch (err) {
+      // A successful redirect from the server action surfaces here as a
+      // thrown error carrying this special digest - it must be allowed to
+      // propagate so Next.js can complete the navigation, not treated as a
+      // failure.
+      if (
+        err &&
+        typeof err === "object" &&
+        "digest" in err &&
+        typeof err.digest === "string" &&
+        err.digest.startsWith("NEXT_REDIRECT")
+      ) {
+        throw err;
+      }
       setLoading(false);
+      setError(err instanceof Error ? err.message : "Failed to reset the team.");
     }
-    // On success the action redirects server-side.
   }
 
   return (

@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { createTeam } from "@/lib/actions/onboarding";
+import { withTimeout } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,12 +46,33 @@ export default function TeamSetupPage() {
     }
 
     setLoading(true);
-    const result = await createTeam(name, ageBand);
-    if (result?.error) {
-      setError(result.error);
+    try {
+      // A dropped connection mid-request would otherwise leave this
+      // awaiting forever, stranding a brand-new coach on their very first
+      // screen with no way forward except reloading.
+      const result = await withTimeout(createTeam(name, ageBand), 15000);
+      if (result?.error) {
+        setError(result.error);
+        setLoading(false);
+      }
+      // On success the action redirects server-side; nothing else to do here.
+    } catch (err) {
+      // A successful redirect from the server action surfaces here as a
+      // thrown error carrying this special digest - it must be allowed to
+      // propagate so Next.js can complete the navigation, not treated as a
+      // failure.
+      if (
+        err &&
+        typeof err === "object" &&
+        "digest" in err &&
+        typeof err.digest === "string" &&
+        err.digest.startsWith("NEXT_REDIRECT")
+      ) {
+        throw err;
+      }
       setLoading(false);
+      setError(err instanceof Error ? err.message : "Failed to set up your team.");
     }
-    // On success the action redirects server-side; nothing else to do here.
   }
 
   return (

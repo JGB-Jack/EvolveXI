@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Lightbulb, Clock, Users } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, withTimeout } from "@/lib/utils";
 
 const PITCH_SIZES: { value: PitchSize; label: string }[] = [
   { value: "quarter", label: "Quarter pitch" },
@@ -117,7 +117,17 @@ export function SessionBuilderCard() {
     };
 
     setLoading(true);
-    const result = await generateSessionPlanForCoach(fields);
+    let result;
+    try {
+      // A dropped connection mid-request would otherwise leave this
+      // awaiting forever - the AI call can legitimately take a while, so
+      // this timeout is generous rather than the usual 15s for a plain save.
+      result = await withTimeout(generateSessionPlanForCoach(fields), 45000);
+    } catch (err) {
+      setLoading(false);
+      setError(err instanceof Error ? err.message : "Failed to build a session.");
+      return;
+    }
     setLoading(false);
     if ("error" in result) {
       setError(result.error);

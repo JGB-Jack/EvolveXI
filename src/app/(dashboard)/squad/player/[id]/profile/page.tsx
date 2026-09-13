@@ -8,7 +8,6 @@ import { getPlayerPillarAverages } from "@/lib/data/player-pillar-averages";
 import { getPlayerScoreHistory } from "@/lib/data/player-score-history";
 import { PlayerProgressChart } from "@/components/squad/player-progress-chart";
 import { SeasonTrendChart } from "@/components/season-trend-chart";
-import { scoreColorClass } from "@/lib/score-color";
 import { cn } from "@/lib/utils";
 import { PlayerAvatar } from "@/components/player-avatar";
 
@@ -104,7 +103,12 @@ export default async function PlayerProfilePage({
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-base">
               Current Development
-              <span className={cn("text-lg", scoreColorClass(overall))}>
+              <span
+                className={cn(
+                  "text-lg font-semibold",
+                  overall !== null ? "text-primary" : "text-muted-foreground",
+                )}
+              >
                 {overall !== null ? overall.toFixed(1) : "-"}
               </span>
             </CardTitle>
@@ -119,7 +123,7 @@ export default async function PlayerProfilePage({
               {pillarAverages.map(({ pillarId, score }) => (
                 <span key={pillarId} className="text-muted-foreground">
                   {PILLAR_NAME[pillarId] ?? pillarId}{" "}
-                  <span className={scoreColorClass(score)}>
+                  <span className="font-semibold text-primary">
                     {score.toFixed(1)}
                   </span>
                 </span>

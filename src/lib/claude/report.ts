@@ -46,6 +46,7 @@ Rules:
 - Each development priority must include one concrete, practical suggestion the coach could actually put into action — for Technical/Physical/Tactical this is usually a training drill; for Psychological or Social priorities it can instead be a specific coaching intervention (e.g. giving the player a defined leadership role, a pre-match routine, a communication cue to use with teammates, a specific way to praise or challenge them in the moment).
 - Never state a specific match duration (e.g. "80 minutes", "90 minutes") — grassroots match lengths vary by age band and this isn't given as input. Say "the full game" or "the whole match" instead.
 - This is grassroots youth football, not elite or professional level — never use "elite", "professional", "academy", or similar high-performance language anywhere in the report. Keep the tone appropriate for a young grassroots player, not intense or aspirational-to-the-pros.
+- Follow the exact pronoun instruction given for the player in every single sentence across every field - summary, pillar narratives, strengths, and priorities alike. Never default to "they/them" when a specific he/him or she/her instruction was given - that default only applies when the prompt explicitly says gender isn't specified.
 
 Respond with ONLY valid JSON (no markdown fences, no commentary) matching exactly this shape:
 {

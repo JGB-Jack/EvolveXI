@@ -16,7 +16,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlayerAvatar } from "@/components/player-avatar";
-import { scoreColorClass } from "@/lib/score-color";
 
 type PillarPlayer = {
   playerId: string;
@@ -99,7 +98,7 @@ export function SquadPillarChart({
                         <span className="flex-1 text-sm font-medium">
                           {p.name}
                         </span>
-                        <span className={scoreColorClass(p.score)}>
+                        <span className="font-semibold text-primary">
                           {p.score.toFixed(1)}
                         </span>
                       </div>

@@ -26,8 +26,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import { scoreColorClass } from "@/lib/score-color";
 import { PlayerAvatar } from "@/components/player-avatar";
 
 const PILLAR_NAME: Record<string, string> = {
@@ -123,7 +121,7 @@ export function SessionDashboard({
                     {player.first_name} {player.last_name}
                   </p>
                 </div>
-                <span className={cn("text-lg", scoreColorClass(overall))}>
+                <span className="text-lg font-semibold text-primary">
                   {formatScore(overall)}
                 </span>
               </div>
@@ -131,7 +129,7 @@ export function SessionDashboard({
                 {pillarIds.map((id) => (
                   <span key={id} className="text-muted-foreground">
                     {PILLAR_NAME[id]}{" "}
-                    <span className={scoreColorClass(pillarAverages[id])}>
+                    <span className="font-semibold text-primary">
                       {formatScore(pillarAverages[id])}
                     </span>
                   </span>
@@ -190,11 +188,11 @@ export function SessionDashboard({
                   </span>
                 </TableCell>
                 {pillarIds.map((id) => (
-                  <TableCell key={id} className={cn(scoreColorClass(pillarAverages[id]))}>
+                  <TableCell key={id} className="font-semibold text-primary">
                     {formatScore(pillarAverages[id])}
                   </TableCell>
                 ))}
-                <TableCell className={cn(scoreColorClass(overall))}>
+                <TableCell className="font-semibold text-primary">
                   {formatScore(overall)}
                 </TableCell>
                 <TableCell className="text-right">

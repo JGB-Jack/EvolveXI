@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Sparkles, Clock, Users } from "lucide-react";
+import { withTimeout } from "@/lib/utils";
 
 const QUICK_ISSUES = [
   "Too many touches on the ball",
@@ -32,7 +33,17 @@ export function DrillGeneratorCard() {
   async function handleGenerate() {
     setError(null);
     setLoading(true);
-    const result = await generateDrillForIssue(issue);
+    let result;
+    try {
+      // A dropped connection mid-request would otherwise leave this
+      // awaiting forever - the AI call can legitimately take a while, so
+      // this timeout is generous rather than the usual 15s for a plain save.
+      result = await withTimeout(generateDrillForIssue(issue), 45000);
+    } catch (err) {
+      setLoading(false);
+      setError(err instanceof Error ? err.message : "Failed to generate a drill.");
+      return;
+    }
     setLoading(false);
     if ("error" in result) {
       setError(result.error);

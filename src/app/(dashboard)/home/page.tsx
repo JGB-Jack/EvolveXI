@@ -8,7 +8,6 @@ import { SquadInsightButton } from "@/components/home/squad-insight-button";
 import { ProgressRing } from "@/components/home/progress-ring";
 import { KpiBar } from "@/components/home/kpi-bar";
 import { getLatestFormRows } from "@/lib/data/latest-form";
-import { scoreBarColorClass } from "@/lib/score-color";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -194,10 +193,6 @@ export default async function HomePage() {
       ? Math.round((fullyAssessedCount / squadCount) * 100)
       : 0;
 
-  // Same red/amber/green banding used everywhere else, expressed relative
-  // to each tile's own scale (/5 scores used directly for the bars).
-  const squadAverageBarColor = scoreBarColorClass(squadAverage);
-  const focusAreaBarColor = scoreBarColorClass(weakestPillar?.score ?? null);
 
   // Sessions are ordered newest-first, so only the latest open one gets a
   // card here - a coach who's left several open at once shouldn't have the
@@ -310,7 +305,7 @@ export default async function HomePage() {
                 </span>
                 <KpiBar
                   percent={weakestPillar ? (weakestPillar.score / 5) * 100 : 0}
-                  colorClass={focusAreaBarColor}
+                  colorClass="bg-primary"
                 />
               </Link>
             </CardContent>
@@ -331,7 +326,7 @@ export default async function HomePage() {
                 </span>
                 <KpiBar
                   percent={squadAverage !== null ? (squadAverage / 5) * 100 : 0}
-                  colorClass={squadAverageBarColor}
+                  colorClass="bg-primary"
                 />
               </CardContent>
             </Card>

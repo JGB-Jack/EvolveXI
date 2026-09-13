@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSessionWizard } from "@/components/sessions/session-wizard-context";
 import { createSession } from "@/lib/actions/sessions";
+import { withTimeout } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -56,19 +57,42 @@ export function PlayerSelectionForm({
       return;
     }
     setSaving(true);
-    const result = await createSession(teamId, {
-      date: state.date,
-      type: state.type,
-      opponent: state.opponent,
-      notes: state.notes,
-      pillarIds: state.pillarIds,
-      playerIds: state.playerIds,
-    });
-    if (result?.error) {
-      setError(result.error);
+    try {
+      // A dropped connection mid-request would otherwise leave this
+      // awaiting forever, leaving "Begin session" stuck with no way out.
+      const result = await withTimeout(
+        createSession(teamId, {
+          date: state.date,
+          type: state.type,
+          opponent: state.opponent,
+          notes: state.notes,
+          pillarIds: state.pillarIds,
+          playerIds: state.playerIds,
+        }),
+        15000,
+      );
+      if (result?.error) {
+        setError(result.error);
+        setSaving(false);
+      }
+      // On success the action redirects server-side.
+    } catch (err) {
+      // A successful redirect from the server action surfaces here as a
+      // thrown error carrying this special digest - it must be allowed to
+      // propagate so Next.js can complete the navigation, not treated as a
+      // failure.
+      if (
+        err &&
+        typeof err === "object" &&
+        "digest" in err &&
+        typeof err.digest === "string" &&
+        err.digest.startsWith("NEXT_REDIRECT")
+      ) {
+        throw err;
+      }
       setSaving(false);
+      setError(err instanceof Error ? err.message : "Failed to start session.");
     }
-    // On success the action redirects server-side.
   }
 
   return (

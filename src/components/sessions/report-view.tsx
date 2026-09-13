@@ -24,10 +24,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { ArrowLeft, Mail, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowLeft, Download, Sparkles, TrendingUp } from "lucide-react";
 import { PlayerProgressChart } from "@/components/squad/player-progress-chart";
 import { SeasonTrendChart } from "@/components/season-trend-chart";
-import { cn } from "@/lib/utils";
+import { cn, withTimeout } from "@/lib/utils";
 import { PlayerAvatar } from "@/components/player-avatar";
 
 const PILLAR_NAME: Record<string, string> = {
@@ -130,7 +130,7 @@ export function ReportView({
     setSaveStatus("saving");
     const timeout = setTimeout(async () => {
       try {
-        await saveReportEdits(reportId, content);
+        await withTimeout(saveReportEdits(reportId, content), 15000);
         setSaveStatus("saved");
       } catch (err) {
         setSaveStatus("idle");
@@ -156,7 +156,7 @@ export function ReportView({
     setSaveStatus("saving");
     const timeout = setTimeout(async () => {
       try {
-        await saveParentReportEdits(reportId, parentContent);
+        await withTimeout(saveParentReportEdits(reportId, parentContent), 15000);
         setSaveStatus("saved");
       } catch (err) {
         setSaveStatus("idle");
@@ -301,11 +301,11 @@ export function ReportView({
     setSaving(true);
     try {
       if (content && reportId) {
-        await saveReportEdits(reportId, content);
+        await withTimeout(saveReportEdits(reportId, content), 15000);
         setSaveStatus("saved");
       }
       if (parentContent && reportId) {
-        await saveParentReportEdits(reportId, parentContent);
+        await withTimeout(saveParentReportEdits(reportId, parentContent), 15000);
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to save");
@@ -349,10 +349,10 @@ export function ReportView({
             <Button
               variant="outline"
               size="icon-lg"
-              onClick={() => toast.info("Sending reports is coming soon")}
-              aria-label="Send"
+              onClick={() => toast.info("Downloading reports is coming soon")}
+              aria-label="Download"
             >
-              <Mail className="size-5" />
+              <Download className="size-5" />
             </Button>
           )}
           <div className="text-right text-sm text-muted-foreground">

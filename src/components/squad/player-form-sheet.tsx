@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { addPlayer, updatePlayer, type PlayerFields } from "@/lib/actions/players";
-import { cn } from "@/lib/utils";
+import { cn, withTimeout } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -105,9 +105,20 @@ export function PlayerFormSheet({
     setSaving(true);
 
     const fields = toFields();
-    const result = player
-      ? await updatePlayer(player.id, fields)
-      : await addPlayer(teamId, fields);
+    let result: Awaited<ReturnType<typeof updatePlayer>> | Awaited<ReturnType<typeof addPlayer>>;
+    try {
+      // A dropped connection mid-request would otherwise leave this awaiting
+      // forever - never reaching setSaving(false) below - so the button
+      // stays stuck on "Saving..." with no way out. The timeout forces it
+      // to fail instead.
+      result = player
+        ? await withTimeout(updatePlayer(player.id, fields), 15000)
+        : await withTimeout(addPlayer(teamId, fields), 15000);
+    } catch (err) {
+      setSaving(false);
+      setError(err instanceof Error ? err.message : "Failed to save. Check your connection and try again.");
+      return;
+    }
 
     setSaving(false);
 
