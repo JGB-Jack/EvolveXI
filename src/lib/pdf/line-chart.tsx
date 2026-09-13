@@ -41,7 +41,7 @@ export function LineChart({
 
   return (
     <Svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`}>
-      {[0, 5].map((v) => {
+      {[0, 1, 2, 3, 4, 5].map((v) => {
         const y = PAD_TOP + PLOT_HEIGHT - (v / 5) * PLOT_HEIGHT;
         return (
           <Line
@@ -55,16 +55,19 @@ export function LineChart({
           />
         );
       })}
-      <Text x={0} y={PAD_TOP + 3} style={{ fontSize: 8, fill: PDF_COLORS.mutedForeground }}>
-        5
-      </Text>
-      <Text
-        x={0}
-        y={PAD_TOP + PLOT_HEIGHT + 3}
-        style={{ fontSize: 8, fill: PDF_COLORS.mutedForeground }}
-      >
-        0
-      </Text>
+      {[0, 1, 2, 3, 4, 5].map((v) => {
+        const y = PAD_TOP + PLOT_HEIGHT - (v / 5) * PLOT_HEIGHT;
+        return (
+          <Text
+            key={v}
+            x={4}
+            y={y + 3}
+            style={{ fontSize: 8, fill: PDF_COLORS.mutedForeground }}
+          >
+            {v}
+          </Text>
+        );
+      })}
 
       <Polyline
         points={points.map((p) => `${p.x},${p.y}`).join(" ")}
