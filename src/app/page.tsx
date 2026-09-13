@@ -1,12 +1,18 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function LandingPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
-      <span className="text-6xl font-bold tracking-tight text-primary">
-        EvolveXI
-      </span>
+    <div className="pitch-bg flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
+      <Image
+        src="/evolvexi-badge.png"
+        alt="EvolveXI"
+        width={112}
+        height={112}
+        priority
+        className="fade-in-step"
+      />
       <h1 className="max-w-xl text-4xl font-semibold tracking-tight">
         <span
           className="fade-in-step inline-block"
@@ -31,9 +37,9 @@ export default function LandingPage() {
         className="fade-in-step max-w-md text-muted-foreground"
         style={{ animationDelay: "3.6s" }}
       >
-        The app for grassroots youth football coaches: watch, assess, and
-        accelerate player improvement with AI-assisted development reports.
-        Learn what &apos;good&apos; looks like, grow with your players.
+        Built for grassroots football coaches: assess and develop players,
+        get AI reports for coaches and parents, and turn to built-in AI
+        tools for drills and sessions in seconds.
       </p>
       <div className="flex gap-3">
         <Button render={<Link href="/register" />} size="lg">

@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState, type FormEvent } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -62,7 +63,8 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="pitch-bg flex min-h-screen flex-col items-center justify-center gap-6 p-4">
+      <Image src="/evolvexi-badge.png" alt="EvolveXI" width={80} height={80} priority />
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Log in to EvolveXI</CardTitle>
