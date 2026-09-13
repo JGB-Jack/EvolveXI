@@ -26,8 +26,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Lightbulb, Clock, Users } from "lucide-react";
+import { Lightbulb, Clock, Users, Download } from "lucide-react";
 import { cn, withTimeout } from "@/lib/utils";
+import { toast } from "sonner";
 
 const PITCH_SIZES: { value: PitchSize; label: string }[] = [
   { value: "quarter", label: "Quarter pitch" },
@@ -309,12 +310,22 @@ export function SessionBuilderCard() {
           </>
         ) : (
           <>
-            <DialogHeader>
-              <DialogTitle>Your session</DialogTitle>
-              <DialogDescription className="sr-only">
-                A technical practice followed by a small-sided game.
-              </DialogDescription>
-            </DialogHeader>
+            <div className="flex items-start justify-between gap-3 pr-10">
+              <DialogHeader className="flex-1">
+                <DialogTitle>Your session</DialogTitle>
+                <DialogDescription className="sr-only">
+                  A technical practice followed by a small-sided game.
+                </DialogDescription>
+              </DialogHeader>
+              <Button
+                variant="outline"
+                size="icon-lg"
+                onClick={() => toast.info("Downloading sessions is coming soon")}
+                aria-label="Download"
+              >
+                <Download className="size-5" />
+              </Button>
+            </div>
 
             <div className="space-y-3">
               <p className="text-xs font-semibold tracking-wide text-primary uppercase">

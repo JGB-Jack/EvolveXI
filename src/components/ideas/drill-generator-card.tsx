@@ -14,8 +14,9 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Sparkles, Clock, Users } from "lucide-react";
+import { Sparkles, Clock, Users, Download } from "lucide-react";
 import { withTimeout } from "@/lib/utils";
+import { toast } from "sonner";
 
 const QUICK_ISSUES = [
   "Too many touches on the ball",
@@ -118,10 +119,20 @@ export function DrillGeneratorCard() {
           </>
         ) : (
           <>
-            <DialogHeader>
-              <DialogTitle>{drill.name}</DialogTitle>
-              <DialogDescription className="sr-only">{drill.target}</DialogDescription>
-            </DialogHeader>
+            <div className="flex items-start justify-between gap-3 pr-10">
+              <DialogHeader className="flex-1">
+                <DialogTitle>{drill.name}</DialogTitle>
+                <DialogDescription className="sr-only">{drill.target}</DialogDescription>
+              </DialogHeader>
+              <Button
+                variant="outline"
+                size="icon-lg"
+                onClick={() => toast.info("Downloading drills is coming soon")}
+                aria-label="Download"
+              >
+                <Download className="size-5" />
+              </Button>
+            </div>
             <div className="space-y-1.5 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Clock className="size-4" />
