@@ -2,6 +2,7 @@ import { Document, Page, Text, View } from "@react-pdf/renderer";
 import type { ReportContent } from "@/lib/claude/report";
 import type { ParentReportContent } from "@/lib/claude/parent-report";
 import { pdfStyles } from "./styles";
+import { PdfLogo } from "./pdf-logo";
 import { RadarChart } from "./radar-chart";
 import { LineChart } from "./line-chart";
 
@@ -43,7 +44,7 @@ export function ReportDocument({
   return (
     <Document title={`${playerName} - ${isCoach ? "Coach" : "Parent"} report`}>
       <Page size="A4" style={pdfStyles.page}>
-        <Text style={pdfStyles.brand}>EvolveXI</Text>
+        <PdfLogo />
         <Text style={pdfStyles.title}>{playerName}</Text>
         <View style={pdfStyles.metaRow}>
           <Text style={pdfStyles.metaItem}>{position}</Text>

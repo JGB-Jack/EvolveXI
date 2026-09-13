@@ -64,7 +64,7 @@ function LoginForm() {
 
   return (
     <div className="pitch-bg flex min-h-screen flex-col items-center justify-center gap-6 p-4">
-      <Image src="/evolvexi-badge.png" alt="EvolveXI" width={80} height={80} priority />
+      <Image src="/evolvexi-logo.png" alt="EvolveXI" width={112} height={112} priority />
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Log in to EvolveXI</CardTitle>

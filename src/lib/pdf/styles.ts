@@ -16,13 +16,10 @@ export const pdfStyles = StyleSheet.create({
     fontFamily: "Helvetica",
     color: PDF_COLORS.foreground,
   },
-  brand: {
-    fontSize: 10,
-    fontWeight: 700,
-    color: PDF_COLORS.primary,
-    marginBottom: 4,
-    textTransform: "uppercase",
-    letterSpacing: 1,
+  logo: {
+    width: 64,
+    height: 64,
+    marginBottom: 8,
   },
   title: {
     fontSize: 20,

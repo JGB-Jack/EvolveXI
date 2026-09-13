@@ -6,7 +6,7 @@ export default function LandingPage() {
   return (
     <div className="pitch-bg flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
       <Image
-        src="/evolvexi-badge.png"
+        src="/evolvexi-logo.png"
         alt="EvolveXI"
         width={112}
         height={112}

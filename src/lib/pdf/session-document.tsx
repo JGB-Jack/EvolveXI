@@ -1,12 +1,13 @@
 import { Document, Page, Text, View } from "@react-pdf/renderer";
 import type { SessionPlan } from "@/lib/claude/session-builder";
 import { pdfStyles } from "./styles";
+import { PdfLogo } from "./pdf-logo";
 
 export function SessionDocument({ plan }: { plan: SessionPlan }) {
   return (
     <Document title="EvolveXI session plan">
       <Page size="A4" style={pdfStyles.page}>
-        <Text style={pdfStyles.brand}>EvolveXI</Text>
+        <PdfLogo />
         <Text style={pdfStyles.title}>Your session</Text>
 
         <Text style={pdfStyles.sectionLabel}>1. Technical practice</Text>

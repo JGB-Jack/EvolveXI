@@ -1,12 +1,13 @@
 import { Document, Page, Text, View } from "@react-pdf/renderer";
 import type { DrillOutput } from "@/lib/claude/drill";
 import { pdfStyles } from "./styles";
+import { PdfLogo } from "./pdf-logo";
 
 export function DrillDocument({ drill }: { drill: DrillOutput }) {
   return (
     <Document title={drill.name}>
       <Page size="A4" style={pdfStyles.page}>
-        <Text style={pdfStyles.brand}>EvolveXI</Text>
+        <PdfLogo />
         <Text style={pdfStyles.title}>{drill.name}</Text>
 
         <View style={pdfStyles.metaRow}>
