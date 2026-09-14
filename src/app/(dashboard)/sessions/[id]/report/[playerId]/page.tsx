@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { ReportView } from "@/components/sessions/report-view";
 import { getExpectedQuestionCount } from "@/lib/data/session-questions";
 import { getPlayerPillarAverages } from "@/lib/data/player-pillar-averages";
@@ -20,11 +20,11 @@ export default async function PlayerReportPage({
   params: Promise<{ id: string; playerId: string }>;
 }) {
   const { id: sessionId, playerId } = await params;
-  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getCurrentUser();
   if (!user) redirect("/login");
+  const supabase = await createClient();
 
   const { data: session } = await supabase
     .from("sessions")

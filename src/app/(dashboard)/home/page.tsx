@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
@@ -18,11 +18,11 @@ const PILLAR_NAME: Record<string, string> = {
 };
 
 export default async function HomePage() {
-  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getCurrentUser();
   const name = (user?.user_metadata?.full_name as string) ?? "coach";
+  const supabase = await createClient();
 
   const { data: team } = await supabase
     .from("teams")

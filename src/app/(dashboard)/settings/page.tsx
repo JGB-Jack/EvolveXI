@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import {
   Card,
   CardHeader,
@@ -13,11 +13,11 @@ import { ResetTeamDialog } from "@/components/settings/reset-team-dialog";
 import { AboutCard } from "@/components/about-card";
 
 export default async function SettingsPage() {
-  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getCurrentUser();
   if (!user) redirect("/login");
+  const supabase = await createClient();
 
   const { data: team } = await supabase
     .from("teams")

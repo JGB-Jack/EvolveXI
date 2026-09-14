@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { PlayerSelectionForm } from "@/components/sessions/player-selection-form";
 
 export default async function SessionPlayersPage() {
-  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getCurrentUser();
   if (!user) redirect("/login");
+  const supabase = await createClient();
 
   const { data: team } = await supabase
     .from("teams")

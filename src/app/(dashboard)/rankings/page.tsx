@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { getLatestFormRows } from "@/lib/data/latest-form";
 import { RankingsTable } from "@/components/rankings/rankings-table";
 import { ExportButton } from "@/components/rankings/export-button";
@@ -28,11 +28,11 @@ type PlayerAgg = {
 };
 
 export default async function RankingsPage() {
-  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getCurrentUser();
   if (!user) redirect("/login");
+  const supabase = await createClient();
 
   const { data: team } = await supabase
     .from("teams")

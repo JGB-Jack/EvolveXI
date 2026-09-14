@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { AssessmentForm } from "@/components/sessions/assessment-form";
 
 export default async function AssessPlayerPage({
@@ -8,11 +8,11 @@ export default async function AssessPlayerPage({
   params: Promise<{ id: string; playerId: string }>;
 }) {
   const { id: sessionId, playerId } = await params;
-  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getCurrentUser();
   if (!user) redirect("/login");
+  const supabase = await createClient();
 
   const { data: sessionRow } = await supabase
     .from("sessions")

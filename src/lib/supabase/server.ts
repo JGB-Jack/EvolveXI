@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -26,3 +27,14 @@ export async function createClient() {
     },
   );
 }
+
+// getUser() always makes a real network call to Supabase's Auth API (it
+// deliberately never trusts a local cookie, unlike getSession()) - the
+// dashboard layout and every page under it each called it independently,
+// tripling that round-trip on every single navigation. React's cache()
+// deduplicates identical calls within one request, so they now share a
+// single network call instead of three.
+export const getCurrentUser = cache(async () => {
+  const supabase = await createClient();
+  return supabase.auth.getUser();
+});

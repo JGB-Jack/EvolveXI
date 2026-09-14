@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { SessionDashboard } from "@/components/sessions/session-dashboard";
 
 export default async function SessionDashboardPage({
@@ -8,11 +8,11 @@ export default async function SessionDashboardPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: sessionId } = await params;
-  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getCurrentUser();
   if (!user) redirect("/login");
+  const supabase = await createClient();
 
   const { data: session } = await supabase
     .from("sessions")
