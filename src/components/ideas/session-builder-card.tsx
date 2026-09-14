@@ -124,9 +124,11 @@ export function SessionBuilderCard() {
     let result;
     try {
       // A dropped connection mid-request would otherwise leave this
-      // awaiting forever - the AI call can legitimately take a while, so
-      // this timeout is generous rather than the usual 15s for a plain save.
-      result = await withTimeout(generateSessionPlanForCoach(fields), 45000);
+      // awaiting forever. This route's own maxDuration is 60s (Vercel's
+      // Hobby-plan ceiling) - stay just under that rather than cutting
+      // the client off early, since a slower connection can legitimately
+      // still be within the server's allowed window.
+      result = await withTimeout(generateSessionPlanForCoach(fields), 58000);
     } catch (err) {
       setLoading(false);
       setError(err instanceof Error ? err.message : "Failed to build a session.");
