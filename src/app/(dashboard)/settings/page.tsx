@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ResetTeamDialog } from "@/components/settings/reset-team-dialog";
+import { ExportDataCard } from "@/components/settings/export-data-card";
 import { AboutCard } from "@/components/about-card";
 
 export default async function SettingsPage() {
@@ -106,19 +107,7 @@ export default async function SettingsPage() {
         </CardHeader>
       </Card>
 
-      <Card className="border-b-2 border-b-primary opacity-70">
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle>Export data</CardTitle>
-            <CardDescription>
-              Download all your players, sessions, and reports.
-            </CardDescription>
-          </div>
-          <Badge className="bg-amber-500 text-white dark:bg-amber-600">
-            Coming soon
-          </Badge>
-        </CardHeader>
-      </Card>
+      <ExportDataCard />
 
       <Card className="border-b-2 border-b-destructive">
         <CardHeader>
