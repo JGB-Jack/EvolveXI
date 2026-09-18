@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ResetTeamDialog } from "@/components/settings/reset-team-dialog";
+import { ClubLogoCard } from "@/components/settings/club-logo-card";
 import { ExportDataCard } from "@/components/settings/export-data-card";
 import { AboutCard } from "@/components/about-card";
 
@@ -22,7 +23,7 @@ export default async function SettingsPage() {
 
   const { data: team } = await supabase
     .from("teams")
-    .select("name, age_band")
+    .select("id, name, age_band, club_logo_url")
     .eq("coach_id", user.id)
     .single();
   if (!team) redirect("/onboarding/team");
@@ -64,19 +65,7 @@ export default async function SettingsPage() {
         </CardHeader>
       </Card>
 
-      <Card className="border-b-2 border-b-primary opacity-70">
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle>Club set up</CardTitle>
-            <CardDescription>
-              Add your club motif to appear on reports.
-            </CardDescription>
-          </div>
-          <Badge className="bg-amber-500 text-white dark:bg-amber-600">
-            Coming soon
-          </Badge>
-        </CardHeader>
-      </Card>
+      <ClubLogoCard teamId={team.id} initialLogoUrl={team.club_logo_url} />
 
       <Card className="border-b-2 border-b-primary opacity-70">
         <CardHeader className="flex-row items-center justify-between space-y-0">
