@@ -104,7 +104,12 @@ export default async function RankingsPage() {
             pillar.
           </p>
         </div>
-        <ExportButton />
+        {players.length > 0 && (
+          <ExportButton
+            players={players}
+            pillars={pillarsPresent.map((id) => ({ id, name: PILLAR_NAME[id] }))}
+          />
+        )}
       </div>
 
       {players.length === 0 ? (
