@@ -28,13 +28,14 @@ export default async function PlayerReportPage({
 
   const { data: session } = await supabase
     .from("sessions")
-    .select("id, date, type, opponent, team_id, teams(age_band)")
+    .select("id, date, type, opponent, team_id, teams(age_band, club_logo_url)")
     .eq("id", sessionId)
     .single();
   if (!session) notFound();
-  const teamAgeBand = (
-    session.teams as unknown as { age_band: string } | null
-  )?.age_band ?? "";
+  const team = session.teams as unknown as
+    | { age_band: string; club_logo_url: string | null }
+    | null;
+  const teamAgeBand = team?.age_band ?? "";
 
   const { data: sessionPlayers } = await supabase
     .from("session_players")
@@ -141,6 +142,7 @@ export default async function PlayerReportPage({
     <ReportView
       sessionId={session.id}
       sessionDate={session.date}
+      clubLogoUrl={team?.club_logo_url ?? null}
       player={player}
       players={ordered}
       currentIndex={currentIndex}

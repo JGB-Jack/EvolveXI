@@ -3,11 +3,17 @@ import type { DrillOutput } from "@/lib/claude/drill";
 import { pdfStyles } from "./styles";
 import { PdfLogo } from "./pdf-logo";
 
-export function DrillDocument({ drill }: { drill: DrillOutput }) {
+export function DrillDocument({
+  drill,
+  clubLogoUrl,
+}: {
+  drill: DrillOutput;
+  clubLogoUrl?: string | null;
+}) {
   return (
     <Document title={drill.name}>
       <Page size="A4" style={pdfStyles.page}>
-        <PdfLogo />
+        <PdfLogo clubLogoUrl={clubLogoUrl} />
         <Text style={pdfStyles.title}>{drill.name}</Text>
 
         <View style={pdfStyles.metaRow}>

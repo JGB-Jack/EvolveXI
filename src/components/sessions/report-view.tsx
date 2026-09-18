@@ -59,6 +59,7 @@ type Player = {
 export function ReportView({
   sessionId,
   sessionDate,
+  clubLogoUrl,
   player,
   players,
   currentIndex,
@@ -75,6 +76,7 @@ export function ReportView({
 }: {
   sessionId: string;
   sessionDate: string;
+  clubLogoUrl: string | null;
   player: Player;
   players: Player[];
   currentIndex: number;
@@ -312,6 +314,7 @@ export function ReportView({
           playerName={`${player.first_name} ${player.last_name}`}
           position={POSITION_LABEL[player.primary_position]}
           sessionDate={sessionDate}
+          clubLogoUrl={clubLogoUrl}
           view={view}
           content={activeContent}
           pillarAverages={pillarAverages}

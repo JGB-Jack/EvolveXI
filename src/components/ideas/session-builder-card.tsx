@@ -67,7 +67,11 @@ const EMPTY_KIT: SessionKit = {
   largeGoals: false,
 };
 
-export function SessionBuilderCard() {
+export function SessionBuilderCard({
+  clubLogoUrl,
+}: {
+  clubLogoUrl?: string | null;
+}) {
   const [playerCount, setPlayerCount] = useState("");
   const [supportCoaches, setSupportCoaches] = useState("0");
   const [minutesAvailable, setMinutesAvailable] = useState("");
@@ -151,7 +155,9 @@ export function SessionBuilderCard() {
     if (!plan) return;
     setDownloading(true);
     try {
-      await generateAndOpenPdf(<SessionDocument plan={plan} />);
+      await generateAndOpenPdf(
+        <SessionDocument plan={plan} clubLogoUrl={clubLogoUrl} />,
+      );
     } catch {
       toast.error("Couldn't create the PDF - try again.");
     } finally {

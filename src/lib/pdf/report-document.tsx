@@ -38,6 +38,7 @@ export function ReportDocument({
   playerName,
   position,
   sessionDate,
+  clubLogoUrl,
   view,
   content,
   pillarAverages,
@@ -47,6 +48,7 @@ export function ReportDocument({
   playerName: string;
   position: string;
   sessionDate: string;
+  clubLogoUrl?: string | null;
   view: "coach" | "parent";
   content: ReportContent | ParentReportContent;
   pillarAverages: Record<string, number>;
@@ -62,7 +64,7 @@ export function ReportDocument({
   return (
     <Document title={`${playerName} - ${isCoach ? "Coach" : "Parent"} report`}>
       <Page size="A4" style={pdfStyles.page}>
-        <PdfLogo />
+        <PdfLogo clubLogoUrl={clubLogoUrl} />
         <Text style={pdfStyles.title}>{playerName}</Text>
         <View style={pdfStyles.metaRow}>
           <Text style={pdfStyles.metaItem}>{position}</Text>

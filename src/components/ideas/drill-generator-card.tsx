@@ -27,7 +27,11 @@ const QUICK_ISSUES = [
   "Slow to press when we lose it",
 ];
 
-export function DrillGeneratorCard() {
+export function DrillGeneratorCard({
+  clubLogoUrl,
+}: {
+  clubLogoUrl?: string | null;
+}) {
   const [issue, setIssue] = useState("");
   const [drill, setDrill] = useState<DrillOutput | null>(null);
   const [loading, setLoading] = useState(false);
@@ -67,7 +71,9 @@ export function DrillGeneratorCard() {
     if (!drill) return;
     setDownloading(true);
     try {
-      await generateAndOpenPdf(<DrillDocument drill={drill} />);
+      await generateAndOpenPdf(
+        <DrillDocument drill={drill} clubLogoUrl={clubLogoUrl} />,
+      );
     } catch {
       toast.error("Couldn't create the PDF - try again.");
     } finally {

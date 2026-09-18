@@ -3,11 +3,17 @@ import type { SessionPlan } from "@/lib/claude/session-builder";
 import { pdfStyles } from "./styles";
 import { PdfLogo } from "./pdf-logo";
 
-export function SessionDocument({ plan }: { plan: SessionPlan }) {
+export function SessionDocument({
+  plan,
+  clubLogoUrl,
+}: {
+  plan: SessionPlan;
+  clubLogoUrl?: string | null;
+}) {
   return (
     <Document title="EvolveXI session plan">
       <Page size="A4" style={pdfStyles.page}>
-        <PdfLogo />
+        <PdfLogo clubLogoUrl={clubLogoUrl} />
         <Text style={pdfStyles.title}>Your session</Text>
 
         <Text style={pdfStyles.sectionLabel}>1. Technical practice</Text>

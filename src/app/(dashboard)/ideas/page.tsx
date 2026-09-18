@@ -1,3 +1,4 @@
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { DrillGeneratorCard } from "@/components/ideas/drill-generator-card";
 import { SessionBuilderCard } from "@/components/ideas/session-builder-card";
 
@@ -7,7 +8,19 @@ import { SessionBuilderCard } from "@/components/ideas/session-builder-card";
 // its own withTimeout fires. 60s is the Hobby plan's max.
 export const maxDuration = 60;
 
-export default function IdeasPage() {
+export default async function IdeasPage() {
+  const {
+    data: { user },
+  } = await getCurrentUser();
+  const supabase = await createClient();
+  const { data: team } = user
+    ? await supabase
+        .from("teams")
+        .select("club_logo_url")
+        .eq("coach_id", user.id)
+        .maybeSingle()
+    : { data: null };
+
   return (
     <div className="space-y-6">
       <div>
@@ -17,8 +30,8 @@ export default function IdeasPage() {
         </p>
       </div>
       <div className="space-y-4">
-        <DrillGeneratorCard />
-        <SessionBuilderCard />
+        <DrillGeneratorCard clubLogoUrl={team?.club_logo_url ?? null} />
+        <SessionBuilderCard clubLogoUrl={team?.club_logo_url ?? null} />
       </div>
     </div>
   );
