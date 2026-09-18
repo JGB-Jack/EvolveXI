@@ -21,6 +21,12 @@ export const pdfStyles = StyleSheet.create({
     height: 64,
     marginBottom: 8,
   },
+  logoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
   title: {
     fontSize: 20,
     fontWeight: 700,
