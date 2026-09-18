@@ -21,8 +21,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, X, ChevronDown } from "lucide-react";
+import { ArrowLeft, X, ChevronDown, CloudOff } from "lucide-react";
 import { PlayerAvatar } from "@/components/player-avatar";
+import { useOfflineSaveQueue } from "@/hooks/use-offline-save-queue";
 
 const PILLAR_ORDER = [
   { id: "technical", name: "Technical" },
@@ -91,6 +92,31 @@ export function AssessmentForm({
   const [confirmArmed, setConfirmArmed] = useState(false);
   const [expandedRefs, setExpandedRefs] = useState<Set<string>>(new Set());
 
+  // A dropped connection while rating a player would otherwise just show a
+  // toast the coach might not see mid-session - these three saves queue in
+  // localStorage and retry automatically instead. markPlayerComplete (in
+  // handleContinue below) deliberately stays a blocking save, not queued:
+  // it's the one place the coach is told "you're done with this player"
+  // and navigates on, so that confirmation should be real, not optimistic.
+  const { pendingCount, saveWithRetry } = useOfflineSaveQueue({
+    rating: (...args) =>
+      saveRating(
+        args[0] as string,
+        args[1] as string,
+        args[2] as string,
+        args[3] as number,
+      ),
+    pillarNotes: (...args) =>
+      savePillarNotes(
+        args[0] as string,
+        args[1] as string,
+        args[2] as string,
+        args[3] as string,
+      ),
+    standoutMoment: (...args) =>
+      saveStandoutMoment(args[0] as string, args[1] as string, args[2] as string),
+  });
+
   function toggleRef(questionId: string) {
     setExpandedRefs((prev) => {
       const next = new Set(prev);
@@ -118,27 +144,20 @@ export function AssessmentForm({
     });
     setConfirmingSkip(false);
     setConfirmArmed(false);
-    try {
-      await saveRating(session.id, player.id, questionId, score);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save rating");
-    }
+    await saveWithRetry("rating", [session.id, player.id, questionId, score]);
   }
 
   async function handleNotesBlur(pillarId: string) {
-    try {
-      await savePillarNotes(session.id, player.id, pillarId, notes[pillarId] ?? "");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save notes");
-    }
+    await saveWithRetry("pillarNotes", [
+      session.id,
+      player.id,
+      pillarId,
+      notes[pillarId] ?? "",
+    ]);
   }
 
   async function handleStandoutBlur() {
-    try {
-      await saveStandoutMoment(session.id, player.id, standoutMoment);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save");
-    }
+    await saveWithRetry("standoutMoment", [session.id, player.id, standoutMoment]);
   }
 
   async function handleContinue() {
@@ -199,6 +218,14 @@ export function AssessmentForm({
           Player {currentIndex + 1} of {players.length}
         </div>
       </div>
+
+      {pendingCount > 0 && (
+        <div className="flex items-center gap-2 rounded-lg border-b-2 border-b-amber-500 bg-amber-500/10 px-3 py-2 text-sm font-medium text-amber-700 dark:text-amber-400">
+          <CloudOff className="size-4 shrink-0" />
+          {pendingCount} change{pendingCount === 1 ? "" : "s"} not saved yet -
+          will retry automatically
+        </div>
+      )}
 
       <Card className="border-b-2 border-b-primary">
       <CardContent>
