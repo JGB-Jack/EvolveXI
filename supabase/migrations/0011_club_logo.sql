@@ -45,3 +45,10 @@ create policy "Anyone can view club logos"
   on storage.objects for select
   to public
   using (bucket_id = 'club-logos');
+
+-- Enforce the same 5MB/PNG-JPG limits server-side, not just in the
+-- Settings upload UI - a bypassed client check could otherwise put an
+-- oversized or wrong-type file straight into Storage.
+update storage.buckets
+set file_size_limit = 5242880, allowed_mime_types = array['image/png','image/jpeg']
+where id = 'club-logos';
