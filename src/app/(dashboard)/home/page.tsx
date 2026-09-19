@@ -27,7 +27,9 @@ export default async function HomePage() {
 
   const { data: team } = await supabase
     .from("teams")
-    .select("id, name, age_band, latest_insight, latest_insight_generated_at")
+    .select(
+      "id, name, age_band, latest_insight, latest_insight_generated_at, pillar_weights",
+    )
     .eq("coach_id", user!.id)
     .single();
 
@@ -134,6 +136,7 @@ export default async function HomePage() {
           sum / count,
         ]),
       ),
+      team?.pillar_weights,
     );
     pillarData = Array.from(totalsByPillar.entries())
       .map(([pillarId, { sum, count }]) => ({
