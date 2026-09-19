@@ -47,6 +47,12 @@ export default async function PlayerProfilePage({
 
   if (!player) notFound();
 
+  const { data: team } = await supabase
+    .from("teams")
+    .select("pillar_weights")
+    .eq("id", player.team_id)
+    .single();
+
   const pillarAverages = await getPlayerPillarAverages(
     supabase,
     player.team_id,
@@ -60,6 +66,7 @@ export default async function PlayerProfilePage({
   }));
   const overall = computeOverallFromPillarAverages(
     Object.fromEntries(pillarAverages.map((p) => [p.pillarId, p.score])),
+    team?.pillar_weights,
   );
 
   return (
