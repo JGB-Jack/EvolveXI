@@ -60,7 +60,12 @@ export default async function PlayerProfilePage({
     player.team_id,
     id,
   );
-  const scoreHistory = await getPlayerScoreHistory(supabase, player.team_id, id);
+  const scoreHistory = await getPlayerScoreHistory(
+    supabase,
+    player.team_id,
+    id,
+    team?.pillar_weights,
+  );
 
   const chartData = pillarAverages.map(({ pillarId, score }) => ({
     pillar: PILLAR_NAME[pillarId] ?? pillarId,

@@ -119,6 +119,7 @@ export default async function PlayerReportPage({
     supabase,
     session.team_id,
     playerId,
+    team?.pillar_weights,
   );
 
   let initialContent: ReportContent | null = null;
