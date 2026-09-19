@@ -17,10 +17,16 @@ export default async function SessionDashboardPage({
 
   const { data: session } = await supabase
     .from("sessions")
-    .select("id, date, type, opponent")
+    .select("id, date, type, opponent, team_id")
     .eq("id", sessionId)
     .single();
   if (!session) notFound();
+
+  const { data: team } = await supabase
+    .from("teams")
+    .select("pillar_weights")
+    .eq("id", session.team_id)
+    .single();
 
   const { data: sessionPillars } = await supabase
     .from("session_pillars")
@@ -69,7 +75,10 @@ export default async function SessionDashboardPage({
     for (const pillarId of pillarIds) {
       scoresByPillar[pillarId] = pillarMap.get(pillarId) ?? [];
     }
-    const { pillarAverages, overall } = computeOverallFromRawScores(scoresByPillar);
+    const { pillarAverages, overall } = computeOverallFromRawScores(
+      scoresByPillar,
+      team?.pillar_weights,
+    );
     return { player, pillarAverages, overall };
   });
 
