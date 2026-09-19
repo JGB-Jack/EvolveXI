@@ -14,6 +14,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { Shield } from "lucide-react";
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/png", "image/jpeg"];
@@ -99,7 +100,12 @@ export function ClubLogoCard({
   return (
     <Card className="border-b-2 border-b-primary">
       <CardHeader>
-        <CardTitle>Club set up</CardTitle>
+        <div className="flex items-center gap-2">
+          <span className="primary-gradient flex size-7 shrink-0 items-center justify-center rounded-md text-primary-foreground">
+            <Shield className="size-4" />
+          </span>
+          <CardTitle>Club set up</CardTitle>
+        </div>
         <CardDescription>
           Add your club badge to appear alongside the EvolveXI logo on
           generated PDFs.

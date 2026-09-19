@@ -9,6 +9,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { BookOpen, User, HelpCircle, AlertTriangle } from "lucide-react";
 import { ResetTeamDialog } from "@/components/settings/reset-team-dialog";
 import { ClubLogoCard } from "@/components/settings/club-logo-card";
 import { ExportDataCard } from "@/components/settings/export-data-card";
@@ -44,7 +45,12 @@ export default async function SettingsPage() {
       <Link href="/settings/questions" className="block">
         <Card className="border-b-2 border-b-primary transition-colors hover:bg-muted/50">
           <CardHeader>
-            <CardTitle>Question bank</CardTitle>
+            <div className="flex items-center gap-2">
+              <span className="primary-gradient flex size-7 shrink-0 items-center justify-center rounded-md text-primary-foreground">
+                <BookOpen className="size-4" />
+              </span>
+              <CardTitle>Question bank</CardTitle>
+            </div>
             <CardDescription>
               View, edit, or add custom questions for any pillar.
             </CardDescription>
@@ -55,7 +61,12 @@ export default async function SettingsPage() {
       <Card className="border-b-2 border-b-primary opacity-70">
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
-            <CardTitle>Profile set up</CardTitle>
+            <div className="flex items-center gap-2">
+              <span className="primary-gradient flex size-7 shrink-0 items-center justify-center rounded-md text-primary-foreground">
+                <User className="size-4" />
+              </span>
+              <CardTitle>Profile set up</CardTitle>
+            </div>
             <CardDescription>
               Edit your name, personal details, and team info.
             </CardDescription>
@@ -73,7 +84,12 @@ export default async function SettingsPage() {
       <Card className="border-b-2 border-b-primary opacity-70">
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
-            <CardTitle>FAQs</CardTitle>
+            <div className="flex items-center gap-2">
+              <span className="primary-gradient flex size-7 shrink-0 items-center justify-center rounded-md text-primary-foreground">
+                <HelpCircle className="size-4" />
+              </span>
+              <CardTitle>FAQs</CardTitle>
+            </div>
             <CardDescription>
               Answers to common questions about using EvolveXI.
             </CardDescription>
@@ -88,7 +104,12 @@ export default async function SettingsPage() {
 
       <Card className="border-b-2 border-b-destructive">
         <CardHeader>
-          <CardTitle>Danger zone</CardTitle>
+          <div className="flex items-center gap-2">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-destructive text-white">
+              <AlertTriangle className="size-4" />
+            </span>
+            <CardTitle>Danger zone</CardTitle>
+          </div>
           <CardDescription>
             Wipe all players, sessions, reports, and questions to start
             fresh with a new squad, optionally at a different age band.

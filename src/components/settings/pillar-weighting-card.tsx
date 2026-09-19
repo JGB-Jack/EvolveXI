@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { savePillarWeights } from "@/lib/actions/pillar-weights";
 import { cn, withTimeout } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -68,10 +68,17 @@ export function PillarWeightingCard({
         className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left"
       >
         <div>
-          <p className="text-sm font-semibold">Pillar weighting</p>
+          <div className="flex items-center gap-2">
+            <span className="primary-gradient flex size-7 shrink-0 items-center justify-center rounded-md text-primary-foreground">
+              <SlidersHorizontal className="size-4" />
+            </span>
+            <p className="font-heading text-base leading-snug font-medium">
+              Pillar weighting
+            </p>
+          </div>
           <p className="text-sm text-muted-foreground">
-            Give some pillars more influence than others on overall scores
-            to match your club or coaching ethos.
+            Give some pillars more influence than others on overall
+            scores to match your club or coaching ethos.
           </p>
         </div>
         <ChevronDown

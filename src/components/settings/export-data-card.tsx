@@ -13,7 +13,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Download } from "lucide-react";
+import { Download, FileSpreadsheet } from "lucide-react";
 
 export function ExportDataCard() {
   const [downloading, setDownloading] = useState(false);
@@ -95,7 +95,12 @@ export function ExportDataCard() {
   return (
     <Card className="border-b-2 border-b-primary">
       <CardHeader>
-        <CardTitle>Export data</CardTitle>
+        <div className="flex items-center gap-2">
+          <span className="primary-gradient flex size-7 shrink-0 items-center justify-center rounded-md text-primary-foreground">
+            <FileSpreadsheet className="size-4" />
+          </span>
+          <CardTitle>Export data</CardTitle>
+        </div>
         <CardDescription>
           Download all your players, sessions, and ratings as an Excel
           workbook.
