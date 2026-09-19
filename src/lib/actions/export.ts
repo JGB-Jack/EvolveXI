@@ -78,7 +78,7 @@ export async function exportTeamData(): Promise<
 
   const { data: team } = await supabase
     .from("teams")
-    .select("id")
+    .select("id, pillar_weights")
     .eq("coach_id", user.id)
     .single();
   if (!team) return { error: "Couldn't find your team." };
@@ -157,7 +157,8 @@ export async function exportTeamData(): Promise<
     playerLastName: row.players.last_name,
     overallScore:
       Math.round(
-        (computeOverallFromRawScores(scoresByPillar).overall ?? 0) * 100,
+        (computeOverallFromRawScores(scoresByPillar, team.pillar_weights).overall ?? 0) *
+          100,
       ) / 100,
   }));
 
@@ -204,7 +205,10 @@ export async function exportTeamData(): Promise<
         ]),
       ) as Record<string, number | null>;
       const overall =
-        Math.round((computeOverallFromPillarAverages(pillarAverages) ?? 0) * 100) / 100;
+        Math.round(
+          (computeOverallFromPillarAverages(pillarAverages, team.pillar_weights) ?? 0) *
+            100,
+        ) / 100;
       return {
         playerFirstName: agg.firstName,
         playerLastName: agg.lastName,
