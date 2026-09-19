@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { getPlayerPillarAverages } from "@/lib/data/player-pillar-averages";
+import { computeOverallFromPillarAverages } from "@/lib/pillar-scoring";
 import { getPlayerScoreHistory } from "@/lib/data/player-score-history";
 import { PlayerProgressChart } from "@/components/squad/player-progress-chart";
 import { SeasonTrendChart } from "@/components/season-trend-chart";
@@ -57,10 +58,9 @@ export default async function PlayerProfilePage({
     pillar: PILLAR_NAME[pillarId] ?? pillarId,
     score,
   }));
-  const overall =
-    pillarAverages.length > 0
-      ? pillarAverages.reduce((sum, p) => sum + p.score, 0) / pillarAverages.length
-      : null;
+  const overall = computeOverallFromPillarAverages(
+    Object.fromEntries(pillarAverages.map((p) => [p.pillarId, p.score])),
+  );
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">

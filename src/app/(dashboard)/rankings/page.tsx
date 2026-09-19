@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { getLatestFormRows } from "@/lib/data/latest-form";
+import { computeOverallFromPillarAverages } from "@/lib/pillar-scoring";
 import { RankingsTable } from "@/components/rankings/rankings-table";
 import { ExportButton } from "@/components/rankings/export-button";
 import {
@@ -78,11 +79,7 @@ export default async function RankingsPage() {
     // Average of the pillar averages (equal weight per pillar), not a raw
     // score average - pillars can come from different sessions with
     // different question counts now that each is independently "latest".
-    const pillarScores = Object.values(pillarAverages).filter(
-      (v): v is number => v !== null,
-    );
-    const overall =
-      pillarScores.reduce((sum, v) => sum + v, 0) / pillarScores.length;
+    const overall = computeOverallFromPillarAverages(pillarAverages) ?? 0;
 
     return {
       playerId: p.playerId,

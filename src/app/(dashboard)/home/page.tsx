@@ -8,6 +8,7 @@ import { SquadInsightButton } from "@/components/home/squad-insight-button";
 import { ProgressRing } from "@/components/home/progress-ring";
 import { KpiBar } from "@/components/home/kpi-bar";
 import { getLatestFormRows } from "@/lib/data/latest-form";
+import { computeOverallFromPillarAverages } from "@/lib/pillar-scoring";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -103,9 +104,7 @@ export default async function HomePage() {
         { sum: number; count: number; name: string; squadNumber: number | null }
       >
     >();
-    let overallSum = 0;
     for (const row of assessmentRows) {
-      overallSum += row.score;
       if (row.pillar_id) {
         const entry = totalsByPillar.get(row.pillar_id) ?? { sum: 0, count: 0 };
         entry.sum += row.score;
@@ -128,7 +127,14 @@ export default async function HomePage() {
         }
       }
     }
-    squadAverage = overallSum / assessmentRows.length;
+    squadAverage = computeOverallFromPillarAverages(
+      Object.fromEntries(
+        Array.from(totalsByPillar.entries()).map(([pillarId, { sum, count }]) => [
+          pillarId,
+          sum / count,
+        ]),
+      ),
+    );
     pillarData = Array.from(totalsByPillar.entries())
       .map(([pillarId, { sum, count }]) => ({
         pillar: PILLAR_NAME[pillarId] ?? pillarId,

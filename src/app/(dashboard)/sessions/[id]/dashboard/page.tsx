@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { SessionDashboard } from "@/components/sessions/session-dashboard";
+import { computeOverallFromRawScores } from "@/lib/pillar-scoring";
 
 export default async function SessionDashboardPage({
   params,
@@ -64,20 +65,11 @@ export default async function SessionDashboardPage({
 
   const playerScores = players.map((player) => {
     const pillarMap = scoresByPlayerPillar.get(player.id) ?? new Map<string, number[]>();
-    const pillarAverages: Record<string, number | null> = {};
-    const allScores: number[] = [];
+    const scoresByPillar: Record<string, number[]> = {};
     for (const pillarId of pillarIds) {
-      const scores = pillarMap.get(pillarId) ?? [];
-      pillarAverages[pillarId] =
-        scores.length > 0
-          ? scores.reduce((s, v) => s + v, 0) / scores.length
-          : null;
-      allScores.push(...scores);
+      scoresByPillar[pillarId] = pillarMap.get(pillarId) ?? [];
     }
-    const overall =
-      allScores.length > 0
-        ? allScores.reduce((s, v) => s + v, 0) / allScores.length
-        : null;
+    const { pillarAverages, overall } = computeOverallFromRawScores(scoresByPillar);
     return { player, pillarAverages, overall };
   });
 

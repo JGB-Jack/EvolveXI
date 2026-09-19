@@ -5,6 +5,7 @@ import { getExpectedQuestionCount } from "@/lib/data/session-questions";
 import { getPlayerPillarAverages } from "@/lib/data/player-pillar-averages";
 import { getPreviousSessionOverall } from "@/lib/data/previous-session-score";
 import { getPlayerScoreHistory } from "@/lib/data/player-score-history";
+import { computeOverallFromRawScores } from "@/lib/pillar-scoring";
 import type { ReportContent } from "@/lib/claude/report";
 import type { ParentReportContent } from "@/lib/claude/parent-report";
 
@@ -82,32 +83,25 @@ export default async function PlayerReportPage({
     pillarIds: (sessionPillars ?? []).map((p) => p.pillar_id),
   });
 
-  const scoresByPillar = new Map<string, number[]>();
+  const scoresByPillar: Record<string, number[]> = {};
   for (const a of (assessments as unknown as
     | { score: number; team_questions: { pillar_id: string } }[]
     | null) ?? []) {
     const pillarId = a.team_questions.pillar_id;
-    if (!scoresByPillar.has(pillarId)) scoresByPillar.set(pillarId, []);
-    scoresByPillar.get(pillarId)!.push(a.score);
+    (scoresByPillar[pillarId] ??= []).push(a.score);
   }
-  const pillarAverages = Object.fromEntries(
-    Array.from(scoresByPillar.entries()).map(([pillarId, scores]) => [
-      pillarId,
-      scores.reduce((sum, s) => sum + s, 0) / scores.length,
-    ]),
-  );
+  const { pillarAverages: rawPillarAverages, overall: sessionOverall } =
+    computeOverallFromRawScores(scoresByPillar);
+  // Downstream JSX expects every pillar present with a number, not
+  // possibly null - this session's own pillars always have at least one
+  // score by construction, so this narrowing is safe.
+  const pillarAverages = rawPillarAverages as Record<string, number>;
 
   const currentDevelopment = await getPlayerPillarAverages(
     supabase,
     session.team_id,
     playerId,
   );
-
-  const sessionScores = (assessments ?? []).map((a) => a.score);
-  const sessionOverall =
-    sessionScores.length > 0
-      ? sessionScores.reduce((sum, s) => sum + s, 0) / sessionScores.length
-      : null;
   const previousSessionOverall = await getPreviousSessionOverall(
     supabase,
     session.team_id,

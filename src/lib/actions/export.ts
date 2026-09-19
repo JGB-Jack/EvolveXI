@@ -1,6 +1,10 @@
 "use server";
 
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
+import {
+  computeOverallFromRawScores,
+  computeOverallFromPillarAverages,
+} from "@/lib/pillar-scoring";
 import { getLatestFormRows } from "@/lib/data/latest-form";
 
 const PILLAR_NAME: Record<string, string> = {
@@ -130,28 +134,31 @@ export async function exportTeamData(): Promise<
     score: a.score,
   }));
 
-  // One overall average per (session, player), across every question they
-  // were rated on in that session - same definition the report page uses.
+  // One overall average per (session, player) - pillar-weighted (equal
+  // weight per pillar), same method every other screen uses now.
   const bySessionPlayer = new Map<
     string,
-    { sum: number; count: number; row: AssessmentRow }
+    { scoresByPillar: Record<string, number[]>; row: AssessmentRow }
   >();
   for (const a of rows) {
     const key = `${a.session_id}:${a.player_id}`;
-    const entry = bySessionPlayer.get(key) ?? { sum: 0, count: 0, row: a };
-    entry.sum += a.score;
-    entry.count += 1;
+    const entry = bySessionPlayer.get(key) ?? { scoresByPillar: {}, row: a };
+    const pillarId = a.team_questions.pillar_id;
+    (entry.scoresByPillar[pillarId] ??= []).push(a.score);
     bySessionPlayer.set(key, entry);
   }
   const sessionOverallScores: SessionOverallExportRow[] = Array.from(
     bySessionPlayer.values(),
-  ).map(({ sum, count, row }) => ({
+  ).map(({ scoresByPillar, row }) => ({
     sessionDate: row.sessions.date,
     sessionType: row.sessions.type,
     opponent: row.sessions.opponent,
     playerFirstName: row.players.first_name,
     playerLastName: row.players.last_name,
-    overallScore: Math.round((sum / count) * 100) / 100,
+    overallScore:
+      Math.round(
+        (computeOverallFromRawScores(scoresByPillar).overall ?? 0) * 100,
+      ) / 100,
   }));
 
   // Same computation the Rankings page itself uses: each player's most
@@ -196,15 +203,8 @@ export async function exportTeamData(): Promise<
             : null,
         ]),
       ) as Record<string, number | null>;
-      const pillarScores = Object.values(pillarAverages).filter(
-        (v): v is number => v !== null,
-      );
       const overall =
-        pillarScores.length > 0
-          ? Math.round(
-              (pillarScores.reduce((sum, v) => sum + v, 0) / pillarScores.length) * 100,
-            ) / 100
-          : 0;
+        Math.round((computeOverallFromPillarAverages(pillarAverages) ?? 0) * 100) / 100;
       return {
         playerFirstName: agg.firstName,
         playerLastName: agg.lastName,

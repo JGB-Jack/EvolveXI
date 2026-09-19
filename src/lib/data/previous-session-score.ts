@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { computeOverallFromRawScores } from "@/lib/pillar-scoring";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -18,7 +19,9 @@ export async function getPreviousSessionOverall(
 ): Promise<number | null> {
   const { data } = await supabase
     .from("assessments")
-    .select("session_id, score, sessions!inner(team_id, date, completed_at)")
+    .select(
+      "session_id, score, team_questions(pillar_id), sessions!inner(team_id, date, completed_at)",
+    )
     .eq("player_id", playerId)
     .eq("sessions.team_id", teamId)
     .not("sessions.completed_at", "is", null)
@@ -28,6 +31,7 @@ export async function getPreviousSessionOverall(
     .map((row) => ({
       session_id: row.session_id as string,
       score: row.score as number,
+      pillar_id: firstOf(row.team_questions)?.pillar_id,
       date: firstOf(row.sessions)?.date,
       completed_at: firstOf(row.sessions)?.completed_at,
     }))
@@ -52,12 +56,11 @@ export async function getPreviousSessionOverall(
     }
   }
 
-  const latestSessionScores = rows
-    .filter((row) => row.session_id === latestSessionId)
-    .map((row) => row.score);
+  const scoresByPillar: Record<string, number[]> = {};
+  for (const row of rows) {
+    if (row.session_id !== latestSessionId || !row.pillar_id) continue;
+    (scoresByPillar[row.pillar_id] ??= []).push(row.score);
+  }
 
-  return (
-    latestSessionScores.reduce((sum, s) => sum + s, 0) /
-    latestSessionScores.length
-  );
+  return computeOverallFromRawScores(scoresByPillar).overall;
 }
