@@ -29,12 +29,18 @@ export default async function PlayerReportPage({
 
   const { data: session } = await supabase
     .from("sessions")
-    .select("id, date, type, opponent, team_id, teams(age_band, club_logo_url)")
+    .select(
+      "id, date, type, opponent, team_id, teams(age_band, club_logo_url, pillar_weights)",
+    )
     .eq("id", sessionId)
     .single();
   if (!session) notFound();
   const team = session.teams as unknown as
-    | { age_band: string; club_logo_url: string | null }
+    | {
+        age_band: string;
+        club_logo_url: string | null;
+        pillar_weights: Record<string, number> | null;
+      }
     | null;
   const teamAgeBand = team?.age_band ?? "";
 
@@ -91,7 +97,7 @@ export default async function PlayerReportPage({
     (scoresByPillar[pillarId] ??= []).push(a.score);
   }
   const { pillarAverages: rawPillarAverages, overall: sessionOverall } =
-    computeOverallFromRawScores(scoresByPillar);
+    computeOverallFromRawScores(scoresByPillar, team?.pillar_weights);
   // Downstream JSX expects every pillar present with a number, not
   // possibly null - this session's own pillars always have at least one
   // score by construction, so this narrowing is safe.
@@ -107,6 +113,7 @@ export default async function PlayerReportPage({
     session.team_id,
     playerId,
     sessionId,
+    team?.pillar_weights,
   );
   const scoreHistory = await getPlayerScoreHistory(
     supabase,

@@ -16,6 +16,7 @@ export async function getPreviousSessionOverall(
   teamId: string,
   playerId: string,
   excludeSessionId: string,
+  weights?: Record<string, number> | null,
 ): Promise<number | null> {
   const { data } = await supabase
     .from("assessments")
@@ -62,5 +63,5 @@ export async function getPreviousSessionOverall(
     (scoresByPillar[row.pillar_id] ??= []).push(row.score);
   }
 
-  return computeOverallFromRawScores(scoresByPillar).overall;
+  return computeOverallFromRawScores(scoresByPillar, weights).overall;
 }
