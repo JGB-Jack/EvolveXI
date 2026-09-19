@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { ResetTeamDialog } from "@/components/settings/reset-team-dialog";
 import { ClubLogoCard } from "@/components/settings/club-logo-card";
 import { ExportDataCard } from "@/components/settings/export-data-card";
+import { PillarWeightingCard } from "@/components/settings/pillar-weighting-card";
 import { AboutCard } from "@/components/about-card";
 
 export default async function SettingsPage() {
@@ -23,7 +24,7 @@ export default async function SettingsPage() {
 
   const { data: team } = await supabase
     .from("teams")
-    .select("id, name, age_band, club_logo_url")
+    .select("id, name, age_band, club_logo_url, pillar_weights")
     .eq("coach_id", user.id)
     .single();
   if (!team) redirect("/onboarding/team");
@@ -67,20 +68,7 @@ export default async function SettingsPage() {
 
       <ClubLogoCard teamId={team.id} initialLogoUrl={team.club_logo_url} />
 
-      <Card className="border-b-2 border-b-primary opacity-70">
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle>Pillar weighting</CardTitle>
-            <CardDescription>
-              Give some pillars more influence than others on overall
-              scores to match your club or coaching ethos.
-            </CardDescription>
-          </div>
-          <Badge className="bg-amber-500 text-white dark:bg-amber-600">
-            Coming soon
-          </Badge>
-        </CardHeader>
-      </Card>
+      <PillarWeightingCard initialWeights={team.pillar_weights} />
 
       <Card className="border-b-2 border-b-primary opacity-70">
         <CardHeader className="flex-row items-center justify-between space-y-0">
