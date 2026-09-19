@@ -47,6 +47,8 @@ export default async function PlayerProfilePage({
 
   if (!player) notFound();
 
+  // No null-check here on purpose - if this ever comes back null, the
+  // overall score below just falls back to unweighted rather than erroring.
   const { data: team } = await supabase
     .from("teams")
     .select("pillar_weights")

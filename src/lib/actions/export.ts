@@ -134,8 +134,9 @@ export async function exportTeamData(): Promise<
     score: a.score,
   }));
 
-  // One overall average per (session, player) - pillar-weighted (equal
-  // weight per pillar), same method every other screen uses now.
+  // One overall average per (session, player) - weighted per the team's
+  // pillar_weights (or equal weight per pillar if unset), same method
+  // every other screen uses now.
   const bySessionPlayer = new Map<
     string,
     { scoresByPillar: Record<string, number[]>; row: AssessmentRow }
@@ -163,9 +164,10 @@ export async function exportTeamData(): Promise<
   }));
 
   // Same computation the Rankings page itself uses: each player's most
-  // recent score per pillar, averaged per pillar, then averaged across
-  // pillars for an overall (equal weight per pillar, not a raw score
-  // average) - kept consistent so this export matches what's on screen.
+  // recent score per pillar, averaged per pillar, then combined across
+  // pillars for an overall (weighted per the team's pillar_weights, or
+  // equal weight per pillar if unset, not a raw score average) - kept
+  // consistent so this export matches what's on screen.
   const formRows = await getLatestFormRows(supabase, team.id);
   type PillarAgg = {
     firstName: string;

@@ -154,6 +154,7 @@ export default async function PlayerReportPage({
       initialParentContent={initialParentContent}
       pillarAverages={pillarAverages}
       currentDevelopment={currentDevelopment}
+      pillarWeights={team?.pillar_weights ?? null}
       sessionOverall={sessionOverall}
       previousSessionOverall={previousSessionOverall}
       scoreHistory={scoreHistory}

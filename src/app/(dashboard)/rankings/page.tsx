@@ -76,9 +76,10 @@ export default async function RankingsPage() {
         p.pillarSums[id] ? p.pillarSums[id].sum / p.pillarSums[id].count : null,
       ]),
     );
-    // Average of the pillar averages (equal weight per pillar), not a raw
-    // score average - pillars can come from different sessions with
-    // different question counts now that each is independently "latest".
+    // Average of the pillar averages (weighted per the team's pillar_weights,
+    // or equal weight per pillar if unset), not a raw score average - pillars
+    // can come from different sessions with different question counts now
+    // that each is independently "latest".
     const overall = computeOverallFromPillarAverages(pillarAverages, team.pillar_weights) ?? 0;
 
     return {

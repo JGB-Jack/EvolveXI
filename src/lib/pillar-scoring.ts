@@ -36,7 +36,11 @@ export function computeOverallFromPillarAverages(
   let weightTotal = 0;
   for (const [pillarId, value] of Object.entries(pillarAverages)) {
     if (value === null || value === undefined) continue;
-    const weight = weights?.[pillarId] ?? 1;
+    const rawWeight = weights?.[pillarId];
+    const weight =
+      typeof rawWeight === "number" && Number.isFinite(rawWeight) && rawWeight > 0
+        ? rawWeight
+        : 1;
     weightedSum += value * weight;
     weightTotal += weight;
   }

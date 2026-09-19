@@ -31,6 +31,7 @@ import { cn, withTimeout } from "@/lib/utils";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { generateAndOpenPdf } from "@/lib/pdf/generate-and-open";
 import { ReportDocument } from "@/lib/pdf/report-document";
+import { computeOverallFromPillarAverages } from "@/lib/pillar-scoring";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -70,6 +71,7 @@ export function ReportView({
   initialParentContent,
   pillarAverages,
   currentDevelopment,
+  pillarWeights,
   sessionOverall,
   previousSessionOverall,
   scoreHistory,
@@ -87,6 +89,7 @@ export function ReportView({
   initialParentContent: ParentReportContent | null;
   pillarAverages: Record<string, number>;
   currentDevelopment: { pillarId: string; score: number }[];
+  pillarWeights: Record<string, number> | null;
   sessionOverall: number | null;
   previousSessionOverall: number | null;
   scoreHistory: { date: string; score: number }[];
@@ -94,11 +97,10 @@ export function ReportView({
   const router = useRouter();
   const isLast = currentIndex === players.length - 1;
 
-  const developmentOverall =
-    currentDevelopment.length > 0
-      ? currentDevelopment.reduce((sum, p) => sum + p.score, 0) /
-        currentDevelopment.length
-      : null;
+  const developmentOverall = computeOverallFromPillarAverages(
+    Object.fromEntries(currentDevelopment.map((p) => [p.pillarId, p.score])),
+    pillarWeights,
+  );
 
   const improved =
     sessionOverall !== null &&
