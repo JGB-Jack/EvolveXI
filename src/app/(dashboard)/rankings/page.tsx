@@ -37,7 +37,7 @@ export default async function RankingsPage() {
 
   const { data: team } = await supabase
     .from("teams")
-    .select("id")
+    .select("id, pillar_weights")
     .eq("coach_id", user.id)
     .single();
   if (!team) redirect("/onboarding/team");
@@ -79,7 +79,7 @@ export default async function RankingsPage() {
     // Average of the pillar averages (equal weight per pillar), not a raw
     // score average - pillars can come from different sessions with
     // different question counts now that each is independently "latest".
-    const overall = computeOverallFromPillarAverages(pillarAverages) ?? 0;
+    const overall = computeOverallFromPillarAverages(pillarAverages, team.pillar_weights) ?? 0;
 
     return {
       playerId: p.playerId,
