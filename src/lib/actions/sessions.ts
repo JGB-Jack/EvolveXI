@@ -11,7 +11,11 @@ export type CreateSessionInput = {
   notes: string;
   pillarIds: string[];
   playerIds: string[];
+  playerPositions: Record<string, string>;
 };
+
+const VALID_POSITIONS = ["defence", "midfield", "attack", "goalkeeper"];
+const NON_POSITIONAL_AGE_BANDS = ["U6-U7", "U8-U9"];
 
 export async function createSession(
   teamId: string,
@@ -25,6 +29,35 @@ export async function createSession(
   }
 
   const supabase = await createClient();
+
+  const { data: team } = await supabase
+    .from("teams")
+    .select("age_band")
+    .eq("id", teamId)
+    .single();
+  const isPositionalBand = !NON_POSITIONAL_AGE_BANDS.includes(
+    team?.age_band ?? "",
+  );
+
+  const { data: playerRows } = await supabase
+    .from("players")
+    .select("id, primary_position")
+    .eq("team_id", teamId)
+    .in("id", input.playerIds);
+  const usualPosition = new Map(
+    (playerRows ?? []).map((p) => [p.id as string, p.primary_position as string]),
+  );
+
+  const positionByPlayer = new Map<string, string>();
+  for (const playerId of input.playerIds) {
+    const chosen = input.playerPositions?.[playerId];
+    const position =
+      isPositionalBand && chosen ? chosen : usualPosition.get(playerId);
+    if (!position || !VALID_POSITIONS.includes(position)) {
+      return { error: "One of the selected players has an invalid position." };
+    }
+    positionByPlayer.set(playerId, position);
+  }
 
   const { data: session, error: sessionError } = await supabase
     .from("sessions")
@@ -61,6 +94,7 @@ export async function createSession(
       input.playerIds.map((playerId) => ({
         session_id: session.id,
         player_id: playerId,
+        position_played: positionByPlayer.get(playerId),
       })),
     );
 

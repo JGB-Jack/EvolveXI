@@ -11,6 +11,7 @@ export type SessionWizardState = {
   notes: string;
   pillarIds: string[];
   playerIds: string[];
+  playerPositions: Record<string, string>;
 };
 
 const DEFAULT_STATE: SessionWizardState = {
@@ -20,6 +21,7 @@ const DEFAULT_STATE: SessionWizardState = {
   notes: "",
   pillarIds: [],
   playerIds: [],
+  playerPositions: {},
 };
 
 type SessionWizardContextValue = {

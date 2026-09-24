@@ -11,7 +11,7 @@ export default async function SessionPlayersPage() {
 
   const { data: team } = await supabase
     .from("teams")
-    .select("id")
+    .select("id, age_band")
     .eq("coach_id", user.id)
     .single();
 
@@ -32,7 +32,11 @@ export default async function SessionPlayersPage() {
           Choose who&apos;s in this session, or use Select all.
         </p>
       </div>
-      <PlayerSelectionForm teamId={team.id} players={players ?? []} />
+      <PlayerSelectionForm
+        teamId={team.id}
+        ageBand={team.age_band}
+        players={players ?? []}
+      />
     </div>
   );
 }

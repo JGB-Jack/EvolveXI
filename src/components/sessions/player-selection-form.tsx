@@ -8,7 +8,16 @@ import { withTimeout } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PlayerAvatar } from "@/components/player-avatar";
+
+const NON_POSITIONAL_AGE_BANDS = ["U6-U7", "U8-U9"];
 
 const POSITION_LABEL: Record<string, string> = {
   defence: "Defence",
@@ -27,15 +36,24 @@ export type SquadPlayer = {
 
 export function PlayerSelectionForm({
   teamId,
+  ageBand,
   players,
 }: {
   teamId: string;
+  ageBand: string;
   players: SquadPlayer[];
 }) {
   const router = useRouter();
   const { state, update } = useSessionWizard();
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const showPositionPicker = !NON_POSITIONAL_AGE_BANDS.includes(ageBand);
+
+  function setPosition(playerId: string, position: string) {
+    update({
+      playerPositions: { ...state.playerPositions, [playerId]: position },
+    });
+  }
 
   function selectAll() {
     update({ playerIds: players.map((p) => p.id) });
@@ -68,6 +86,7 @@ export function PlayerSelectionForm({
           notes: state.notes,
           pillarIds: state.pillarIds,
           playerIds: state.playerIds,
+          playerPositions: state.playerPositions,
         }),
         15000,
       );
@@ -120,9 +139,40 @@ export function PlayerSelectionForm({
               <span className="flex-1">
                 {player.first_name} {player.last_name}
               </span>
-              <span className="text-sm text-muted-foreground">
-                {POSITION_LABEL[player.primary_position]}
-              </span>
+              {checked && showPositionPicker ? (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <Select
+                    value={
+                      state.playerPositions[player.id] ?? player.primary_position
+                    }
+                    onValueChange={(v) =>
+                      setPosition(player.id, v ?? player.primary_position)
+                    }
+                  >
+                    <SelectTrigger size="sm" className="w-32">
+                      <SelectValue>
+                        {
+                          POSITION_LABEL[
+                            state.playerPositions[player.id] ??
+                              player.primary_position
+                          ]
+                        }
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(POSITION_LABEL).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <span className="text-sm text-muted-foreground">
+                  {POSITION_LABEL[player.primary_position]}
+                </span>
+              )}
             </div>
           );
         })}
