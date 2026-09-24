@@ -56,7 +56,7 @@ type SessionPlayer = {
   id: string;
   first_name: string;
   last_name: string;
-  primary_position: string;
+  position_played: string;
   squad_number: number | null;
   standout_moment: string | null;
 };
@@ -209,7 +209,7 @@ export function AssessmentForm({
               {player.first_name} {player.last_name}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {POSITION_LABEL[player.primary_position]} &middot; {sessionLabel}{" "}
+              {POSITION_LABEL[player.position_played]} &middot; {sessionLabel}{" "}
               &middot; {session.date}
             </p>
           </div>

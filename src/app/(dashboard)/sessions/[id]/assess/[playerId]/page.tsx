@@ -31,14 +31,13 @@ export default async function AssessPlayerPage({
 
   const { data: sessionPlayers } = await supabase
     .from("session_players")
-    .select("player_id, standout_moment, players(id, first_name, last_name, primary_position, squad_number)")
+    .select("player_id, standout_moment, position_played, players(id, first_name, last_name, squad_number)")
     .eq("session_id", sessionId);
 
   type PlayerRow = {
     id: string;
     first_name: string;
     last_name: string;
-    primary_position: string;
     squad_number: number | null;
   };
 
@@ -49,7 +48,7 @@ export default async function AssessPlayerPage({
         id: p.id,
         first_name: p.first_name,
         last_name: p.last_name,
-        primary_position: p.primary_position,
+        position_played: sp.position_played as string,
         squad_number: p.squad_number,
         standout_moment: sp.standout_moment as string | null,
       };
@@ -68,9 +67,9 @@ export default async function AssessPlayerPage({
   const isPositionalBand = !["U6-U7", "U8-U9"].includes(teamAgeBand);
   const variants = !isPositionalBand
     ? ["all", "outfield"]
-    : player.primary_position === "goalkeeper"
+    : player.position_played === "goalkeeper"
       ? ["all", "goalkeeper"]
-      : ["all", "outfield", player.primary_position];
+      : ["all", "outfield", player.position_played];
 
   const { data: questions } = await supabase
     .from("team_questions")
