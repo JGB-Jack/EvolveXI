@@ -33,7 +33,7 @@ export async function generateReport(sessionId: string, playerId: string) {
 
   const { data: player } = await supabase
     .from("players")
-    .select("first_name, last_name, primary_position, gender")
+    .select("first_name, last_name, gender")
     .eq("id", playerId)
     .single();
   if (!player) throw new Error("Player not found.");
@@ -62,10 +62,18 @@ export async function generateReport(sessionId: string, playerId: string) {
     );
   }
 
+  const { data: sessionPlayer } = await supabase
+    .from("session_players")
+    .select("standout_moment, position_played")
+    .eq("session_id", sessionId)
+    .eq("player_id", playerId)
+    .single();
+  if (!sessionPlayer) throw new Error("Player isn't part of this session.");
+
   const expectedQuestionCount = await getExpectedQuestionCount(supabase, {
     teamId: session.team_id,
     ageBand: team?.age_band ?? "",
-    position: player.primary_position,
+    position: sessionPlayer.position_played,
     pillarIds,
   });
   if (assessments.length < expectedQuestionCount) {
@@ -82,13 +90,6 @@ export async function generateReport(sessionId: string, playerId: string) {
   const notesByPillar = Object.fromEntries(
     (pillarNotes ?? []).map((n) => [n.pillar_id, n.notes ?? ""]),
   );
-
-  const { data: sessionPlayer } = await supabase
-    .from("session_players")
-    .select("standout_moment")
-    .eq("session_id", sessionId)
-    .eq("player_id", playerId)
-    .single();
 
   type AssessmentRow = {
     score: number;
@@ -130,13 +131,13 @@ export async function generateReport(sessionId: string, playerId: string) {
 
   const content = await generatePlayerReport({
     playerName: `${player.first_name} ${player.last_name}`,
-    position: player.primary_position,
+    position: sessionPlayer.position_played,
     gender: player.gender,
     ageBand: team?.age_band ?? "",
     sessionType: session.type,
     sessionDate: session.date,
     pillars,
-    standoutMoment: sessionPlayer?.standout_moment ?? "",
+    standoutMoment: sessionPlayer.standout_moment ?? "",
   });
 
   const contentJson = JSON.stringify(content);

@@ -46,19 +46,21 @@ export default async function PlayerReportPage({
 
   const { data: sessionPlayers } = await supabase
     .from("session_players")
-    .select("player_id, players(id, first_name, last_name, primary_position, squad_number)")
+    .select("player_id, position_played, players(id, first_name, last_name, squad_number)")
     .eq("session_id", sessionId);
 
   type PlayerRow = {
     id: string;
     first_name: string;
     last_name: string;
-    primary_position: string;
     squad_number: number | null;
   };
 
   const ordered = (sessionPlayers ?? [])
-    .map((sp) => sp.players as unknown as PlayerRow)
+    .map((sp) => ({
+      ...(sp.players as unknown as PlayerRow),
+      position_played: sp.position_played as string,
+    }))
     .sort((a, b) => a.last_name.localeCompare(b.last_name));
 
   const currentIndex = ordered.findIndex((p) => p.id === playerId);
@@ -85,7 +87,7 @@ export default async function PlayerReportPage({
   const expectedQuestionCount = await getExpectedQuestionCount(supabase, {
     teamId: session.team_id,
     ageBand: teamAgeBand,
-    position: player.primary_position,
+    position: player.position_played,
     pillarIds: (sessionPillars ?? []).map((p) => p.pillar_id),
   });
 

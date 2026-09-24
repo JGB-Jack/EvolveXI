@@ -53,7 +53,7 @@ type Player = {
   id: string;
   first_name: string;
   last_name: string;
-  primary_position: string;
+  position_played: string;
   squad_number: number | null;
 };
 
@@ -314,7 +314,7 @@ export function ReportView({
       await generateAndOpenPdf(
         <ReportDocument
           playerName={`${player.first_name} ${player.last_name}`}
-          position={POSITION_LABEL[player.primary_position]}
+          position={POSITION_LABEL[player.position_played]}
           sessionDate={sessionDate}
           clubLogoUrl={clubLogoUrl}
           view={view}
@@ -374,7 +374,7 @@ export function ReportView({
               {player.first_name} {player.last_name}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {POSITION_LABEL[player.primary_position]} &middot; Report
+              {POSITION_LABEL[player.position_played]} &middot; Report
             </p>
           </div>
         </div>
