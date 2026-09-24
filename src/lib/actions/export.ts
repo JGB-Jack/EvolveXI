@@ -33,6 +33,7 @@ export type SessionRatingExportRow = {
   opponent: string | null;
   playerFirstName: string;
   playerLastName: string;
+  positionPlayed: string;
   pillar: string;
   question: string;
   score: number;
@@ -44,6 +45,7 @@ export type SessionOverallExportRow = {
   opponent: string | null;
   playerFirstName: string;
   playerLastName: string;
+  positionPlayed: string;
   overallScore: number;
 };
 
@@ -123,12 +125,25 @@ export async function exportTeamData(): Promise<
 
   const rows = (assessmentRows ?? []) as unknown as AssessmentRow[];
 
+  const { data: positionRows, error: positionsError } = await supabase
+    .from("session_players")
+    .select("session_id, player_id, position_played, sessions!inner(team_id)")
+    .eq("sessions.team_id", team.id);
+  if (positionsError) return { error: positionsError.message };
+  const positionPlayed = new Map(
+    (positionRows ?? []).map((r) => [
+      `${r.session_id}:${r.player_id}`,
+      r.position_played as string,
+    ]),
+  );
+
   const ratings: SessionRatingExportRow[] = rows.map((a) => ({
     sessionDate: a.sessions.date,
     sessionType: a.sessions.type,
     opponent: a.sessions.opponent,
     playerFirstName: a.players.first_name,
     playerLastName: a.players.last_name,
+    positionPlayed: positionPlayed.get(`${a.session_id}:${a.player_id}`) ?? "",
     pillar: PILLAR_NAME[a.team_questions.pillar_id] ?? a.team_questions.pillar_id,
     question: a.team_questions.question_text,
     score: a.score,
@@ -156,6 +171,7 @@ export async function exportTeamData(): Promise<
     opponent: row.sessions.opponent,
     playerFirstName: row.players.first_name,
     playerLastName: row.players.last_name,
+    positionPlayed: positionPlayed.get(`${row.session_id}:${row.player_id}`) ?? "",
     overallScore:
       Math.round(
         (computeOverallFromRawScores(scoresByPillar, team.pillar_weights).overall ?? 0) *
