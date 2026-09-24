@@ -21,8 +21,8 @@ per-session position drive the assessment.
   in that session (Technical/Tactical variants for every positional age
   band, plus the goalkeeper Physical set).
 - Everything session-specific (completeness check, AI report, report
-  page/PDF, session dashboard, export session tabs) reflects the position
-  played, not the usual position.
+  page/PDF, export session tabs) reflects the position played, not the
+  usual position.
 - Existing sessions keep working exactly as they do today.
 
 ## Non-goals
@@ -91,8 +91,9 @@ Each of these already selects the session's player rows, so they add
   check uses `position_played`.
 - `lib/actions/reports.ts`: the position passed to the AI report (coach
   and parent versions) is `position_played`.
-- Report page and `report-view.tsx` (title line and PDF position label),
-  and the session dashboard: display `position_played`.
+- Report page and `report-view.tsx` (title line and PDF position label):
+  display `position_played`. (The session dashboard does not display a
+  position anywhere today, so it needs no change.)
 - Export (`lib/actions/export.ts` and `export-data-card.tsx`): the
   Sessions & Ratings and Session Overall Scores tabs gain a "Position
   played" column. The Players tab keeps the usual position.
