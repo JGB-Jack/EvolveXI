@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { AuthLinkErrorBanner } from "@/components/auth-link-error-banner";
 
 export default function LandingPage() {
   return (
     <div className="pitch-bg flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
+      <AuthLinkErrorBanner />
       <Image
         src="/evolvexi-logo.png"
         alt="EvolveXI"
