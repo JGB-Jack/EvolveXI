@@ -43,13 +43,18 @@ export function AboutCard() {
         )}
       >
         <div className="space-y-3 border-t px-4 pt-3 pb-4">
+          <p className="text-sm font-semibold text-foreground">
+            Built by a real grassroots coach and dad who wanted better tools
+            for his own team.
+          </p>
           <p className="text-sm text-muted-foreground">
             Watch, assess, and develop every player with one shared standard
             for &quot;good.&quot; Customise the questions and observations to
             fit your team, and let AI-assisted reports do the heavy lifting
-            &mdash; complete with targeted drills for each player. See at a
-            glance who&apos;s ready for selection, who needs extra reps, and
-            where to focus training next.
+            &mdash; complete with targeted drills for each player. Share
+            regular development reports with parents to keep them engaged
+            all season, and see at a glance who&apos;s ready for selection,
+            who needs extra reps, and where to focus training next.
           </p>
           <p className="text-sm text-muted-foreground">
             The 5 pillars are a widely-used framework in football coaching
