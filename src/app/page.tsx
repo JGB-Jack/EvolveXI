@@ -35,14 +35,16 @@ export default function LandingPage() {
           Develop.
         </span>
       </h1>
-      <p
-        className="fade-in-step max-w-md text-muted-foreground"
-        style={{ animationDelay: "3.6s" }}
-      >
-        Built for grassroots football coaches: assess and develop players,
-        get AI reports for coaches and parents, and turn to built-in AI
-        tools for drills and sessions in seconds.
-      </p>
+      <div className="max-w-md space-y-2 text-muted-foreground">
+        <p className="fade-in-step" style={{ animationDelay: "3.6s" }}>
+          Built for grassroots football to develop every player and every
+          coach.
+        </p>
+        <p className="fade-in-step" style={{ animationDelay: "4.5s" }}>
+          Share AI-assisted development reports — insights that keep players
+          and parents returning season after season.
+        </p>
+      </div>
       <div className="flex gap-3">
         <Button render={<Link href="/register" />} size="lg">
           Start for free
