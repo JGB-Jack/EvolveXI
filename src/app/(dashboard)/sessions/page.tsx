@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
-import { restoreSession } from "@/lib/actions/sessions";
-import { playerNamesSummary, playerNamesFull } from "@/lib/player-names";
 import { SessionsList } from "@/components/sessions/sessions-list";
+import { ArchivedSessionsList } from "@/components/sessions/archived-sessions-list";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -73,32 +72,8 @@ export default async function SessionsPage() {
               their data is kept. Restore anyone archived by mistake.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {archivedSessions.map((session) => (
-              <div
-                key={session.id}
-                className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2"
-              >
-                <div className="min-w-0">
-                  <p className="truncate">
-                    {session.type}
-                    {session.opponent ? ` vs ${session.opponent}` : ""}
-                    <span className="text-muted-foreground"> &middot; {session.date}</span>
-                  </p>
-                  <p
-                    className="truncate text-sm text-muted-foreground"
-                    title={playerNamesFull(session.session_players)}
-                  >
-                    {playerNamesSummary(session.session_players)}
-                  </p>
-                </div>
-                <form action={restoreSession.bind(null, session.id)}>
-                  <Button type="submit" size="sm" variant="outline">
-                    Restore
-                  </Button>
-                </form>
-              </div>
-            ))}
+          <CardContent>
+            <ArchivedSessionsList sessions={archivedSessions} />
           </CardContent>
         </Card>
       )}

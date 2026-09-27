@@ -124,3 +124,18 @@ export async function restoreSession(id: string) {
   if (error) throw new Error(error.message);
   revalidatePath("/sessions");
 }
+
+// Permanently removes a session and, via "on delete cascade", everything
+// that belongs to it (session_pillars, session_players, assessments,
+// assessment_pillar_notes, reports). Scoped to archived rows only, so this
+// can't be called on a session still in active use.
+export async function deleteSessionPermanently(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("sessions")
+    .delete()
+    .eq("id", id)
+    .not("archived_at", "is", null);
+  if (error) throw new Error(error.message);
+  revalidatePath("/sessions");
+}

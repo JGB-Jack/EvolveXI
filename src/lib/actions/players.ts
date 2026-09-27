@@ -80,3 +80,18 @@ export async function restorePlayer(id: string) {
 
   if (error) throw new Error(error.message);
 }
+
+// Permanently removes a player and, via "on delete cascade", their entire
+// history (session_players, assessments, assessment_pillar_notes, reports).
+// Scoped to archived (inactive) players only, so this can't be called on a
+// player still in active use.
+export async function deletePlayerPermanently(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("players")
+    .delete()
+    .eq("id", id)
+    .eq("active", false);
+
+  if (error) throw new Error(error.message);
+}

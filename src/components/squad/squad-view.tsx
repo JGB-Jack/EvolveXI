@@ -4,8 +4,22 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { archivePlayer, restorePlayer } from "@/lib/actions/players";
+import {
+  archivePlayer,
+  restorePlayer,
+  deletePlayerPermanently,
+} from "@/lib/actions/players";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -123,6 +137,16 @@ export function SquadView({
     }
   }
 
+  async function handleDeletePermanently(player: ArchivedPlayer) {
+    try {
+      await deletePlayerPermanently(player.id);
+      toast.success(`${player.first_name} deleted`);
+      router.refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete");
+    }
+  }
+
   const archivedSection = archivedPlayers.length > 0 && (
     <Card className="border-b-2 border-b-primary">
       <CardHeader>
@@ -147,14 +171,43 @@ export function SquadView({
                 &middot; {POSITION_LABEL[player.primary_position]}
               </span>
             </span>
-            <Button
-              size="sm"
-              variant="outline"
-              className="shrink-0"
-              onClick={() => handleRestore(player)}
-            >
-              Restore
-            </Button>
+            <div className="flex shrink-0 gap-1">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleRestore(player)}
+              >
+                Restore
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger
+                  render={<Button size="sm" variant="outline" />}
+                >
+                  Delete
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Delete {player.first_name} {player.last_name} permanently?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This removes their entire history - all ratings, notes,
+                      and reports across every session. This can&apos;t be
+                      undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDeletePermanently(player)}
+                    >
+                      Delete permanently
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
         ))}
       </CardContent>
