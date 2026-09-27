@@ -12,6 +12,7 @@ import {
   type ParentReportContent,
 } from "@/lib/claude/parent-report";
 import { getExpectedQuestionCount } from "@/lib/data/session-questions";
+import { getPreviousReport } from "@/lib/data/previous-report";
 
 const PILLAR_NAME: Record<string, string> = {
   technical: "Technical",
@@ -129,6 +130,13 @@ export async function generateReport(sessionId: string, playerId: string) {
     };
   });
 
+  const previousReport = await getPreviousReport(
+    supabase,
+    session.team_id,
+    playerId,
+    sessionId,
+  );
+
   const content = await generatePlayerReport({
     playerName: `${player.first_name} ${player.last_name}`,
     position: sessionPlayer.position_played,
@@ -138,6 +146,7 @@ export async function generateReport(sessionId: string, playerId: string) {
     sessionDate: session.date,
     pillars,
     standoutMoment: sessionPlayer.standout_moment ?? "",
+    previousReport,
   });
 
   const contentJson = JSON.stringify(content);

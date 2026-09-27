@@ -26,6 +26,7 @@ export type ReportInput = {
   sessionDate: string;
   pillars: PillarInput[];
   standoutMoment: string;
+  previousReport?: { summary: string; priorities: string[] } | null;
 };
 
 function pronounInstruction(gender: string | null): string {
@@ -45,6 +46,7 @@ Rules:
 - Choose the 2 development priorities based on which pillars genuinely need the most attention, considering ALL pillars given equally — do not default to Technical, Physical, or Tactical just because they're easier to write a drill for. If Psychological or Social scores or notes show a real area for growth, it deserves a priority slot just as much as a technical weakness.
 - Each development priority must include one concrete, practical suggestion the coach could actually put into action — for Technical/Physical/Tactical this is usually a training drill; for Psychological or Social priorities it can instead be a specific coaching intervention (e.g. giving the player a defined leadership role, a pre-match routine, a communication cue to use with teammates, a specific way to praise or challenge them in the moment).
 - Never state a specific match duration (e.g. "80 minutes", "90 minutes") — grassroots match lengths vary by age band and this isn't given as input. Say "the full game" or "the whole match" instead.
+- If a previous report's summary and priorities are given, use them for continuity — e.g. note genuine progress on a priority, or that one is still developing — but only where THIS session's ratings actually support it. Never claim progress the scores don't show, never repeat the previous report's own wording, and never force a callback into every field. If nothing about this session meaningfully connects to the previous one, write this report as its own standalone assessment.
 - This is grassroots youth football, not elite or professional level — never use "elite", "professional", "academy", or similar high-performance language anywhere in the report. Keep the tone appropriate for a young grassroots player, not intense or aspirational-to-the-pros.
 - Follow the exact pronoun instruction given for the player in every single sentence across every field - summary, pillar narratives, strengths, and priorities alike. Never default to "they/them" when a specific he/him or she/her instruction was given - that default only applies when the prompt explicitly says gender isn't specified.
 
@@ -81,7 +83,12 @@ Age band: ${input.ageBand}
 Session: ${input.sessionType} on ${input.sessionDate}
 
 ${pillarBlocks}
-${input.standoutMoment ? `\nStandout moment noted by the coach: ${input.standoutMoment}` : ""}`;
+${input.standoutMoment ? `\nStandout moment noted by the coach: ${input.standoutMoment}` : ""}
+${
+  input.previousReport
+    ? `\nPrevious report summary: ${input.previousReport.summary}\nPrevious development priorities: ${input.previousReport.priorities.join("; ")}`
+    : ""
+}`;
 }
 
 function stripCodeFences(text: string): string {
