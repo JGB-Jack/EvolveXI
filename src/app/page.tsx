@@ -39,9 +39,9 @@ export default function LandingPage() {
         className="fade-in-step max-w-md text-muted-foreground"
         style={{ animationDelay: "3.6s" }}
       >
-        Built for grassroots football to develop every player and every
-        coach — tools and insights that keep players and parents returning
-        season after season.
+        Built for grassroots football coaches to develop every player — AI
+        training tools, reports and insights that keep players and parents
+        returning season after season.
       </p>
       <div className="flex gap-3">
         <Button render={<Link href="/register" />} size="lg">
