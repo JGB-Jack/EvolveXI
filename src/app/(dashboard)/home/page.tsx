@@ -50,6 +50,7 @@ export default async function HomePage() {
         )
         .eq("team_id", team!.id)
         .is("completed_at", null)
+        .is("archived_at", null)
         .order("date", { ascending: false }),
       // Each player's ratings from their own most recent completed session -
       // a current-form snapshot rather than an all-time blend, since players
