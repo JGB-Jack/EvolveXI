@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { QuestionBankAccordion } from "@/components/questions/question-bank-accordion";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default async function QuestionBankSettingsPage() {
   const {
@@ -28,6 +31,15 @@ export default async function QuestionBankSettingsPage() {
 
   return (
     <div className="space-y-6">
+      <Button
+        variant="ghost"
+        size="sm"
+        render={<Link href="/settings" />}
+      >
+        <ArrowLeft className="size-4" />
+        Back to settings
+      </Button>
+
       <div>
         <h1 className="text-2xl font-semibold text-foreground">Question bank</h1>
         <p className="text-muted-foreground">
