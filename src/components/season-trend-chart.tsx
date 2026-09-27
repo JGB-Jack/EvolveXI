@@ -11,6 +11,13 @@ import {
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+function formatTick(date: string): string {
+  return new Date(`${date}T00:00:00`).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
 export function SeasonTrendChart({
   data,
   playerFirstName,
@@ -47,9 +54,14 @@ export function SeasonTrendChart({
     <div className="space-y-2">
       <div className="h-40">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+          <LineChart data={data} margin={{ top: 8, right: 12, left: 4, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+            <XAxis
+              dataKey="date"
+              tick={{ fontSize: 10 }}
+              interval={0}
+              tickFormatter={formatTick}
+            />
             <YAxis domain={[0, 5]} tick={{ fontSize: 10 }} width={20} />
             <Line
               type="monotone"
